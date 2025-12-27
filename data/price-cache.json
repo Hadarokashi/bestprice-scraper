@@ -1,0 +1,3458 @@
+{
+  "4010118455971": {
+    "productId": "75da0149-ab16-4b69-8c70-3579a9bdc17e",
+    "barcode": "4010118455971",
+    "recommendedPrice": 1249,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=860544",
+        "price": 1100,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:45.418Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=860544",
+        "price": 1100,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:45.418Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=860544",
+        "price": 1100,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:45.418Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=860544",
+        "price": 1100,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:45.418Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=860544",
+        "price": 1100,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:45.418Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=860544",
+        "price": 1249,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:45.418Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=860544",
+        "price": 1100,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:45.418Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=860544",
+        "price": 1100,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:45.418Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=860544",
+        "price": 1100,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:45.418Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=860544",
+        "price": 1100,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:45.418Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=860544",
+        "price": 1100,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:45.418Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T12:30:45.420Z"
+  },
+  "4010118011108": {
+    "productId": "82623aa1-8d63-4abf-abb0-941f2bd56e5b",
+    "barcode": "4010118011108",
+    "recommendedPrice": 525,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1258022",
+        "price": 519,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:57.516Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1258022",
+        "price": 525,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:57.516Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אילת דיפו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1258022",
+        "price": 564,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:57.516Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T12:30:57.519Z"
+  },
+  "4010118008535": {
+    "productId": "f7f6ac68-cabe-4220-ba2e-db765e567e0e",
+    "barcode": "4010118008535",
+    "recommendedPrice": 1049,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T12:30:58.935Z"
+  },
+  "4010118472787": {
+    "productId": "2db72d3b-ed2d-49d9-8a96-215d5d19cb09",
+    "barcode": "4010118472787",
+    "recommendedPrice": 919,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 748,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 748.75,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 749,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 749,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 830,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "גיימסטורם",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 849,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 859,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קילומבו kilombo",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 859,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אילת דיפו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 865,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 875,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 748,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 748.75,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 749,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 749,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 830,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "גיימסטורם",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 849,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:21.601Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:19:21.604Z"
+  },
+  "4010118483660": {
+    "productId": "d7049f49-adb8-4a1b-a26c-255cbb03b3dc",
+    "barcode": "4010118483660",
+    "recommendedPrice": 859,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927732",
+        "price": 740,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:23.031Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927732",
+        "price": 740,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:23.031Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927732",
+        "price": 760,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:23.031Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927732",
+        "price": 810,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:23.031Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927732",
+        "price": 830,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:23.031Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "גיימסטורם",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927732",
+        "price": 849,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:23.031Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927732",
+        "price": 859,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:23.031Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927732",
+        "price": 859,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:23.031Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קילומבו kilombo",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927732",
+        "price": 859,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:23.031Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927732",
+        "price": 740,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:23.031Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927732",
+        "price": 740,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:23.031Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927732",
+        "price": 760,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:23.031Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:19:23.036Z"
+  },
+  "4010118474743": {
+    "productId": "a47822d0-da87-4118-bc0f-890a5740bf6c",
+    "barcode": "4010118474743",
+    "recommendedPrice": 859,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 748,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 748.75,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 749,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 749,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 830,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "גיימסטורם",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 849,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 859,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קילומבו kilombo",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 859,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אילת דיפו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 865,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 875,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 748,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 748.75,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 749,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=501789",
+        "price": 749,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:19:24.472Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:19:24.474Z"
+  },
+  "4010118459047": {
+    "productId": "db9decff-8a73-4752-8d0b-51c9e52bde5a",
+    "barcode": "4010118459047",
+    "recommendedPrice": 859,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 719,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 719,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 740,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 760,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 810,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 830,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "גיימסטורם",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 849,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 859,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 859,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קילומבו kilombo",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 859,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "טרטל ציוד הגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 859,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 719,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 719,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 740,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=927731",
+        "price": 760,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:52.162Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:15:52.165Z"
+  },
+  "4010118490972": {
+    "productId": "ae488c9d-41ff-40de-9242-3a90adfaf27b",
+    "barcode": "4010118490972",
+    "recommendedPrice": 1049,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:18:43.922Z"
+  },
+  "4010118718175": {
+    "productId": "6785a101-54f8-4f4a-93d7-ff308ddcfb6d",
+    "barcode": "4010118718175",
+    "recommendedPrice": 899,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1258020",
+        "price": 1040,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:55.078Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1258020",
+        "price": 1049,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:55.078Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1258020",
+        "price": 1160,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:55.078Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:15:55.080Z"
+  },
+  "4010118459030": {
+    "productId": "d20f0cc3-f28b-4db6-a55c-a139afab8195",
+    "barcode": "4010118459030",
+    "recommendedPrice": 919,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1258020",
+        "price": 1040,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:56.519Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1258020",
+        "price": 1049,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:56.519Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1258020",
+        "price": 1160,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:56.519Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:15:56.521Z"
+  },
+  "4010118737701": {
+    "productId": "3a674a41-5792-4422-9f3e-3ce6e678bfec",
+    "barcode": "4010118737701",
+    "recommendedPrice": 1249,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1134738",
+        "price": 1079,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:57.847Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1134738",
+        "price": 1079,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:57.847Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1134738",
+        "price": 1080,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:57.847Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1134738",
+        "price": 1080,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:57.847Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1134738",
+        "price": 1220,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:57.847Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קילומבו kilombo",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1134738",
+        "price": 1249,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:57.847Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1134738",
+        "price": 1249,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:57.847Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1134738",
+        "price": 1079,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:57.847Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1134738",
+        "price": 1079,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:57.847Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1134738",
+        "price": 1080,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:57.847Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1134738",
+        "price": 1080,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:57.847Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:15:57.849Z"
+  },
+  "4010118729904": {
+    "productId": "91780f13-aefa-4f82-8e6f-14b9e9f0d92d",
+    "barcode": "4010118729904",
+    "recommendedPrice": 1249,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1025,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1048.98,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1075,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1150,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1160,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1220,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "גיימסטורם",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1249,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קילומבו kilombo",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1249,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "טרטל ציוד הגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1249,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1249,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1025,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1048.98,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1075,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1150,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1129756",
+        "price": 1160,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:15:59.254Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:15:59.255Z"
+  },
+  "4010118001543": {
+    "productId": "95df25e3-b6f5-4b19-8953-4ceefc32e90a",
+    "barcode": "4010118001543",
+    "recommendedPrice": 1049,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1116977",
+        "price": 859,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:04.542Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1116977",
+        "price": 960,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:04.542Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1116977",
+        "price": 960,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:04.542Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1116977",
+        "price": 1040,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:04.543Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1116977",
+        "price": 1049,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:04.543Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1116977",
+        "price": 1160,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:04.543Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1116977",
+        "price": 859,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:04.542Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1116977",
+        "price": 960,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:04.542Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1116977",
+        "price": 960,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:04.542Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:16:04.546Z"
+  },
+  "4010118008528": {
+    "productId": "da91ae13-f757-49b5-82d6-3e98cc516cfa",
+    "barcode": "4010118008528",
+    "recommendedPrice": 1049,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1258020",
+        "price": 1040,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:05.656Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1258020",
+        "price": 1049,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:05.656Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1258020",
+        "price": 1160,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:05.656Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:05.658Z"
+  },
+  "4010118001536": {
+    "productId": "d96b5c94-fab5-47cb-97d7-b7260840ec8c",
+    "barcode": "4010118001536",
+    "recommendedPrice": 2799,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:07.827Z"
+  },
+  "4010118001550": {
+    "productId": "62abacc7-56af-4939-9a7d-9064232bb2e3",
+    "barcode": "4010118001550",
+    "recommendedPrice": 2799,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:10.050Z"
+  },
+  "4010118003547": {
+    "productId": "0718b6ce-addb-484b-8bea-3b625b1948e8",
+    "barcode": "4010118003547",
+    "recommendedPrice": 2449,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:12.596Z"
+  },
+  "4010118007408": {
+    "productId": "fa12518a-7aff-4ce5-a368-f81a075d9b1d",
+    "barcode": "4010118007408",
+    "recommendedPrice": 2449,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:15.515Z"
+  },
+  "4010118718359": {
+    "productId": "e17cac4e-3fd7-4e05-abfd-eb0d69ecefd0",
+    "barcode": "4010118718359",
+    "recommendedPrice": 579,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:40.275Z"
+  },
+  "4010118730092": {
+    "productId": "3f598ffd-5158-422f-9c93-6a7264a6f919",
+    "barcode": "4010118730092",
+    "recommendedPrice": 2399,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 530,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מרכז הסאונד",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 541,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 545,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 560,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קילומבו kilombo",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 569,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 570,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 575,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קאמרה סיטי",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 590,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "טרטל ציוד הגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 594,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 595,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "ארליך",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 595,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אילת דיפו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 600,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 605,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 618,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שרון רייכטר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 625,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "יוגנד פוטו וידאו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 664,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "IHP מחשבים וסלולר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 770,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שרון רייכטר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 970,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1500,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שרון רייכטר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1550,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1590,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1790,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1790,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "ריקוטק",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1855,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "טרטל ציוד הגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1960,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 2525,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 2939,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 2990,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 3400,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אילת דיפו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 3579,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 3749.97,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שרון רייכטר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 3750,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 3799,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "טרטל ציוד הגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 7507.5,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שרון רייכטר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 7950,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שרון רייכטר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 8220,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שרון רייכטר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 9847,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 22800,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שרון רייכטר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 24140,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 530,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מרכז הסאונד",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 541,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 545,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 560,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קילומבו kilombo",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 569,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 570,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 575,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קאמרה סיטי",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 590,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "טרטל ציוד הגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 594,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 595,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "ארליך",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 595,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אילת דיפו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 600,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 605,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 618,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שרון רייכטר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 625,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "יוגנד פוטו וידאו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 664,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "IHP מחשבים וסלולר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 770,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שרון רייכטר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 970,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1500,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שרון רייכטר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1550,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "עולם המוזיקה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1590,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1790,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1790,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "ריקוטק",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1855,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "טרטל ציוד הגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=715246",
+        "price": 1960,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:41.385Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:16:41.388Z"
+  },
+  "4010118730184": {
+    "productId": "97db92f4-addc-4ec9-b4f2-2c87f08a5c31",
+    "barcode": "4010118730184",
+    "recommendedPrice": 1899,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216591",
+        "price": 1689,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:42.504Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216591",
+        "price": 1690,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:42.504Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216591",
+        "price": 1899,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:42.504Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216591",
+        "price": 1689,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:42.504Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216591",
+        "price": 1690,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:42.504Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:16:42.507Z"
+  },
+  "4010118730160": {
+    "productId": "4fe75bcb-84f0-4083-9fdb-71a3917e3b70",
+    "barcode": "4010118730160",
+    "recommendedPrice": 4159,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1179840",
+        "price": 33670,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:48.548Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אילת דיפו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1179840",
+        "price": 34338,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:48.548Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1179840",
+        "price": 34408,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:48.548Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שרון רייכטר",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1179840",
+        "price": 34459,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:48.548Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:48.550Z"
+  },
+  "4010118730214": {
+    "productId": "f222c9e2-215a-4244-bf2a-3d0e4f26874a",
+    "barcode": "4010118730214",
+    "recommendedPrice": 3099,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1066431",
+        "price": 3099,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:49.594Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1066431",
+        "price": 3099,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:49.594Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1066431",
+        "price": 3699.59,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:49.594Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1066431",
+        "price": 3735,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:49.594Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1066431",
+        "price": 5999,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:49.594Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:49.597Z"
+  },
+  "4010118730238": {
+    "productId": "4082a89b-de94-44c8-8e85-db240289fb50",
+    "barcode": "4010118730238",
+    "recommendedPrice": 5999,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:51.410Z"
+  },
+  "4010118730269": {
+    "productId": "6ac05d9a-3ffb-4543-aec8-2c0f2e10c0aa",
+    "barcode": "4010118730269",
+    "recommendedPrice": 3299,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1066430",
+        "price": 3299,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:52.482Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1066430",
+        "price": 3299,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:52.483Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:52.485Z"
+  },
+  "4010118707247": {
+    "productId": "c5c5caf5-57e9-496e-8afd-7650653b55cf",
+    "barcode": "4010118707247",
+    "recommendedPrice": 259,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "ל- פון קום",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1218928",
+        "price": 212,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:54.831Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1218928",
+        "price": 214,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:54.831Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1218928",
+        "price": 262,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:54.831Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1218928",
+        "price": 263,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:54.831Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1218928",
+        "price": 308,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:54.831Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "ל- פון קום",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1218928",
+        "price": 212,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:54.831Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1218928",
+        "price": 214,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:54.831Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:16:54.833Z"
+  },
+  "4010118707254": {
+    "productId": "c1033873-97ea-4e22-9abb-18a9a610a5e9",
+    "barcode": "4010118707254",
+    "recommendedPrice": 559,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216584",
+        "price": 521,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:55.931Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216584",
+        "price": 609,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:55.931Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216584",
+        "price": 609,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:55.931Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:55.933Z"
+  },
+  "4010118707261": {
+    "productId": "23279f7f-301e-4a31-949a-21bc9f6aa05c",
+    "barcode": "4010118707261",
+    "recommendedPrice": 609,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216584",
+        "price": 521,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:57.017Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216584",
+        "price": 609,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:57.017Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216584",
+        "price": 609,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:57.017Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216584",
+        "price": 521,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:57.017Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:16:57.019Z"
+  },
+  "4010118707292": {
+    "productId": "f1085be2-9aaf-4597-8203-74e48f0c6152",
+    "barcode": "4010118707292",
+    "recommendedPrice": 1059,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1158110",
+        "price": 850,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:58.080Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1158110",
+        "price": 895,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:58.080Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1158110",
+        "price": 895,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:58.080Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1158110",
+        "price": 850,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:58.080Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1158110",
+        "price": 895,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:58.080Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1158110",
+        "price": 895,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:58.080Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:16:58.082Z"
+  },
+  "4010118707285": {
+    "productId": "bc38a7fc-c31c-4ea4-a75a-941598e6bf00",
+    "barcode": "4010118707285",
+    "recommendedPrice": 1049,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:59.346Z"
+  },
+  "4010118708428": {
+    "productId": "6292a3da-263c-4ae8-bba9-3d1881a40eda",
+    "barcode": "4010118708428",
+    "recommendedPrice": 499,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "ל- פון קום",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1218930",
+        "price": 419,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:00.565Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1218930",
+        "price": 420,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:00.565Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1218930",
+        "price": 499,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:00.565Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1218930",
+        "price": 1407,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:00.565Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "ל- פון קום",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1218930",
+        "price": 419,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:00.565Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1218930",
+        "price": 420,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:00.565Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:17:00.570Z"
+  },
+  "4010118710384": {
+    "productId": "7a570a4e-8fc3-4531-bc27-ac9745653434",
+    "barcode": "4010118710384",
+    "recommendedPrice": 1299,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216590",
+        "price": 1227,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:02.456Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:02.458Z"
+  },
+  "4010118707018": {
+    "productId": "685b79ad-219b-443c-82e4-63c12adb668a",
+    "barcode": "4010118707018",
+    "recommendedPrice": 899,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216586",
+        "price": 609.95,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:04.545Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216586",
+        "price": 610,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:04.545Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216586",
+        "price": 899,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:04.545Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216586",
+        "price": 609.95,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:04.545Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216586",
+        "price": 610,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:04.545Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:17:04.547Z"
+  },
+  "4010118707025": {
+    "productId": "f82cf15f-ff1f-4cb8-acee-c3c5fded02e9",
+    "barcode": "4010118707025",
+    "recommendedPrice": 899,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:05.797Z"
+  },
+  "4010118717901": {
+    "productId": "c081b514-8769-4355-9b1e-a21810f667e8",
+    "barcode": "4010118717901",
+    "recommendedPrice": 1299,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:07.827Z"
+  },
+  "4010118708992": {
+    "productId": "2a2a6b17-0db6-47b3-9d82-72abe9e40b53",
+    "barcode": "4010118708992",
+    "recommendedPrice": 1399,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216589",
+        "price": 1060,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:08.913Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216589",
+        "price": 1060,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:08.913Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216589",
+        "price": 1399,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:08.913Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216589",
+        "price": 4733,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:08.913Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216589",
+        "price": 1060,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:08.913Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216589",
+        "price": 1060,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:08.913Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:17:08.915Z"
+  },
+  "4010118727689": {
+    "productId": "55057fc9-eb11-492a-874e-43fe2b826f20",
+    "barcode": "4010118727689",
+    "recommendedPrice": 3699,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216592",
+        "price": 2665,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:09.969Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216592",
+        "price": 3678.8,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:09.969Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216592",
+        "price": 4773,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:09.969Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216592",
+        "price": 2665,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:09.969Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:17:09.972Z"
+  },
+  "4010118727719": {
+    "productId": "92756d55-7262-4da0-93ce-619225a20b20",
+    "barcode": "4010118727719",
+    "recommendedPrice": 5899,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216764",
+        "price": 4260,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:11.197Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216764",
+        "price": 4260,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:11.197Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:17:11.200Z"
+  },
+  "4010118737176": {
+    "productId": "3f3f5d8d-21fc-4a1f-a614-80909ddddf0b",
+    "barcode": "4010118737176",
+    "recommendedPrice": 639,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216582",
+        "price": 520,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:12.543Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216582",
+        "price": 520,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:12.543Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216582",
+        "price": 570,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:12.543Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216582",
+        "price": 639,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:12.543Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216582",
+        "price": 520,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:12.543Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216582",
+        "price": 520,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:12.543Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216582",
+        "price": 570,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:12.543Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:17:12.546Z"
+  },
+  "4010118707155": {
+    "productId": "0fa4ccbd-df42-46a6-a27d-50a5c01585f7",
+    "barcode": "4010118707155",
+    "recommendedPrice": 689,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216583",
+        "price": 530,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:13.571Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216583",
+        "price": 568,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:13.571Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216583",
+        "price": 689,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:13.571Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216583",
+        "price": 530,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:13.571Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1216583",
+        "price": 568,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:13.571Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:17:13.574Z"
+  },
+  "4010118728464": {
+    "productId": "556f6687-5f97-4985-bcd8-ad51ab05d6b0",
+    "barcode": "4010118728464",
+    "recommendedPrice": 149,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:14.662Z"
+  },
+  "4010118728518": {
+    "productId": "b16ccb83-6596-48d7-89cf-8e5777a8e167",
+    "barcode": "4010118728518",
+    "recommendedPrice": 411,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:16.360Z"
+  },
+  "4010118728495": {
+    "productId": "789c3f14-a3f8-4f29-b008-708fce3bf8f5",
+    "barcode": "4010118728495",
+    "recommendedPrice": 459,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:16.918Z"
+  },
+  "4010118934780": {
+    "productId": "f2f3cdd6-c975-47bb-8a30-5c867b0e4b9f",
+    "barcode": "4010118934780",
+    "recommendedPrice": 119,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:18.041Z"
+  },
+  "4010118934797": {
+    "productId": "faa4e86f-4076-4d01-9759-441a51e343c7",
+    "barcode": "4010118934797",
+    "recommendedPrice": 119,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:18.597Z"
+  },
+  "4010118710728": {
+    "productId": "0666a51c-0681-4b2b-83ca-c2501801e5c5",
+    "barcode": "4010118710728",
+    "recommendedPrice": 219,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:19.719Z"
+  },
+  "4010118718977": {
+    "productId": "2cd6a98e-e3f9-41e2-a366-2dc25b005630",
+    "barcode": "4010118718977",
+    "recommendedPrice": 159,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:20.980Z"
+  },
+  "4010118004223": {
+    "productId": "eb6c8012-7b57-4132-96ef-becdc494998b",
+    "barcode": "4010118004223",
+    "recommendedPrice": 119,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:23.959Z"
+  },
+  "4010118004193": {
+    "productId": "e58b332d-09d1-4c00-85b5-0122d029b6ec",
+    "barcode": "4010118004193",
+    "recommendedPrice": 119,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:24.959Z"
+  },
+  "4010118004490": {
+    "productId": "6c03c104-be92-4512-858f-2d5cc677d75d",
+    "barcode": "4010118004490",
+    "recommendedPrice": 27,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "טאצ' סטור",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 465,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אי-ליין",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 469,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "Best Cell Celular",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 470,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מובייל לנד",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 472,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "הייטק מובייל",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 474,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "הצלצול",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 477,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מובייל שופ",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 489,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אייפרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 499,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שופיפס-Shopips",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 509,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "גיימסטורם",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 529,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אל סי דיל",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 535,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "Zol4u - זול פור יו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 536,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אילת דיפו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 613,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סל-טק",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 634,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אנג'וי סטיק",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 679,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "זיגזג 2000",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 749,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "טופ סלולר אונליין",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 789,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "או אם סי מחשבים צפון",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 924,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:17:26.994Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:26.997Z"
+  },
+  "4010118917707": {
+    "productId": "608c4739-1b22-4309-9a02-40e77aae3d9b",
+    "barcode": "4010118917707",
+    "recommendedPrice": 209,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:27.522Z"
+  },
+  "4010118916328": {
+    "productId": "c77f5c41-1f98-4fc1-9aeb-7ff37201b22a",
+    "barcode": "4010118916328",
+    "recommendedPrice": 209,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:28.068Z"
+  },
+  "4010118004308": {
+    "productId": "cf34c386-cb82-402f-a95d-551acfbaa9ec",
+    "barcode": "4010118004308",
+    "recommendedPrice": 269,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:28.962Z"
+  },
+  "4010118101908": {
+    "productId": "f807fc18-d480-4f5e-9edd-88f25f47ef14",
+    "barcode": "4010118101908",
+    "recommendedPrice": 249,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:29.963Z"
+  },
+  "4010118442070": {
+    "productId": "3e0599a6-1b1f-47d9-b19e-d89ea11b4d59",
+    "barcode": "4010118442070",
+    "recommendedPrice": 229,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:38.092Z"
+  },
+  "4010118482151": {
+    "productId": "6e9b3daf-a13c-4913-999b-82e864e991b7",
+    "barcode": "4010118482151",
+    "recommendedPrice": 249,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:38.959Z"
+  },
+  "4010118407192": {
+    "productId": "5a4dbf33-b101-43f9-8890-8466bc9d7079",
+    "barcode": "4010118407192",
+    "recommendedPrice": 249,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:39.959Z"
+  },
+  "4010118727955": {
+    "productId": "e4837701-24d7-42f0-b057-c46224e71c9c",
+    "barcode": "4010118727955",
+    "recommendedPrice": 115,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:45.862Z"
+  },
+  "4010118727931": {
+    "productId": "6e7c511a-5afc-4239-99e0-926bb0ea8f22",
+    "barcode": "4010118727931",
+    "recommendedPrice": 149,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:48.847Z"
+  },
+  "4010118419089": {
+    "productId": "9f6bb680-a575-4225-bc48-e061c908f0b3",
+    "barcode": "4010118419089",
+    "recommendedPrice": 149,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:53.892Z"
+  },
+  "4010118111242": {
+    "productId": "e9efe684-1186-4aef-9081-4bdaa03dddbe",
+    "barcode": "4010118111242",
+    "recommendedPrice": 119,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:56.937Z"
+  },
+  "4010118421464": {
+    "productId": "d32e71b8-269c-429f-82c9-b83f50c42b40",
+    "barcode": "4010118421464",
+    "recommendedPrice": 1249,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=824308",
+        "price": 903,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:43.386Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=824308",
+        "price": 970,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:43.386Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=824308",
+        "price": 970,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:43.386Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=824308",
+        "price": 971,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:43.386Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "HeadSound",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=824308",
+        "price": 1190,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:43.386Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "לבמה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=824308",
+        "price": 1249,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:43.386Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "נקסט פרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=824308",
+        "price": 903,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:43.386Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מג'יקל נוטס",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=824308",
+        "price": 970,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:43.386Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "דיאז",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=824308",
+        "price": 970,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:43.386Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סיגנאל מעבדות",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=824308",
+        "price": 971,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:43.386Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T12:30:43.388Z"
+  },
+  "4010118442841": {
+    "productId": "c0f2ca6a-6c8f-43a8-9d71-8ea72db94922",
+    "barcode": "4010118442841",
+    "recommendedPrice": 1249,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1173149",
+        "price": 1085,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:46.501Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "קול המוסיקה כלי נגינה והגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1173149",
+        "price": 1085,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T12:30:46.501Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T12:30:46.503Z"
+  },
+  "4010118445170": {
+    "productId": "fcf1a7d4-df70-4647-823e-52b24704d33a",
+    "barcode": "4010118445170",
+    "recommendedPrice": 1049,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T12:33:44.119Z"
+  },
+  "4010118007378": {
+    "productId": "6504681b-8483-40d1-95f5-9d3ade0dd074",
+    "barcode": "4010118007378",
+    "recommendedPrice": 2449,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:18.691Z"
+  },
+  "4010118007415": {
+    "productId": "928a36ac-02cb-4154-8117-8358889efbfe",
+    "barcode": "4010118007415",
+    "recommendedPrice": 2449,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:20.744Z"
+  },
+  "4010118402951": {
+    "productId": "9b7bbe87-19f8-4074-af83-d5c16049e03a",
+    "barcode": "4010118402951",
+    "recommendedPrice": 1449,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:25.220Z"
+  },
+  "4010118402975": {
+    "productId": "ad896bd3-7e84-46db-8a42-709372005c2f",
+    "barcode": "4010118402975",
+    "recommendedPrice": 1799,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:29.307Z"
+  },
+  "4010118701597": {
+    "productId": "f633ee43-caf4-426b-902b-7432965e4edb",
+    "barcode": "4010118701597",
+    "recommendedPrice": 1799,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:32.389Z"
+  },
+  "4010118701610": {
+    "productId": "fbc7c283-0200-47f7-83a3-0239d697ec4c",
+    "barcode": "4010118701610",
+    "recommendedPrice": 1999,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:34.636Z"
+  },
+  "4010118701467": {
+    "productId": "28eb40bf-c003-489f-bfe1-a1ac1798a567",
+    "barcode": "4010118701467",
+    "recommendedPrice": 2150,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:36.969Z"
+  },
+  "4010118497896": {
+    "productId": "6ed4ea0b-8a4d-46b1-890a-4c3456d0c7aa",
+    "barcode": "4010118497896",
+    "recommendedPrice": 2309,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:16:38.851Z"
+  },
+  "4010118730177": {
+    "productId": "0edb2342-b144-436f-b8de-b00ce0b4e8cd",
+    "barcode": "4010118730177",
+    "recommendedPrice": 5349,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "טרטל ציוד הגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1122636",
+        "price": 124,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:45.650Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "טרטל ציוד הגברה",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1122636",
+        "price": 124,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:45.650Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:16:45.653Z"
+  },
+  "4010118730283": {
+    "productId": "8640aa49-cbc4-4902-b854-18a84a86ad09",
+    "barcode": "4010118730283",
+    "recommendedPrice": 1199,
+    "threshold": 7,
+    "providers": [
+      {
+        "providerName": "טאצ' סטור",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 465,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אי-ליין",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 469,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "Best Cell Celular",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 470,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מובייל לנד",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 472,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "הייטק מובייל",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 474,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "הצלצול",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 477,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מובייל שופ",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 489,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אייפרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 499,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שופיפס-Shopips",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 509,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "גיימסטורם",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 529,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אל סי דיל",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 535,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "Zol4u - זול פור יו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 536,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אילת דיפו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 613,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סל-טק",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 634,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אנג'וי סטיק",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 679,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "זיגזג 2000",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 749,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "טופ סלולר אונליין",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 789,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "או אם סי מחשבים צפון",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 924,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      }
+    ],
+    "flaggedProviders": [
+      {
+        "providerName": "טאצ' סטור",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 465,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אי-ליין",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 469,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "Best Cell Celular",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 470,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מובייל לנד",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 472,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "הייטק מובייל",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 474,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "הצלצול",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 477,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "מובייל שופ",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 489,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אייפרו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 499,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "שופיפס-Shopips",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 509,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "גיימסטורם",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 529,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אל סי דיל",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 535,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "Zol4u - זול פור יו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 536,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אילת דיפו",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 613,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "סל-טק",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 634,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "אנג'וי סטיק",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 679,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "זיגזג 2000",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 749,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "טופ סלולר אונליין",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 789,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      },
+      {
+        "providerName": "או אם סי מחשבים צפון",
+        "providerUrl": "https://www.zap.co.il/model.aspx?modelid=1228604",
+        "price": 924,
+        "currency": "ILS",
+        "lastUpdated": "2025-12-27T11:16:53.685Z",
+        "source": "zap"
+      }
+    ],
+    "lastSearched": "2025-12-27T11:16:53.688Z"
+  },
+  "4010118728457": {
+    "productId": "6f1a896b-f10d-4f8c-b9cc-f6a60884502d",
+    "barcode": "4010118728457",
+    "recommendedPrice": 139,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:14.093Z"
+  },
+  "4010118728471": {
+    "productId": "e0a72f10-6d15-43d1-ae9e-550f76ab47ac",
+    "barcode": "4010118728471",
+    "recommendedPrice": 159,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:15.228Z"
+  },
+  "4010118728488": {
+    "productId": "4e173039-a906-4f84-a429-d941eaeeff33",
+    "barcode": "4010118728488",
+    "recommendedPrice": 159,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:15.795Z"
+  },
+  "4010118730450": {
+    "productId": "27969862-b231-43be-a63d-ff49899b8657",
+    "barcode": "4010118730450",
+    "recommendedPrice": 79,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:17.478Z"
+  },
+  "4010118705953": {
+    "productId": "f6583854-249e-4aec-bf5c-0fcf71ba8c43",
+    "barcode": "4010118705953",
+    "recommendedPrice": 69,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:19.161Z"
+  },
+  "4010118717963": {
+    "productId": "15f829fa-b089-4287-b2e4-e94514d2b6c2",
+    "barcode": "4010118717963",
+    "recommendedPrice": 219,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:20.270Z"
+  },
+  "4010118004209": {
+    "productId": "92bd8393-ab2b-4e84-9828-80cfea2706b5",
+    "barcode": "4010118004209",
+    "recommendedPrice": 119,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:21.963Z"
+  },
+  "4010118004216": {
+    "productId": "7316b388-595f-4b2d-b96c-7bed49dcded4",
+    "barcode": "4010118004216",
+    "recommendedPrice": 119,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:22.959Z"
+  },
+  "4010118220135": {
+    "productId": "14613e94-eb3c-4b62-9fa3-97f503a3da0a",
+    "barcode": "4010118220135",
+    "recommendedPrice": 349,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:30.962Z"
+  },
+  "4010118406539": {
+    "productId": "92b53b67-c205-4e56-a2d3-4d9c44df5dd6",
+    "barcode": "4010118406539",
+    "recommendedPrice": 349,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:31.952Z"
+  },
+  "4010118431579": {
+    "productId": "bf38a620-0a6d-4749-995f-feea5369daa2",
+    "barcode": "4010118431579",
+    "recommendedPrice": 249,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:32.960Z"
+  },
+  "4010118445309": {
+    "productId": "2a4e9c8f-ed7d-4f92-9748-f30a67bb5b37",
+    "barcode": "4010118445309",
+    "recommendedPrice": 409,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:33.962Z"
+  },
+  "4010118445897": {
+    "productId": "4bf359df-7f85-4dd1-be70-032eab4f1918",
+    "barcode": "4010118445897",
+    "recommendedPrice": 449,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:34.964Z"
+  },
+  "4010118445316": {
+    "productId": "281676d0-c981-418f-9dbc-39283acc2e68",
+    "barcode": "4010118445316",
+    "recommendedPrice": 449,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:35.962Z"
+  },
+  "4010118111464": {
+    "productId": "06ad38b8-d5e7-42a5-873f-d2879c53656c",
+    "barcode": "4010118111464",
+    "recommendedPrice": 29,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:40.954Z"
+  },
+  "4010118727948": {
+    "productId": "592a224a-8bb6-4e50-b9b6-ad240977392c",
+    "barcode": "4010118727948",
+    "recommendedPrice": 115,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:42.899Z"
+  },
+  "4010118727917": {
+    "productId": "b4960fa7-6934-48ae-9028-ad2c262e0a01",
+    "barcode": "4010118727917",
+    "recommendedPrice": 115,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:47.347Z"
+  },
+  "4010118459351": {
+    "productId": "6abf5e2c-1d98-43fc-9c3c-5d2215710515",
+    "barcode": "4010118459351",
+    "recommendedPrice": 286,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:50.328Z"
+  },
+  "4010118436604": {
+    "productId": "a348fc7f-47a1-46a6-ab5b-e386254ea489",
+    "barcode": "4010118436604",
+    "recommendedPrice": 99,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:52.453Z"
+  },
+  "4010118465314": {
+    "productId": "c19ba352-03c7-497e-8a7f-54f11e463dc6",
+    "barcode": "4010118465314",
+    "recommendedPrice": 99,
+    "threshold": 7,
+    "providers": [],
+    "flaggedProviders": [],
+    "lastSearched": "2025-12-27T11:17:55.435Z"
+  }
+}

@@ -1,0 +1,752 @@
+{
+  "products": [
+    {
+      "id": "d32e71b8-269c-429f-82c9-b83f50c42b40",
+      "name": "DT 100 400 Black",
+      "sku": "421464",
+      "barcode": "4010118421464",
+      "recommendedPrice": 1249
+    },
+    {
+      "id": "75da0149-ab16-4b69-8c70-3579a9bdc17e",
+      "name": "DT 150 250",
+      "sku": "455970",
+      "barcode": "4010118455971",
+      "recommendedPrice": 1249
+    },
+    {
+      "id": "c0f2ca6a-6c8f-43a8-9d71-8ea72db94922",
+      "name": "DT 250 80",
+      "sku": "442844",
+      "barcode": "4010118442841",
+      "recommendedPrice": 1249
+    },
+    {
+      "id": "fcf1a7d4-df70-4647-823e-52b24704d33a",
+      "name": "DT 252 80",
+      "sku": "445177",
+      "barcode": "4010118445170",
+      "recommendedPrice": 1049
+    },
+    {
+      "id": "82623aa1-8d63-4abf-abb0-941f2bd56e5b",
+      "name": "DT 270 PRO",
+      "sku": "1002202",
+      "barcode": "4010118011108",
+      "recommendedPrice": 525
+    },
+    {
+      "id": "f7f6ac68-cabe-4220-ba2e-db765e567e0e",
+      "name": "DJ300 PRO X",
+      "sku": "1001619",
+      "barcode": "4010118008535",
+      "recommendedPrice": 1049
+    },
+    {
+      "id": "2db72d3b-ed2d-49d9-8a96-215d5d19cb09",
+      "name": "DT 770 M 80",
+      "sku": "472786",
+      "barcode": "4010118472787",
+      "recommendedPrice": 919
+    },
+    {
+      "id": "d7049f49-adb8-4a1b-a26c-255cbb03b3dc",
+      "name": "DT 770 PRO 32",
+      "sku": "483664",
+      "barcode": "4010118483660",
+      "recommendedPrice": 859,
+      "salePrice": 482,
+      "consumerSalePrice": 830
+    },
+    {
+      "id": "a47822d0-da87-4118-bc0f-890a5740bf6c",
+      "name": "DT 770 PRO 80",
+      "sku": "474746",
+      "barcode": "4010118474743",
+      "recommendedPrice": 859,
+      "salePrice": 482,
+      "consumerSalePrice": 830
+    },
+    {
+      "id": "db9decff-8a73-4752-8d0b-51c9e52bde5a",
+      "name": "DT 770 PRO 250",
+      "sku": "459046",
+      "barcode": "4010118459047",
+      "recommendedPrice": 859,
+      "salePrice": 482,
+      "consumerSalePrice": 830
+    },
+    {
+      "id": "ae488c9d-41ff-40de-9242-3a90adfaf27b",
+      "name": "DT 880 PRO 250",
+      "sku": "490970",
+      "barcode": "4010118490972",
+      "recommendedPrice": 1049
+    },
+    {
+      "id": "6785a101-54f8-4f4a-93d7-ff308ddcfb6d",
+      "name": "DT 990 PRO 80",
+      "sku": "718173",
+      "barcode": "4010118718175",
+      "recommendedPrice": 899,
+      "salePrice": 482,
+      "consumerSalePrice": 830
+    },
+    {
+      "id": "d20f0cc3-f28b-4db6-a55c-a139afab8195",
+      "name": "DT 990 PRO 250",
+      "sku": "459038",
+      "barcode": "4010118459030",
+      "recommendedPrice": 919,
+      "salePrice": 482,
+      "consumerSalePrice": 830
+    },
+    {
+      "id": "3a674a41-5792-4422-9f3e-3ce6e678bfec",
+      "name": "DT 700 PRO X",
+      "sku": "737704",
+      "barcode": "4010118737701",
+      "recommendedPrice": 1249,
+      "salePrice": 755,
+      "consumerSalePrice": 1160
+    },
+    {
+      "id": "91780f13-aefa-4f82-8e6f-14b9e9f0d92d",
+      "name": "DT 900 PRO X",
+      "sku": "729906",
+      "barcode": "4010118729904",
+      "recommendedPrice": 1249,
+      "salePrice": 755,
+      "consumerSalePrice": 1160
+    },
+    {
+      "id": "95df25e3-b6f5-4b19-8953-4ceefc32e90a",
+      "name": "DT 770 PRO X 48",
+      "sku": "1000302",
+      "barcode": "4010118001543",
+      "recommendedPrice": 1049
+    },
+    {
+      "id": "da91ae13-f757-49b5-82d6-3e98cc516cfa",
+      "name": "DT 990 PRO X 48",
+      "sku": "1001629",
+      "barcode": "4010118008528",
+      "recommendedPrice": 1049
+    },
+    {
+      "id": "d96b5c94-fab5-47cb-97d7-b7260840ec8c",
+      "name": "DT 1770 PRO MK II",
+      "sku": "1000310",
+      "barcode": "4010118001536",
+      "recommendedPrice": 2799
+    },
+    {
+      "id": "62abacc7-56af-4939-9a7d-9064232bb2e3",
+      "name": "DT 1990 PRO MK II",
+      "sku": "1000303",
+      "barcode": "4010118001550",
+      "recommendedPrice": 2799
+    },
+    {
+      "id": "0718b6ce-addb-484b-8bea-3b625b1948e8",
+      "name": "DT 70 IE Mixing Critical Listening",
+      "sku": "1000640",
+      "barcode": "4010118003547",
+      "recommendedPrice": 2449,
+      "category": "Proffesional In-Ear Monitoring Headphones"
+    },
+    {
+      "id": "fa12518a-7aff-4ce5-a368-f81a075d9b1d",
+      "name": "DT 71 IE Drum Bass",
+      "sku": "1001387",
+      "barcode": "4010118007408",
+      "recommendedPrice": 2449,
+      "category": "Proffesional In-Ear Monitoring Headphones"
+    },
+    {
+      "id": "6504681b-8483-40d1-95f5-9d3ade0dd074",
+      "name": "DT 73 IE Classic Instruments Keys",
+      "sku": "1001386",
+      "barcode": "4010118007378",
+      "recommendedPrice": 2449,
+      "category": "Proffesional In-Ear Monitoring Headphones"
+    },
+    {
+      "id": "928a36ac-02cb-4154-8117-8358889efbfe",
+      "name": "DT 72 IE Guitar Voice",
+      "sku": "1001379",
+      "barcode": "4010118007415",
+      "recommendedPrice": 2449,
+      "category": "Proffesional In-Ear Monitoring Headphones"
+    },
+    {
+      "id": "9b7bbe87-19f8-4074-af83-d5c16049e03a",
+      "name": "DT 108 200 50 black",
+      "sku": "402958",
+      "barcode": "4010118402951",
+      "recommendedPrice": 1449,
+      "category": "Professional Headsets"
+    },
+    {
+      "id": "ad896bd3-7e84-46db-8a42-709372005c2f",
+      "name": "DT 109 200 50 black",
+      "sku": "402974",
+      "barcode": "4010118402975",
+      "recommendedPrice": 1799,
+      "category": "Professional Headsets"
+    },
+    {
+      "id": "f633ee43-caf4-426b-902b-7432965e4edb",
+      "name": "DT 280 MK II 200 80",
+      "sku": "701599",
+      "barcode": "4010118701597",
+      "recommendedPrice": 1799,
+      "category": "Professional Headsets"
+    },
+    {
+      "id": "fbc7c283-0200-47f7-83a3-0239d697ec4c",
+      "name": "DT 290 MK II 200 80",
+      "sku": "701610",
+      "barcode": "4010118701610",
+      "recommendedPrice": 1999,
+      "category": "Professional Headsets"
+    },
+    {
+      "id": "28eb40bf-c003-489f-bfe1-a1ac1798a567",
+      "name": "DT 297 PV MK II 80",
+      "sku": "701467",
+      "barcode": "4010118701467",
+      "recommendedPrice": 2150,
+      "category": "Professional Headsets"
+    },
+    {
+      "id": "6ed4ea0b-8a4d-46b1-890a-4c3456d0c7aa",
+      "name": "DT 797 PV 250",
+      "sku": "497894",
+      "barcode": "4010118497896",
+      "recommendedPrice": 2309,
+      "category": "Professional Headsets"
+    },
+    {
+      "id": "e17cac4e-3fd7-4e05-abfd-eb0d69ecefd0",
+      "name": "M 70 PRO X",
+      "sku": "718351",
+      "barcode": "4010118718359",
+      "recommendedPrice": 579,
+      "category": "Home/Mobile Studio Microphones"
+    },
+    {
+      "id": "3f598ffd-5158-422f-9c93-6a7264a6f919",
+      "name": "M 88",
+      "sku": "730092",
+      "barcode": "4010118730092",
+      "recommendedPrice": 2399,
+      "category": "Home/Mobile Studio Microphones"
+    },
+    {
+      "id": "97db92f4-addc-4ec9-b4f2-2c87f08a5c31",
+      "name": "M 201",
+      "sku": "730181",
+      "barcode": "4010118730184",
+      "recommendedPrice": 1899,
+      "category": "Home/Mobile Studio Microphones"
+    },
+    {
+      "id": "0edb2342-b144-436f-b8de-b00ce0b4e8cd",
+      "name": "M 130",
+      "sku": "730173",
+      "barcode": "4010118730177",
+      "recommendedPrice": 5349,
+      "category": "Home/Mobile Studio Microphones"
+    },
+    {
+      "id": "4fe75bcb-84f0-4083-9fdb-71a3917e3b70",
+      "name": "M 160",
+      "sku": "730165",
+      "barcode": "4010118730160",
+      "recommendedPrice": 4159,
+      "category": "Home/Mobile Studio Microphones"
+    },
+    {
+      "id": "f222c9e2-215a-4244-bf2a-3d0e4f26874a",
+      "name": "MC 930",
+      "sku": "730211",
+      "barcode": "4010118730214",
+      "recommendedPrice": 3099,
+      "category": "Home/Mobile Studio Microphones"
+    },
+    {
+      "id": "4082a89b-de94-44c8-8e85-db240289fb50",
+      "name": "MC 930 Stereo-Set",
+      "sku": "730238",
+      "barcode": "4010118730238",
+      "recommendedPrice": 5999,
+      "category": "Home/Mobile Studio Microphones"
+    },
+    {
+      "id": "6ac05d9a-3ffb-4543-aec8-2c0f2e10c0aa",
+      "name": "MC 950",
+      "sku": "730262",
+      "barcode": "4010118730269",
+      "recommendedPrice": 3299,
+      "category": "Home/Mobile Studio Microphones"
+    },
+    {
+      "id": "8640aa49-cbc4-4902-b854-18a84a86ad09",
+      "name": "MM 1",
+      "sku": "730289",
+      "barcode": "4010118730283",
+      "recommendedPrice": 1199,
+      "category": "Home/Mobile Studio Microphones"
+    },
+    {
+      "id": "c5c5caf5-57e9-496e-8afd-7650653b55cf",
+      "name": "TG V35 s",
+      "sku": "707244",
+      "barcode": "4010118707247",
+      "recommendedPrice": 259,
+      "category": "TG Vocal Microphones"
+    },
+    {
+      "id": "c1033873-97ea-4e22-9abb-18a9a610a5e9",
+      "name": "TG V50",
+      "sku": "707252",
+      "barcode": "4010118707254",
+      "recommendedPrice": 559,
+      "category": "TG Vocal Microphones"
+    },
+    {
+      "id": "23279f7f-301e-4a31-949a-21bc9f6aa05c",
+      "name": "TG V50 s",
+      "sku": "707260",
+      "barcode": "4010118707261",
+      "recommendedPrice": 609,
+      "category": "TG Vocal Microphones"
+    },
+    {
+      "id": "f1085be2-9aaf-4597-8203-74e48f0c6152",
+      "name": "TG V70",
+      "sku": "707295",
+      "barcode": "4010118707292",
+      "recommendedPrice": 1059,
+      "category": "TG Vocal Microphones"
+    },
+    {
+      "id": "bc38a7fc-c31c-4ea4-a75a-941598e6bf00",
+      "name": "TG V70 s",
+      "sku": "707287",
+      "barcode": "4010118707285",
+      "recommendedPrice": 1049,
+      "category": "TG Vocal Microphones"
+    },
+    {
+      "id": "6292a3da-263c-4ae8-bba9-3d1881a40eda",
+      "name": "TG D35",
+      "sku": "708429",
+      "barcode": "4010118708428",
+      "recommendedPrice": 499,
+      "category": "TG Drum Microphones"
+    },
+    {
+      "id": "7a570a4e-8fc3-4531-bc27-ac9745653434",
+      "name": "TG D35 TRIPLE SET",
+      "sku": "710385",
+      "barcode": "4010118710384",
+      "recommendedPrice": 1299,
+      "category": "TG Drum Microphones"
+    },
+    {
+      "id": "685b79ad-219b-443c-82e4-63c12adb668a",
+      "name": "TG D57",
+      "sku": "707015",
+      "barcode": "4010118707018",
+      "recommendedPrice": 899,
+      "category": "TG Drum Microphones"
+    },
+    {
+      "id": "f82cf15f-ff1f-4cb8-acee-c3c5fded02e9",
+      "name": "TG D58",
+      "sku": "707023",
+      "barcode": "4010118707025",
+      "recommendedPrice": 899,
+      "category": "TG Drum Microphones"
+    },
+    {
+      "id": "c081b514-8769-4355-9b1e-a21810f667e8",
+      "name": "TG D70 MK II",
+      "sku": "717908",
+      "barcode": "4010118717901",
+      "recommendedPrice": 1299,
+      "category": "TG Drum Microphones"
+    },
+    {
+      "id": "2a2a6b17-0db6-47b3-9d82-72abe9e40b53",
+      "name": "TG D71",
+      "sku": "708992",
+      "barcode": "4010118708992",
+      "recommendedPrice": 1399,
+      "category": "TG Drum Microphones"
+    },
+    {
+      "id": "55057fc9-eb11-492a-874e-43fe2b826f20",
+      "name": "TG Drum Set PRO M",
+      "sku": "727687",
+      "barcode": "4010118727689",
+      "recommendedPrice": 3699,
+      "category": "TG Drum Microphones"
+    },
+    {
+      "id": "92756d55-7262-4da0-93ce-619225a20b20",
+      "name": "TG Drum Set PRO L",
+      "sku": "727717",
+      "barcode": "4010118727719",
+      "recommendedPrice": 5899,
+      "category": "TG Drum Microphones"
+    },
+    {
+      "id": "3f3f5d8d-21fc-4a1f-a614-80909ddddf0b",
+      "name": "TG I51",
+      "sku": "737178",
+      "barcode": "4010118737176",
+      "recommendedPrice": 639,
+      "category": "TG Instrumental Microphones"
+    },
+    {
+      "id": "0fa4ccbd-df42-46a6-a27d-50a5c01585f7",
+      "name": "TG I53",
+      "sku": "707155",
+      "barcode": "4010118707155",
+      "recommendedPrice": 689,
+      "category": "TG Instrumental Microphones"
+    },
+    {
+      "id": "6f1a896b-f10d-4f8c-b9cc-f6a60884502d",
+      "name": "PRO X Cable 1.2 m",
+      "sku": "728454",
+      "barcode": "4010118728457",
+      "recommendedPrice": 139,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "556f6687-5f97-4985-bcd8-ad51ab05d6b0",
+      "name": "PRO X Cable 1.8 m",
+      "sku": "728462",
+      "barcode": "4010118728464",
+      "recommendedPrice": 149,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "e0a72f10-6d15-43d1-ae9e-550f76ab47ac",
+      "name": "PRO X Cable 3 m",
+      "sku": "728471",
+      "barcode": "4010118728471",
+      "recommendedPrice": 159,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "4e173039-a906-4f84-a429-d941eaeeff33",
+      "name": "PRO X Coiled Cable",
+      "sku": "728489",
+      "barcode": "4010118728488",
+      "recommendedPrice": 159,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "b16ccb83-6596-48d7-89cf-8e5777a8e167",
+      "name": "PRO X Lightning Cable",
+      "sku": "728519",
+      "barcode": "4010118728518",
+      "recommendedPrice": 411,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "789c3f14-a3f8-4f29-b008-708fce3bf8f5",
+      "name": "PRO X USB-C Cable",
+      "sku": "728497",
+      "barcode": "4010118728495",
+      "recommendedPrice": 459,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "27969862-b231-43be-a63d-ff49899b8657",
+      "name": "PRO X Drawstring Bag black",
+      "sku": "730459",
+      "barcode": "4010118730450",
+      "recommendedPrice": 79,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "f2f3cdd6-c975-47bb-8a30-5c867b0e4b9f",
+      "name": "EDT 700 PRO X",
+      "sku": "934780",
+      "barcode": "4010118934780",
+      "recommendedPrice": 119,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "faa4e86f-4076-4d01-9759-441a51e343c7",
+      "name": "EDT 900 PRO X",
+      "sku": "934798",
+      "barcode": "4010118934797",
+      "recommendedPrice": 119,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "f6583854-249e-4aec-bf5c-0fcf71ba8c43",
+      "name": "DT-Drawstring Bag",
+      "sku": "705950",
+      "barcode": "4010118705953",
+      "recommendedPrice": 69,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "0666a51c-0681-4b2b-83ca-c2501801e5c5",
+      "name": "K 1000.07",
+      "sku": "710725",
+      "barcode": "4010118710728",
+      "recommendedPrice": 219,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "15f829fa-b089-4287-b2e4-e94514d2b6c2",
+      "name": "Hardcase Pro",
+      "sku": "717967",
+      "barcode": "4010118717963",
+      "recommendedPrice": 219,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "2cd6a98e-e3f9-41e2-a366-2dc25b005630",
+      "name": "DT Hard Case",
+      "sku": "718971",
+      "barcode": "4010118718977",
+      "recommendedPrice": 159,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "92bd8393-ab2b-4e84-9828-80cfea2706b5",
+      "name": "EDT 770 V",
+      "sku": "1000886",
+      "barcode": "4010118004209",
+      "recommendedPrice": 119,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "7316b388-595f-4b2d-b96c-7bed49dcded4",
+      "name": "EDT 770 VB",
+      "sku": "1000887",
+      "barcode": "4010118004216",
+      "recommendedPrice": 119,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "eb6c8012-7b57-4132-96ef-becdc494998b",
+      "name": "EDT 990 V",
+      "sku": "1000896",
+      "barcode": "4010118004223",
+      "recommendedPrice": 119,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "e58b332d-09d1-4c00-85b5-0122d029b6ec",
+      "name": "EDT 990 VB",
+      "sku": "1000893",
+      "barcode": "4010118004193",
+      "recommendedPrice": 119,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "6c03c104-be92-4512-858f-2d5cc677d75d",
+      "name": "Basic foam disc set",
+      "sku": "1000953",
+      "barcode": "4010118004490",
+      "recommendedPrice": 27,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "608c4739-1b22-4309-9a02-40e77aae3d9b",
+      "name": "EDT 1770",
+      "sku": "917700",
+      "barcode": "4010118917707",
+      "recommendedPrice": 209,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "c77f5c41-1f98-4fc1-9aeb-7ff37201b22a",
+      "name": "EDT 1770D",
+      "sku": "916323",
+      "barcode": "4010118916328",
+      "recommendedPrice": 209,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "cf34c386-cb82-402f-a95d-551acfbaa9ec",
+      "name": "EDT Hygienepad",
+      "sku": "1000907",
+      "barcode": "4010118004308",
+      "recommendedPrice": 269,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "f807fc18-d480-4f5e-9edd-88f25f47ef14",
+      "name": "K 109.00 - 15 m",
+      "sku": "101907",
+      "barcode": "4010118101908",
+      "recommendedPrice": 249,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "14613e94-eb3c-4b62-9fa3-97f503a3da0a",
+      "name": "K 109.28 - 15 m",
+      "sku": "220132",
+      "barcode": "4010118220135",
+      "recommendedPrice": 349,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "92b53b67-c205-4e56-a2d3-4d9c44df5dd6",
+      "name": "K 109.38 - 15 m",
+      "sku": "406538",
+      "barcode": "4010118406539",
+      "recommendedPrice": 349,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "bf38a620-0a6d-4749-995f-feea5369daa2",
+      "name": "K 190.00 - 15 m",
+      "sku": "431575",
+      "barcode": "4010118431579",
+      "recommendedPrice": 249,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "2a4e9c8f-ed7d-4f92-9748-f30a67bb5b37",
+      "name": "K 190.28 - 15 m",
+      "sku": "445304",
+      "barcode": "4010118445309",
+      "recommendedPrice": 409,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "4bf359df-7f85-4dd1-be70-032eab4f1918",
+      "name": "K 190.40 - 15 m",
+      "sku": "445894",
+      "barcode": "4010118445897",
+      "recommendedPrice": 449,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "281676d0-c981-418f-9dbc-39283acc2e68",
+      "name": "K 190.41 - 15 m",
+      "sku": "445312",
+      "barcode": "4010118445316",
+      "recommendedPrice": 449,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "3e0599a6-1b1f-47d9-b19e-d89ea11b4d59",
+      "name": "WK 250.07",
+      "sku": "442070",
+      "barcode": "4010118442070",
+      "recommendedPrice": 229,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "6e9b3daf-a13c-4913-999b-82e864e991b7",
+      "name": "K 100.07 - 30 m",
+      "sku": "482153",
+      "barcode": "4010118482151",
+      "recommendedPrice": 249,
+      "category": "Accessories Professional Headsets"
+    },
+    {
+      "id": "5a4dbf33-b101-43f9-8890-8466bc9d7079",
+      "name": "EA 19 25",
+      "sku": "407194",
+      "barcode": "4010118407192",
+      "recommendedPrice": 249,
+      "category": "Accessories Stage Microphones"
+    },
+    {
+      "id": "06ad38b8-d5e7-42a5-873f-d2879c53656c",
+      "name": "NR. 216 3 8 A- 5 8I",
+      "sku": "111465",
+      "barcode": "4010118111464",
+      "recommendedPrice": 29,
+      "category": "Accessories Stage Microphones"
+    },
+    {
+      "id": "592a224a-8bb6-4e50-b9b6-ad240977392c",
+      "name": "MA-CL21",
+      "sku": "727946",
+      "barcode": "4010118727948",
+      "recommendedPrice": 115,
+      "category": "Accessories Stage Microphones"
+    },
+    {
+      "id": "e4837701-24d7-42f0-b057-c46224e71c9c",
+      "name": "MA-CL25",
+      "sku": "727954",
+      "barcode": "4010118727955",
+      "recommendedPrice": 115,
+      "category": "Accessories Stage Microphones"
+    },
+    {
+      "id": "b4960fa7-6934-48ae-9028-ad2c262e0a01",
+      "name": "MA-CL29",
+      "sku": "727911",
+      "barcode": "4010118727917",
+      "recommendedPrice": 115,
+      "category": "Accessories Stage Microphones"
+    },
+    {
+      "id": "6e7c511a-5afc-4239-99e0-926bb0ea8f22",
+      "name": "MA-CL36",
+      "sku": "727938",
+      "barcode": "4010118727931",
+      "recommendedPrice": 149,
+      "category": "Accessories Stage Microphones"
+    },
+    {
+      "id": "6abf5e2c-1d98-43fc-9c3c-5d2215710515",
+      "name": "MKV 87",
+      "sku": "459356",
+      "barcode": "4010118459351",
+      "recommendedPrice": 286,
+      "category": "Accessories Stage Microphones"
+    },
+    {
+      "id": "a348fc7f-47a1-46a6-ab5b-e386254ea489",
+      "name": "WS 53 AZ",
+      "sku": "436607",
+      "barcode": "4010118436604",
+      "recommendedPrice": 99,
+      "category": "Accessories Stage Microphones"
+    },
+    {
+      "id": "9f6bb680-a575-4225-bc48-e061c908f0b3",
+      "name": "WS 59 AZ",
+      "sku": "419087",
+      "barcode": "4010118419089",
+      "recommendedPrice": 149,
+      "category": "Accessories Stage Microphones"
+    },
+    {
+      "id": "c19ba352-03c7-497e-8a7f-54f11e463dc6",
+      "name": "WS 97 AZ",
+      "sku": "465313",
+      "barcode": "4010118465314",
+      "recommendedPrice": 99,
+      "category": "Accessories Stage Microphones"
+    },
+    {
+      "id": "e9efe684-1186-4aef-9081-4bdaa03dddbe",
+      "name": "WS 101 AZ",
+      "sku": "111244",
+      "barcode": "4010118111242",
+      "recommendedPrice": 119,
+      "category": "Accessories Stage Microphones"
+    }
+  ],
+  "lastImported": "2025-12-26T16:10:03.464Z"
+}
