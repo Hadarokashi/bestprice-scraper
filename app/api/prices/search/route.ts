@@ -1,39 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { supabase } from '@/lib/supabase';
 import { searchPrices } from '@/lib/price-sources';
-import { PriceCache, PriceComparison, AppSettings, ApiResponse, PriceSource } from '@/lib/types';
-
-const DATA_DIR = path.join(process.cwd(), 'data');
-const PRICE_CACHE_FILE = path.join(DATA_DIR, 'price-cache.json');
-const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
-
-async function ensureDataDir() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-}
-
-async function loadPriceCache(): Promise<PriceCache> {
-  try {
-    const data = await fs.readFile(PRICE_CACHE_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch {
-    return {};
-  }
-}
-
-async function savePriceCache(cache: PriceCache): Promise<void> {
-  await ensureDataDir();
-  await fs.writeFile(PRICE_CACHE_FILE, JSON.stringify(cache, null, 2), 'utf-8');
-}
-
-async function loadSettings(): Promise<AppSettings> {
-  try {
-    const data = await fs.readFile(SETTINGS_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch {
-    return { threshold: 10, priceSource: 'serpapi' };
-  }
-}
+import { PriceComparison, ApiResponse, PriceSource } from '@/lib/types';
 
 // POST /api/prices/search - Search for prices
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<PriceComparison>>> {
@@ -48,31 +16,43 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       );
     }
 
-    // Load settings to get threshold and default source
-    const settings = await loadSettings();
-    const priceSource: PriceSource = source || settings.priceSource;
-    const effectiveApiKey = apiKey || settings.serpApiKey;
+    // Load settings from Supabase
+    const { data: settingsData } = await supabase
+      .from('settings')
+      .select('*')
+      .single();
+
+    const settings = settingsData || { threshold: 10, price_source: 'zap' };
+    const priceSource: PriceSource = source || settings.price_source;
+    const threshold = settings.threshold;
 
     // Search for prices
     const result = await searchPrices(
       { productName, barcode },
       priceSource,
-      effectiveApiKey
+      apiKey
     );
 
     if (!result.success) {
-      return NextResponse.json(
-        { success: false, error: result.error || 'Search failed' },
-        { status: 500 }
-      );
+      // Still save the error to cache
+      const errorComparison: PriceComparison = {
+        productId: productId || barcode,
+        barcode,
+        recommendedPrice: body.recommendedPrice || 0,
+        threshold,
+        providers: [],
+        flaggedProviders: [],
+        lastSearched: new Date().toISOString(),
+        error: result.error,
+      };
+
+      await upsertPriceCache(errorComparison);
+
+      return NextResponse.json({ success: true, data: errorComparison });
     }
 
-    // Load cached data to get recommended price
-    const cache = await loadPriceCache();
-    
-    // Get recommended price from request or existing cache
-    const recommendedPrice = body.recommendedPrice || cache[barcode]?.recommendedPrice || 0;
-    const threshold = settings.threshold;
+    // Get recommended price from request
+    const recommendedPrice = body.recommendedPrice || 0;
 
     // Calculate flagged providers (below threshold)
     const thresholdPrice = recommendedPrice * (1 - threshold / 100);
@@ -89,12 +69,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       lastSearched: new Date().toISOString(),
     };
 
-    // Update cache
-    cache[barcode] = comparison;
-    await savePriceCache(cache);
+    // Update cache in Supabase
+    await upsertPriceCache(comparison);
 
     return NextResponse.json({ success: true, data: comparison });
   } catch (error) {
+    console.error('POST /api/prices/search error:', error);
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -102,3 +82,22 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
   }
 }
 
+async function upsertPriceCache(comparison: PriceComparison): Promise<void> {
+  const { error } = await supabase
+    .from('price_cache')
+    .upsert({
+      barcode: comparison.barcode,
+      product_id: comparison.productId,
+      recommended_price: comparison.recommendedPrice,
+      threshold: comparison.threshold,
+      providers: comparison.providers,
+      flagged_providers: comparison.flaggedProviders,
+      last_searched: comparison.lastSearched,
+      error: comparison.error || null,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'barcode' });
+
+  if (error) {
+    console.error('Error upserting price cache:', error);
+  }
+}

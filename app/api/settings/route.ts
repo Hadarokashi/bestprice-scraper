@@ -1,40 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { supabase } from '@/lib/supabase';
 import { AppSettings, ApiResponse } from '@/lib/types';
-
-const DATA_DIR = path.join(process.cwd(), 'data');
-const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
 
 const DEFAULT_SETTINGS: AppSettings = {
   threshold: 10,
-  priceSource: 'zap', // Default to Zap - free, accurate, reliable
+  priceSource: 'zap',
 };
-
-async function ensureDataDir() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-}
-
-async function loadSettings(): Promise<AppSettings> {
-  try {
-    const data = await fs.readFile(SETTINGS_FILE, 'utf-8');
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(data) };
-  } catch {
-    return DEFAULT_SETTINGS;
-  }
-}
-
-async function saveSettings(settings: AppSettings): Promise<void> {
-  await ensureDataDir();
-  await fs.writeFile(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf-8');
-}
 
 // GET /api/settings - Get current settings
 export async function GET(): Promise<NextResponse<ApiResponse<AppSettings>>> {
   try {
-    const settings = await loadSettings();
+    const { data, error } = await supabase
+      .from('settings')
+      .select('*')
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows
+
+    const settings: AppSettings = data ? {
+      threshold: data.threshold,
+      priceSource: data.price_source,
+    } : DEFAULT_SETTINGS;
+
     return NextResponse.json({ success: true, data: settings });
   } catch (error) {
+    console.error('GET /api/settings error:', error);
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -46,50 +36,53 @@ export async function GET(): Promise<NextResponse<ApiResponse<AppSettings>>> {
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<AppSettings>>> {
   try {
     const body = await request.json();
-    const currentSettings = await loadSettings();
 
     // Validate threshold
+    let threshold = DEFAULT_SETTINGS.threshold;
     if (body.threshold !== undefined) {
-      const threshold = Number(body.threshold);
+      threshold = Number(body.threshold);
       if (isNaN(threshold) || threshold < 0 || threshold > 100) {
         return NextResponse.json(
           { success: false, error: 'Threshold must be a number between 0 and 100' },
           { status: 400 }
         );
       }
-      currentSettings.threshold = threshold;
     }
 
     // Validate price source
-    if (body.priceSource !== undefined) {
-      if (!['serpapi', 'zap', 'manual', 'combined'].includes(body.priceSource)) {
-        return NextResponse.json(
-          { success: false, error: 'Invalid price source' },
-          { status: 400 }
-        );
-      }
-      currentSettings.priceSource = body.priceSource;
+    let priceSource = body.priceSource || DEFAULT_SETTINGS.priceSource;
+    if (!['serpapi', 'zap', 'manual', 'combined'].includes(priceSource)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid price source' },
+        { status: 400 }
+      );
     }
 
-    // Update API key (never returned in GET for security)
-    if (body.serpApiKey !== undefined) {
-      currentSettings.serpApiKey = body.serpApiKey;
-    }
+    // Upsert settings (update if exists, insert if not)
+    const { data, error } = await supabase
+      .from('settings')
+      .upsert({
+        id: 1, // Always use ID 1 for settings
+        threshold,
+        price_source: priceSource,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'id' })
+      .select()
+      .single();
 
-    await saveSettings(currentSettings);
+    if (error) throw error;
 
-    // Return settings without API key
-    const safeSettings = { ...currentSettings };
-    if (safeSettings.serpApiKey) {
-      safeSettings.serpApiKey = '***configured***';
-    }
+    const settings: AppSettings = {
+      threshold: data.threshold,
+      priceSource: data.price_source,
+    };
 
-    return NextResponse.json({ success: true, data: safeSettings });
+    return NextResponse.json({ success: true, data: settings });
   } catch (error) {
+    console.error('POST /api/settings error:', error);
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
 }
-

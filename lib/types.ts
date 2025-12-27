@@ -29,6 +29,7 @@ export interface PriceComparison {
   providers: ProviderPrice[];
   flaggedProviders: ProviderPrice[];
   lastSearched: string;
+  error?: string;
 }
 
 // Settings for the application

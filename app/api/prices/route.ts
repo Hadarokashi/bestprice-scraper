@@ -1,26 +1,34 @@
 import { NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
-import { PriceCache, ApiResponse } from '@/lib/types';
-
-const DATA_DIR = path.join(process.cwd(), 'data');
-const PRICE_CACHE_FILE = path.join(DATA_DIR, 'price-cache.json');
-
-async function loadPriceCache(): Promise<PriceCache> {
-  try {
-    const data = await fs.readFile(PRICE_CACHE_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch {
-    return {};
-  }
-}
+import { supabase } from '@/lib/supabase';
+import { PriceCache, PriceComparison, ApiResponse } from '@/lib/types';
 
 // GET /api/prices - Get all cached prices
 export async function GET(): Promise<NextResponse<ApiResponse<PriceCache>>> {
   try {
-    const cache = await loadPriceCache();
+    const { data, error } = await supabase
+      .from('price_cache')
+      .select('*');
+
+    if (error) throw error;
+
+    // Convert to PriceCache format (barcode -> PriceComparison)
+    const cache: PriceCache = {};
+    for (const row of data || []) {
+      cache[row.barcode] = {
+        productId: row.product_id,
+        barcode: row.barcode,
+        recommendedPrice: parseFloat(row.recommended_price),
+        threshold: row.threshold,
+        providers: row.providers || [],
+        flaggedProviders: row.flagged_providers || [],
+        lastSearched: row.last_searched,
+        error: row.error || undefined,
+      };
+    }
+
     return NextResponse.json({ success: true, data: cache });
   } catch (error) {
+    console.error('GET /api/prices error:', error);
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -31,14 +39,19 @@ export async function GET(): Promise<NextResponse<ApiResponse<PriceCache>>> {
 // DELETE /api/prices - Clear price cache
 export async function DELETE(): Promise<NextResponse<ApiResponse<null>>> {
   try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    await fs.writeFile(PRICE_CACHE_FILE, '{}', 'utf-8');
+    const { error } = await supabase
+      .from('price_cache')
+      .delete()
+      .neq('id', 0); // Delete all
+
+    if (error) throw error;
+
     return NextResponse.json({ success: true, data: null });
   } catch (error) {
+    console.error('DELETE /api/prices error:', error);
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
 }
-

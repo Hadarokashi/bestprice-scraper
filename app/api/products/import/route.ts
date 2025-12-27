@@ -1,29 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { supabase } from '@/lib/supabase';
 import { parseProductCSV } from '@/lib/csv-parser';
-import { ProductsStore, ApiResponse, Product } from '@/lib/types';
-
-const DATA_DIR = path.join(process.cwd(), 'data');
-const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
-
-async function ensureDataDir() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-}
-
-async function loadProducts(): Promise<ProductsStore> {
-  try {
-    const data = await fs.readFile(PRODUCTS_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch {
-    return { products: [], lastImported: '' };
-  }
-}
-
-async function saveProducts(store: ProductsStore): Promise<void> {
-  await ensureDataDir();
-  await fs.writeFile(PRODUCTS_FILE, JSON.stringify(store, null, 2), 'utf-8');
-}
+import { ApiResponse } from '@/lib/types';
 
 // POST /api/products/import - Import products from CSV
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<{ imported: number; total: number }>>> {
@@ -56,40 +34,57 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       );
     }
 
-    // Load existing or start fresh
-    let store: ProductsStore;
+    // If replacing, delete all existing products first
     if (replaceExisting) {
-      store = { products: [], lastImported: '' };
-    } else {
-      store = await loadProducts();
+      const { error: deleteError } = await supabase
+        .from('products')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+
+      if (deleteError) throw deleteError;
     }
 
-    // Merge by barcode
+    // Prepare products for upsert
+    const productsToUpsert = parsedProducts.map(p => ({
+      id: p.id,
+      name: p.name,
+      sku: p.sku,
+      barcode: p.barcode,
+      recommended_price: p.recommendedPrice,
+      sale_price: p.salePrice || null,
+      consumer_sale_price: p.consumerSalePrice || null,
+      category: p.category || null,
+      updated_at: new Date().toISOString(),
+    }));
+
+    // Upsert in batches of 100
+    const batchSize = 100;
     let imported = 0;
-    for (const newProduct of parsedProducts) {
-      const existingIndex = store.products.findIndex(
-        (p: Product) => p.barcode === newProduct.barcode
-      );
-      if (existingIndex >= 0) {
-        store.products[existingIndex] = newProduct;
-      } else {
-        store.products.push(newProduct);
-      }
-      imported++;
+
+    for (let i = 0; i < productsToUpsert.length; i += batchSize) {
+      const batch = productsToUpsert.slice(i, i + batchSize);
+      const { error } = await supabase
+        .from('products')
+        .upsert(batch, { onConflict: 'barcode' });
+
+      if (error) throw error;
+      imported += batch.length;
     }
 
-    store.lastImported = new Date().toISOString();
-    await saveProducts(store);
+    // Get total count
+    const { count } = await supabase
+      .from('products')
+      .select('*', { count: 'exact', head: true });
 
     return NextResponse.json({
       success: true,
-      data: { imported, total: store.products.length },
+      data: { imported, total: count || imported },
     });
   } catch (error) {
+    console.error('POST /api/products/import error:', error);
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
 }
-
