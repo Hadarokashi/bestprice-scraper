@@ -89,8 +89,9 @@ function isProductMatch(foundName: string, searchName: string): boolean {
   const foundModels = found.match(modelPattern) || [];
 
   // If search has a model number, it MUST be in the found product
-  if (searchModels.length > 0) {
-    const searchModelNormalized = searchModels[0].replace(/\s/g, '');
+  const firstSearchModel = searchModels[0];
+  if (firstSearchModel) {
+    const searchModelNormalized = firstSearchModel.replace(/\s/g, '');
     let modelFound = false;
     
     for (const foundModel of foundModels) {
