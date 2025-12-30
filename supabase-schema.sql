@@ -53,3 +53,4 @@ CREATE POLICY "Allow all on products" ON products FOR ALL USING (true) WITH CHEC
 CREATE POLICY "Allow all on price_cache" ON price_cache FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all on settings" ON settings FOR ALL USING (true) WITH CHECK (true);
 
+

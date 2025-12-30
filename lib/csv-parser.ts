@@ -100,13 +100,15 @@ export function parseProductCSV(csvContent: string): Product[] {
   let currentCategory = '';
 
   for (const row of result.data) {
-    // Use flexible column matching
-    const name = findColumnValue(row, ['שם פריט', 'שם', 'פריט', 'לינק']);
+    // Use flexible column matching - support multiple CSV formats
+    const name = findColumnValue(row, ['שם פריט', 'קוד פריט', 'שם', 'פריט', 'לינק']);
     const sku = findColumnValue(row, ['מק"ט', 'מקט', 'יצרן']);
     const barcode = findColumnValue(row, ['ברקוד', 'barcode']);
-    const recommendedPriceStr = findColumnValue(row, ['מחיר מומלץ', 'לצרכן', 'כולל מעמ']);
+    // Handle different price column names in different CSVs
+    const recommendedPriceStr = findColumnValue(row, ['מחיר מומלץ', 'מחיר צרכן', 'לצרכן', 'כולל מעמ']);
     const salePriceStr = findColumnValue(row, ['סייל', 'לסוחר', 'ללא מע']);
-    const consumerSalePriceStr = findColumnValue(row, ['מבצע לצרכן', 'מבצע']);
+    // Consumer sale price - check for "מבצע" but avoid matching the recommended price column
+    const consumerSalePriceStr = findColumnValue(row, ['מבצע לצרכן', 'מבצע נובמבר', 'לקוח כולל']);
 
     // Check if this is a category row (has text in price column but no barcode)
     if (!barcode && recommendedPriceStr && !recommendedPriceStr.includes('₪')) {
