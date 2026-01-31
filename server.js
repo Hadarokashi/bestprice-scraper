@@ -193,10 +193,25 @@ async function scrapeSite(browser, config, productName, recommendedPrice) {
     await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
     await page.waitForTimeout(2000);
     
+    // Debug: Log page title and URL to verify page loaded
+    const pageTitle = await page.title();
+    const pageUrl = page.url();
+    console.log(`[${config.name}] Page loaded - Title: "${pageTitle}", URL: ${pageUrl}`);
+    
     const products = await extractPrices(page, config);
+    console.log(`[${config.name}] Extracted ${products.length} products from page`);
+    
+    // Debug: Log first few products found
+    if (products.length > 0) {
+      console.log(`[${config.name}] Sample products:`, products.slice(0, 3).map(p => `${p.name}: ₪${p.price}`));
+    }
     
     for (const product of products) {
-      if (isProductMatch(product.name, productName) && isPriceValid(product.price, recommendedPrice)) {
+      const matchResult = isProductMatch(product.name, productName);
+      const priceValid = isPriceValid(product.price, recommendedPrice);
+      console.log(`[${config.name}] Checking "${product.name}" (₪${product.price}): match=${matchResult}, priceValid=${priceValid}`);
+      
+      if (matchResult && priceValid) {
         const num = providers.length + 1;
         providers.push({
           providerName: num > 1 ? `${config.name} (${num})` : config.name,
