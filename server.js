@@ -8,23 +8,75 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Israeli music/audio store configurations
+// In-memory job storage
+const jobs = new Map();
+
+// Israeli store configurations - 60 WEBSITES
 const SCRAPER_CONFIGS = [
-  { id: '1', name: 'Zap.co.il', baseUrl: 'https://www.zap.co.il', searchPattern: '/search.aspx?keyword={query}', enabled: true },
-  { id: '2', name: 'Bconnect', baseUrl: 'https://bconnect.co.il', searchPattern: '/?s={query}', enabled: true },
-  { id: '3', name: 'Diez', baseUrl: 'https://diez.co.il', searchPattern: '/?s={query}', enabled: true },
-  { id: '4', name: 'Sound Check', baseUrl: 'https://sound-check.co.il', searchPattern: '/?s={query}', enabled: true },
-  { id: '5', name: 'הד סאונד', baseUrl: 'https://www.head-sound.co.il', searchPattern: '/?s={query}', enabled: true },
+  // Music & Audio Stores
+  { id: '1', name: 'Bconnect', baseUrl: 'https://bconnect.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '2', name: 'Diez', baseUrl: 'https://diez.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '3', name: 'Next-Pro', baseUrl: 'https://www.next-pro.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '4', name: 'הד סאונד', baseUrl: 'https://headsound.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '5', name: 'טרטל', baseUrl: 'https://www.turtle.co.il', searchPattern: '/?s={query}', enabled: true },
   { id: '6', name: 'עולם המוסיקה', baseUrl: 'https://www.musicworld.co.il', searchPattern: '/?s={query}', enabled: true },
-  { id: '7', name: 'לבמה', baseUrl: 'https://www.labama.co.il', searchPattern: '/?s={query}', enabled: true },
-  { id: '8', name: 'Ginges', baseUrl: 'https://www.ginges.co.il', searchPattern: '/?s={query}', enabled: true },
-  { id: '9', name: 'FunkyDJ', baseUrl: 'https://www.funkydj.co.il', searchPattern: '/?s={query}', enabled: true },
-  { id: '10', name: 'KSP', baseUrl: 'https://www.ksp.co.il', searchPattern: '/?select=.2.100..&txt_search={query}', enabled: true },
-  { id: '11', name: 'Bug', baseUrl: 'https://www.bug.co.il', searchPattern: '/search?q={query}', enabled: true },
-  { id: '12', name: 'Ivory', baseUrl: 'https://www.ivory.co.il', searchPattern: '/search?q={query}', enabled: true },
-  { id: '13', name: 'Pro-Shop', baseUrl: 'https://www.proshop.co.il', searchPattern: '/?s={query}', enabled: true },
-  { id: '14', name: 'Music Station', baseUrl: 'https://www.musicstation.co.il', searchPattern: '/?s={query}', enabled: true },
-  { id: '15', name: 'Next-Pro', baseUrl: 'https://next-pro.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '7', name: 'מג\'יקל נוטס', baseUrl: 'https://www.magical-notes.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '8', name: 'אודיולאב', baseUrl: 'https://audiolab.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '9', name: 'לבמה', baseUrl: 'https://la-bama.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '10', name: 'מיוזיק סנטר', baseUrl: 'https://www.music-center.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '11', name: 'אסקול', baseUrl: 'https://www.askol.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '12', name: 'Speed of Sound', baseUrl: 'https://www.speedofsound.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '13', name: 'Ginges', baseUrl: 'https://www.ginges.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '14', name: 'Signal', baseUrl: 'https://www.signal-audio.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '15', name: 'Orior', baseUrl: 'https://www.orior.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '16', name: 'Kilombo', baseUrl: 'https://kilombo.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '17', name: 'FunkyDJ', baseUrl: 'https://www.funkydj.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '18', name: 'שלמון', baseUrl: 'https://shalmonmusic.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '19', name: 'קול המוסיקה', baseUrl: 'https://kolhamusica.com', searchPattern: '/?s={query}', enabled: true },
+  { id: '20', name: 'חלילית', baseUrl: 'https://www.halilit.com', searchPattern: '/?s={query}', enabled: true },
+  { id: '21', name: 'מצלול', baseUrl: 'https://mitzlol.com', searchPattern: '/?s={query}', enabled: true },
+  { id: '22', name: 'פעימות', baseUrl: 'https://peimot.com', searchPattern: '/?s={query}', enabled: true },
+  { id: '23', name: 'אפקט', baseUrl: 'https://www.effect.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '24', name: 'שכטר', baseUrl: 'https://shechtermusic.com', searchPattern: '/?s={query}', enabled: true },
+  { id: '25', name: 'סאונד צ\'ק', baseUrl: 'https://www.sound-check.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '26', name: 'דראם בית', baseUrl: 'https://www.drumbite.co.il', searchPattern: '/?s={query}', enabled: true },
+  // Electronics & General Stores
+  { id: '27', name: 'KSP', baseUrl: 'https://ksp.co.il', searchPattern: '/?select=.2.100..&txt_search={query}', enabled: true },
+  { id: '28', name: 'Bug', baseUrl: 'https://www.bug.co.il', searchPattern: '/search?q={query}', enabled: true },
+  { id: '29', name: 'Ivory', baseUrl: 'https://www.ivory.co.il', searchPattern: '/search?q={query}', enabled: true },
+  { id: '30', name: 'Gamestorm', baseUrl: 'https://www.gamestorm.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '31', name: 'Flymac', baseUrl: 'https://flymac.website', searchPattern: '/?s={query}', enabled: true },
+  { id: '32', name: 'אילת דיפו', baseUrl: 'https://www.eilatdepot.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '33', name: 'לידר קומפיוטרס', baseUrl: 'https://www.leadercomputers.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '34', name: 'WALLASHOPS', baseUrl: 'https://www.wallashops.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '35', name: 'מחסני חשמל', baseUrl: 'https://www.payngo.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '36', name: 'מחסני חשמל אילת', baseUrl: 'https://eilat.payngo.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '37', name: 'OLSALE', baseUrl: 'https://www.olsale.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '38', name: 'LASTPRICE', baseUrl: 'https://www.lastprice.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '39', name: 'KRAVITZ', baseUrl: 'https://www.kravitz.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '40', name: 'HITECHZONE', baseUrl: 'https://www.htzone.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '41', name: 'בזק סטור', baseUrl: 'https://bstore.bezeq.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '42', name: 'ALM', baseUrl: 'https://www.alm.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '43', name: 'ביג אלקטריק', baseUrl: 'https://bigelectric.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '44', name: 'בסט מובייל', baseUrl: 'https://www.bestmobile.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '45', name: 'חשמל נטו', baseUrl: 'https://www.netoneto.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '46', name: 'SHEKEM', baseUrl: 'https://www.shekem-electric.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '47', name: 'שקם דיוטי פרי', baseUrl: 'https://shekem-df.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '48', name: 'SUPERPHARM', baseUrl: 'https://shop.super-pharm.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '49', name: 'ברנרד', baseUrl: 'https://www.bernard.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '50', name: 'סנסנטר', baseUrl: 'https://www.sancenter.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '51', name: 'i-Cell', baseUrl: 'https://www.i-cell.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '52', name: 'Greenmobile', baseUrl: 'https://greenmobile.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '53', name: 'גאדג\'ט סלולר', baseUrl: 'https://www.gadget-cellular.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '54', name: 'רדיו אלקטריק', baseUrl: 'https://www.rde.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '55', name: 'ריקוטק', baseUrl: 'https://rikotek.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '56', name: 'ZAPSTORE', baseUrl: 'https://shop.zap.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '57', name: 'אורסייל', baseUrl: 'https://orsale.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '58', name: 'גאדג\'ט מובייל', baseUrl: 'https://gadget-mobile.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '59', name: 'נירטק', baseUrl: 'https://www.nirtech.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '60', name: 'X-Press', baseUrl: 'https://www.x-press.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '61', name: 'אייס', baseUrl: 'https://www.ace.co.il', searchPattern: '/?s={query}', enabled: true },
+  { id: '62', name: 'King Games', baseUrl: 'https://www.king-games.co.il', searchPattern: '/?s={query}', enabled: true },
 ];
 
 // Build search URL
@@ -43,7 +95,6 @@ function isProductMatch(foundName, searchQuery) {
   const found = normalize(foundName);
   const search = normalize(searchQuery);
   
-  // Extract model numbers
   const modelPattern = /[a-z]+\s*\d+|\d+\s*[a-z]+/gi;
   const searchModels = search.match(modelPattern) || [];
   const foundModels = found.match(modelPattern) || [];
@@ -82,7 +133,7 @@ async function extractPrices(page, config) {
   const products = [];
   
   try {
-    await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+    await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
     
     // Try JSON-LD first
     const jsonLdProducts = await page.evaluate(() => {
@@ -94,16 +145,6 @@ async function extractPrices(page, config) {
             const offer = Array.isArray(data.offers) ? data.offers[0] : data.offers;
             const price = parseFloat(offer.price || offer.lowPrice);
             if (price > 0) results.push({ name: data.name, price, url: offer.url || data.url || '' });
-          }
-          if (data['@type'] === 'ItemList' && Array.isArray(data.itemListElement)) {
-            data.itemListElement.forEach(item => {
-              if (item.item?.['@type'] === 'Product') {
-                const product = item.item;
-                const offer = Array.isArray(product.offers) ? product.offers[0] : product.offers;
-                const price = parseFloat(offer?.price || offer?.lowPrice || 0);
-                if (price > 0) results.push({ name: product.name, price, url: product.url || '' });
-              }
-            });
           }
         } catch {}
       });
@@ -148,7 +189,7 @@ async function extractPrices(page, config) {
         const text = el.textContent?.trim() || '';
         const match = text.match(priceRegex);
         if (match) {
-          const nameEl = el.querySelector('h1, h2, h3, h4, .title, .name, [class*="title"], [class*="name"]');
+          const nameEl = el.querySelector('h1, h2, h3, h4, .title, .name');
           const linkEl = el.querySelector('a');
           if (nameEl) {
             const name = nameEl.textContent?.trim() || '';
@@ -181,37 +222,23 @@ async function scrapeSite(browser, config, productName, recommendedPrice) {
   
   try {
     context = await browser.newContext({
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
       locale: 'he-IL',
-      viewport: { width: 1920, height: 1080 },
+      viewport: { width: 1280, height: 720 },
     });
     
     const page = await context.newPage();
     const searchUrl = buildSearchUrl(config, productName);
     
-    console.log(`[${config.name}] Navigating to ${searchUrl}`);
-    await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
-    await page.waitForTimeout(2000);
-    
-    // Debug: Log page title and URL to verify page loaded
-    const pageTitle = await page.title();
-    const pageUrl = page.url();
-    console.log(`[${config.name}] Page loaded - Title: "${pageTitle}", URL: ${pageUrl}`);
+    console.log(`[${config.name}] Navigating...`);
+    await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 10000 });
+    await page.waitForTimeout(1500);
     
     const products = await extractPrices(page, config);
-    console.log(`[${config.name}] Extracted ${products.length} products from page`);
-    
-    // Debug: Log first few products found
-    if (products.length > 0) {
-      console.log(`[${config.name}] Sample products:`, products.slice(0, 3).map(p => `${p.name}: ₪${p.price}`));
-    }
+    console.log(`[${config.name}] Found ${products.length} products`);
     
     for (const product of products) {
-      const matchResult = isProductMatch(product.name, productName);
-      const priceValid = isPriceValid(product.price, recommendedPrice);
-      console.log(`[${config.name}] Checking "${product.name}" (₪${product.price}): match=${matchResult}, priceValid=${priceValid}`);
-      
-      if (matchResult && priceValid) {
+      if (isProductMatch(product.name, productName) && isPriceValid(product.price, recommendedPrice)) {
         const num = providers.length + 1;
         providers.push({
           providerName: num > 1 ? `${config.name} (${num})` : config.name,
@@ -220,12 +247,8 @@ async function scrapeSite(browser, config, productName, recommendedPrice) {
           currency: 'ILS',
           lastUpdated: new Date().toISOString(),
         });
-        console.log(`[${config.name}] Found: ${product.name} - ₪${product.price}`);
+        console.log(`[${config.name}] Match: ${product.name} - ₪${product.price}`);
       }
-    }
-    
-    if (providers.length === 0) {
-      console.log(`[${config.name}] No matches`);
     }
   } catch (error) {
     console.error(`[${config.name}] Error:`, error.message);
@@ -236,7 +259,68 @@ async function scrapeSite(browser, config, productName, recommendedPrice) {
   return providers;
 }
 
-// Main scrape endpoint
+// Background scraping function
+async function runScrapeJob(jobId, productName, recommendedPrice, barcode) {
+  const job = jobs.get(jobId);
+  if (!job) return;
+  
+  let browser = null;
+  
+  try {
+    console.log(`\n🔍 [Job ${jobId}] Starting scrape for "${productName}"`);
+    
+    browser = await chromium.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+    });
+    
+    // Process sites ONE AT A TIME to minimize memory usage
+    for (const config of SCRAPER_CONFIGS) {
+      if (job.status === 'cancelled') break;
+      
+      try {
+        const providers = await scrapeSite(browser, config, productName, recommendedPrice);
+        
+        // Update job with results
+        job.providers.push(...providers);
+        job.scans.push({
+          name: config.name,
+          status: providers.length > 0 ? 'found' : 'not_found',
+          resultsCount: providers.length,
+        });
+        job.completedSites++;
+        job.progress = Math.round((job.completedSites / SCRAPER_CONFIGS.length) * 100);
+        
+      } catch (error) {
+        job.scans.push({
+          name: config.name,
+          status: 'error',
+          resultsCount: 0,
+          error: error.message,
+        });
+        job.completedSites++;
+      }
+    }
+    
+    job.status = 'completed';
+    job.completedAt = new Date().toISOString();
+    console.log(`✅ [Job ${jobId}] Completed - Found ${job.providers.length} results`);
+    
+  } catch (error) {
+    console.error(`❌ [Job ${jobId}] Fatal error:`, error.message);
+    job.status = 'failed';
+    job.error = error.message;
+  } finally {
+    if (browser) await browser.close();
+  }
+}
+
+// Generate simple job ID
+function generateJobId() {
+  return Math.random().toString(36).substring(2, 15);
+}
+
+// Create scrape job - returns immediately
 app.post('/scrape', async (req, res) => {
   const { productName, recommendedPrice, barcode } = req.body;
   
@@ -244,100 +328,150 @@ app.post('/scrape', async (req, res) => {
     return res.status(400).json({ success: false, error: 'productName is required' });
   }
   
-  console.log(`\n🔍 Scraping: "${productName}" (₪${recommendedPrice || 'N/A'})`);
+  const jobId = generateJobId();
   
-  let browser = null;
-  const allProviders = [];
-  const scans = [];
+  // Create job
+  const job = {
+    id: jobId,
+    status: 'processing',
+    productName,
+    recommendedPrice,
+    barcode,
+    providers: [],
+    scans: [],
+    completedSites: 0,
+    totalSites: SCRAPER_CONFIGS.length,
+    progress: 0,
+    createdAt: new Date().toISOString(),
+  };
   
-  try {
-    browser = await chromium.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-    });
-    
-    // Process sites in batches of 3
-    for (let i = 0; i < SCRAPER_CONFIGS.length; i += 3) {
-      const batch = SCRAPER_CONFIGS.slice(i, i + 3);
-      
-      const results = await Promise.all(
-        batch.map(async (config) => {
-          try {
-            const providers = await scrapeSite(browser, config, productName, recommendedPrice);
-            return { config, providers, error: null };
-          } catch (error) {
-            return { config, providers: [], error };
-          }
-        })
-      );
-      
-      for (const { config, providers, error } of results) {
-        if (error) {
-          scans.push({ name: config.name, status: 'error', resultsCount: 0 });
-        } else if (providers.length > 0) {
-          scans.push({ name: config.name, status: 'found', resultsCount: providers.length });
-          allProviders.push(...providers);
-        } else {
-          scans.push({ name: config.name, status: 'not_found', resultsCount: 0 });
-        }
-      }
-    }
-    
-    console.log(`✅ Found ${allProviders.length} results from ${scans.filter(s => s.status === 'found').length} sites\n`);
-    
-    res.json({
-      success: true,
-      data: {
-        productName,
-        barcode,
-        recommendedPrice,
-        providers: allProviders,
-        scanMetadata: {
-          totalWebsites: scans.length,
-          scannedWebsites: scans.length,
-          websites: scans,
-        },
-      },
-    });
-  } catch (error) {
-    console.error('Scrape error:', error);
-    res.status(500).json({ success: false, error: error.message });
-  } finally {
-    if (browser) await browser.close();
+  jobs.set(jobId, job);
+  
+  // Start scraping in background (don't await)
+  runScrapeJob(jobId, productName, recommendedPrice, barcode);
+  
+  // Return immediately with job ID
+  res.json({
+    success: true,
+    data: {
+      jobId,
+      status: 'processing',
+      message: 'Scraping started. Poll /status/:jobId for results.',
+    },
+  });
+});
+
+// Get job status and results
+app.get('/status/:jobId', (req, res) => {
+  const { jobId } = req.params;
+  const job = jobs.get(jobId);
+  
+  if (!job) {
+    return res.status(404).json({ success: false, error: 'Job not found' });
   }
+  
+  res.json({
+    success: true,
+    data: {
+      jobId: job.id,
+      status: job.status,
+      progress: job.progress,
+      productName: job.productName,
+      recommendedPrice: job.recommendedPrice,
+      providers: job.providers,
+      scanMetadata: {
+        totalWebsites: job.totalSites,
+        scannedWebsites: job.completedSites,
+        websites: job.scans,
+      },
+      createdAt: job.createdAt,
+      completedAt: job.completedAt,
+    },
+  });
+});
+
+// Legacy endpoint - waits for completion (for backwards compatibility)
+app.post('/scrape-sync', async (req, res) => {
+  const { productName, recommendedPrice, barcode } = req.body;
+  
+  if (!productName) {
+    return res.status(400).json({ success: false, error: 'productName is required' });
+  }
+  
+  // Create and run job
+  const jobId = generateJobId();
+  const job = {
+    id: jobId,
+    status: 'processing',
+    productName,
+    recommendedPrice,
+    barcode,
+    providers: [],
+    scans: [],
+    completedSites: 0,
+    totalSites: SCRAPER_CONFIGS.length,
+    progress: 0,
+    createdAt: new Date().toISOString(),
+  };
+  
+  jobs.set(jobId, job);
+  
+  // Wait for completion
+  await runScrapeJob(jobId, productName, recommendedPrice, barcode);
+  
+  const completedJob = jobs.get(jobId);
+  
+  res.json({
+    success: true,
+    data: {
+      productName,
+      barcode,
+      recommendedPrice,
+      providers: completedJob.providers,
+      scanMetadata: {
+        totalWebsites: completedJob.totalSites,
+        scannedWebsites: completedJob.completedSites,
+        websites: completedJob.scans,
+      },
+    },
+  });
 });
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', service: 'bestprice-playwright-scraper' });
+  res.json({ status: 'ok', service: 'bestprice-playwright-scraper', jobs: jobs.size });
 });
 
+// Root endpoint
 app.get('/', (req, res) => {
   res.json({ 
     service: 'BestPrice Playwright Scraper',
     status: 'running',
     endpoints: {
       'GET /health': 'Health check',
-      'POST /scrape': 'Scrape prices for a product',
-    },
-    usage: {
-      method: 'POST',
-      url: '/scrape',
-      body: {
-        productName: 'DT 770 PRO',
-        recommendedPrice: 859,
-      },
+      'POST /scrape': 'Start async scrape job (returns jobId)',
+      'GET /status/:jobId': 'Get job status and results',
     },
   });
 });
 
+// Cleanup old jobs every 10 minutes
+setInterval(() => {
+  const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
+  for (const [jobId, job] of jobs.entries()) {
+    if (new Date(job.createdAt).getTime() < tenMinutesAgo) {
+      jobs.delete(jobId);
+    }
+  }
+}, 60 * 1000);
+
 app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════════════════════════════╗
-║       🎧 BestPrice Playwright Scraper - Railway Edition        ║
+║       🎧 BestPrice Playwright Scraper - Job-Based             ║
 ╠════════════════════════════════════════════════════════════════╣
 ║  Server running on port ${PORT}                                   ║
-║  Endpoints: GET /health, POST /scrape                          ║
+║  Endpoints: POST /scrape, GET /status/:jobId                   ║
 ╚════════════════════════════════════════════════════════════════╝
   `);
 });
