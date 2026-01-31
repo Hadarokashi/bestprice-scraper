@@ -91,35 +91,85 @@ export default function Dashboard() {
     }
   };
 
-  // Check price for a single product
+  // Check price for a single product using queue-based scraping
   const handleCheckPrice = useCallback(async (product: Product, signal?: AbortSignal) => {
     setLoading(prev => ({ ...prev, [product.barcode]: true }));
 
     try {
-      const response = await fetch('/api/prices/search', {
+      // Step 1: Create scraping job
+      const createJobResponse = await fetch('/api/scraping/create-job', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId: product.id,
           barcode: product.barcode,
           productName: product.name,
-          recommendedPrice: product.recommendedPrice,
         }),
         signal,
       });
 
-      const result = await response.json();
-      if (result.success && result.data) {
+      const createJobResult = await createJobResponse.json();
+      if (!createJobResult.success) {
+        throw new Error(createJobResult.error || 'Failed to create job');
+      }
+
+      const job = createJobResult.data;
+      console.log(`[Price Check] Created job ${job.id} for ${product.name}`);
+
+      // Step 2: Process in batches until complete
+      let isComplete = false;
+      let lastResults: any[] = [];
+
+      while (!isComplete && !signal?.aborted) {
+        // Process next batch
+        const batchResponse = await fetch('/api/scraping/process-batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jobId: job.id }),
+          signal,
+        });
+
+        const batchResult = await batchResponse.json();
+        if (!batchResult.success) {
+          console.error('[Price Check] Batch error:', batchResult.error);
+          break;
+        }
+
+        lastResults = batchResult.data.results || [];
+        isComplete = batchResult.data.status === 'completed';
+
+        // Update UI with partial results
+        const thresholdPrice = product.recommendedPrice * (1 - settings.threshold / 100);
+        const flaggedProviders = lastResults.filter((p: any) => p.price < thresholdPrice);
+
         setPriceData(prev => ({
           ...prev,
-          [product.barcode]: result.data,
+          [product.barcode]: {
+            productId: product.id,
+            barcode: product.barcode,
+            recommendedPrice: product.recommendedPrice,
+            threshold: settings.threshold,
+            providers: lastResults,
+            flaggedProviders,
+            lastSearched: new Date().toISOString(),
+          },
         }));
-        
-        // Log results summary
-        const providerCount = result.data.providers?.length || 0;
-        console.log(`Found ${providerCount} Israeli providers for ${product.name}`);
+
+        console.log(`[Price Check] Progress: ${batchResult.data.completedScrapers}/${batchResult.data.totalScrapers} - Found ${lastResults.length} providers`);
+
+        // Small delay between batches
+        if (!isComplete) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      console.log(`[Price Check] Completed ${product.name}: ${lastResults.length} providers found`);
+    } catch (error) {
+      if ((error as Error).name === 'AbortError') {
+        console.log(`Search aborted for ${product.name}`);
       } else {
-        // Still update the cache to show "searched but no results"
+        console.error('Price search error:', error);
+        // Show error state
         setPriceData(prev => ({
           ...prev,
           [product.barcode]: {
@@ -130,15 +180,9 @@ export default function Dashboard() {
             providers: [],
             flaggedProviders: [],
             lastSearched: new Date().toISOString(),
+            error: error instanceof Error ? error.message : 'Unknown error',
           },
         }));
-        console.log(`No results for ${product.name}: ${result.error || 'No Israeli providers found'}`);
-      }
-    } catch (error) {
-      if ((error as Error).name === 'AbortError') {
-        console.log(`Search aborted for ${product.name}`);
-      } else {
-        console.error('Price search error:', error);
       }
     } finally {
       setLoading(prev => ({ ...prev, [product.barcode]: false }));

@@ -85,3 +85,29 @@ export interface ProductsStore {
   lastImported: string;
 }
 
+// Scraper configuration
+export interface ScraperConfig {
+  id: string;
+  name: string;
+  baseUrl: string;
+  enabled: boolean;
+  priority: number;
+  searchPattern?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// Scraping job
+export interface ScrapingJob {
+  id: string;
+  productId: string;
+  productName: string;
+  barcode: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  totalScrapers: number;
+  completedScrapers: number;
+  results: ProviderPrice[];
+  createdAt: string;
+  updatedAt: string;
+}
+
