@@ -1,6 +1,5 @@
 # Use Playwright's official image which includes browsers
-FROM mcr.microsoft.com/playwright:v1.40.0-jammy
-
+FROM mcr.microsoft.com/playwright:v1.58.1-jammy
 WORKDIR /app
 
 # Copy package files
