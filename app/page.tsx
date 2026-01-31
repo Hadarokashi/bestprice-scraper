@@ -103,8 +103,8 @@ export default function Dashboard() {
   
   // Check if Playwright scraper is available (cloud or local)
   useEffect(() => {
-    // Try cloud scraper first
-    fetch(`${CLOUD_SCRAPER_URL}/health`, { signal: AbortSignal.timeout(5000) })
+    // Try cloud scraper first (longer timeout for Render free tier wake-up)
+    fetch(`${CLOUD_SCRAPER_URL}/health`, { signal: AbortSignal.timeout(30000) })
       .then(r => r.json())
       .then(data => {
         if (data.status === 'ok') {
