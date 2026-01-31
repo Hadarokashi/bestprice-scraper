@@ -185,7 +185,7 @@ function isStrictMatch(foundName: string, searchQuery: string): boolean {
   const foundModels = found.match(modelPattern) || [];
   
   // If search has model number, it must appear in found product
-  if (searchModels.length > 0) {
+  if (searchModels.length > 0 && searchModels[0]) {
     const searchModel = searchModels[0].replace(/\s/g, '').toLowerCase();
     const hasModel = foundModels.some(m => 
       m.replace(/\s/g, '').toLowerCase().includes(searchModel) ||
