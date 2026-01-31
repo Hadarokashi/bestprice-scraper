@@ -259,6 +259,9 @@ async function scrapeSite(browser, config, productName, recommendedPrice) {
   return providers;
 }
 
+// Number of sites to scrape in parallel (2-3 recommended for 2GB RAM)
+const PARALLEL_SITES = 3;
+
 // Background scraping function
 async function runScrapeJob(jobId, productName, recommendedPrice, barcode) {
   const job = jobs.get(jobId);
@@ -267,39 +270,51 @@ async function runScrapeJob(jobId, productName, recommendedPrice, barcode) {
   let browser = null;
   
   try {
-    console.log(`\n🔍 [Job ${jobId}] Starting scrape for "${productName}"`);
+    console.log(`\n🔍 [Job ${jobId}] Starting scrape for "${productName}" (${PARALLEL_SITES} sites in parallel)`);
     
     browser = await chromium.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
     });
     
-    // Process sites ONE AT A TIME to minimize memory usage
-    for (const config of SCRAPER_CONFIGS) {
+    // Process sites in batches of PARALLEL_SITES
+    for (let i = 0; i < SCRAPER_CONFIGS.length; i += PARALLEL_SITES) {
       if (job.status === 'cancelled') break;
       
-      try {
-        const providers = await scrapeSite(browser, config, productName, recommendedPrice);
-        
-        // Update job with results
-        job.providers.push(...providers);
-        job.scans.push({
-          name: config.name,
-          status: providers.length > 0 ? 'found' : 'not_found',
-          resultsCount: providers.length,
-        });
-        job.completedSites++;
-        job.progress = Math.round((job.completedSites / SCRAPER_CONFIGS.length) * 100);
-        
-      } catch (error) {
-        job.scans.push({
-          name: config.name,
-          status: 'error',
-          resultsCount: 0,
-          error: error.message,
-        });
+      const batch = SCRAPER_CONFIGS.slice(i, i + PARALLEL_SITES);
+      console.log(`[Job ${jobId}] Processing batch ${Math.floor(i / PARALLEL_SITES) + 1}: ${batch.map(c => c.name).join(', ')}`);
+      
+      const batchResults = await Promise.all(
+        batch.map(async (config) => {
+          try {
+            const providers = await scrapeSite(browser, config, productName, recommendedPrice);
+            return { config, providers, error: null };
+          } catch (error) {
+            return { config, providers: [], error: error.message };
+          }
+        })
+      );
+      
+      // Update job with batch results
+      for (const { config, providers, error } of batchResults) {
+        if (error) {
+          job.scans.push({
+            name: config.name,
+            status: 'error',
+            resultsCount: 0,
+            error,
+          });
+        } else {
+          job.providers.push(...providers);
+          job.scans.push({
+            name: config.name,
+            status: providers.length > 0 ? 'found' : 'not_found',
+            resultsCount: providers.length,
+          });
+        }
         job.completedSites++;
       }
+      job.progress = Math.round((job.completedSites / SCRAPER_CONFIGS.length) * 100);
     }
     
     job.status = 'completed';
