@@ -139,7 +139,8 @@ export default function Dashboard() {
       if (usePlaywright && scraperUrl) {
         console.log(`[Price Check] Using Playwright scraper for ${product.name}`);
         
-        const localResponse = await fetch(`${scraperUrl}/scrape`, {
+        // Start the scrape job
+        const startResponse = await fetch(`${scraperUrl}/scrape`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -150,27 +151,55 @@ export default function Dashboard() {
           signal,
         });
 
-        const localResult = await localResponse.json();
+        const startResult = await startResponse.json();
         
-        if (localResult.success) {
-          const thresholdPrice = product.recommendedPrice * (1 - settings.threshold / 100);
-          const flaggedProviders = (localResult.data.providers || []).filter((p: any) => p.price < thresholdPrice);
+        if (startResult.success && startResult.data.jobId) {
+          const jobId = startResult.data.jobId;
+          console.log(`[Price Check] Started job ${jobId} for ${product.name}`);
           
-          setPriceData(prev => ({
-            ...prev,
-            [product.barcode]: {
-              productId: product.id,
-              barcode: product.barcode,
-              recommendedPrice: product.recommendedPrice,
-              threshold: settings.threshold,
-              providers: localResult.data.providers || [],
-              flaggedProviders,
-              lastSearched: new Date().toISOString(),
-              scanMetadata: localResult.data.scanMetadata,
-            },
-          }));
+          // Poll for results
+          let attempts = 0;
+          const maxAttempts = 60; // 2 minutes max
           
-          console.log(`[Price Check] Playwright found ${localResult.data.providers?.length || 0} results for ${product.name}`);
+          while (attempts < maxAttempts && !signal?.aborted) {
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+            
+            const statusResponse = await fetch(`${scraperUrl}/status/${jobId}`, { signal });
+            const statusResult = await statusResponse.json();
+            
+            if (statusResult.success) {
+              const thresholdPrice = product.recommendedPrice * (1 - settings.threshold / 100);
+              const flaggedProviders = (statusResult.data.providers || []).filter((p: any) => p.price < thresholdPrice);
+              
+              // Update UI with current progress
+              setPriceData(prev => ({
+                ...prev,
+                [product.barcode]: {
+                  productId: product.id,
+                  barcode: product.barcode,
+                  recommendedPrice: product.recommendedPrice,
+                  threshold: settings.threshold,
+                  providers: statusResult.data.providers || [],
+                  flaggedProviders,
+                  lastSearched: new Date().toISOString(),
+                  scanMetadata: statusResult.data.scanMetadata,
+                },
+              }));
+              
+              // Check if completed
+              if (statusResult.data.status === 'completed' || statusResult.data.status === 'failed') {
+                console.log(`[Price Check] Job ${jobId} ${statusResult.data.status} - Found ${statusResult.data.providers?.length || 0} results`);
+                setLoading(prev => ({ ...prev, [product.barcode]: false }));
+                return;
+              }
+              
+              console.log(`[Price Check] Job ${jobId} progress: ${statusResult.data.progress}%`);
+            }
+            
+            attempts++;
+          }
+          
+          console.log(`[Price Check] Job ${jobId} timeout after ${attempts} attempts`);
           setLoading(prev => ({ ...prev, [product.barcode]: false }));
           return;
         }
