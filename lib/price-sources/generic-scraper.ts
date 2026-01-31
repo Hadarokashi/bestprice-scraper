@@ -290,17 +290,20 @@ export async function scrapeGeneric(
     const html = await response.text();
     
     // Try extraction methods in order of reliability
-    // ONLY use JSON-LD and meta tags - regex is too unreliable and causes false positives
     let extractedProducts: ExtractedProduct[] = [];
     
+    // First try JSON-LD (most reliable)
     extractedProducts = extractFromJsonLd(html);
+    
+    // Then try meta tags
     if (extractedProducts.length === 0) {
       extractedProducts = extractFromMetaTags(html);
     }
-    // DISABLED: regex extraction causes too many false positives (like ₪299 from ads)
-    // if (extractedProducts.length === 0) {
-    //   extractedProducts = extractFromCommonSelectors(html, searchUrl);
-    // }
+    
+    // Finally try regex extraction but ONLY if we have recommended price for validation
+    if (extractedProducts.length === 0 && recommendedPrice && recommendedPrice > 0) {
+      extractedProducts = extractFromCommonSelectors(html, searchUrl);
+    }
     
     // Filter for strict matches only - collect ALL matching products with valid prices
     for (const product of extractedProducts) {
