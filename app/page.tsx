@@ -95,22 +95,38 @@ export default function Dashboard() {
     }
   };
 
-  // Local Playwright server URL
+  // Playwright scraper URL (Render cloud or local)
+  const CLOUD_SCRAPER_URL = 'https://bestprice-scraper.onrender.com';
   const LOCAL_SCRAPER_URL = 'http://localhost:3001';
-  const [useLocalScraper, setUseLocalScraper] = useState(false);
+  const [scraperUrl, setScraperUrl] = useState<string | null>(null);
+  const [usePlaywright, setUsePlaywright] = useState(false);
   
-  // Check if local scraper is available on mount
+  // Check if Playwright scraper is available (cloud or local)
   useEffect(() => {
-    fetch(`${LOCAL_SCRAPER_URL}/health`, { signal: AbortSignal.timeout(2000) })
+    // Try cloud scraper first
+    fetch(`${CLOUD_SCRAPER_URL}/health`, { signal: AbortSignal.timeout(5000) })
       .then(r => r.json())
       .then(data => {
         if (data.status === 'ok') {
-          setUseLocalScraper(true);
-          console.log('[Dashboard] Local Playwright scraper detected - using browser-based scraping');
+          setScraperUrl(CLOUD_SCRAPER_URL);
+          setUsePlaywright(true);
+          console.log('[Dashboard] Cloud Playwright scraper detected - using browser-based scraping');
         }
       })
       .catch(() => {
-        console.log('[Dashboard] Local scraper not available - using HTTP scraping');
+        // Try local scraper as fallback
+        fetch(`${LOCAL_SCRAPER_URL}/health`, { signal: AbortSignal.timeout(2000) })
+          .then(r => r.json())
+          .then(data => {
+            if (data.status === 'ok') {
+              setScraperUrl(LOCAL_SCRAPER_URL);
+              setUsePlaywright(true);
+              console.log('[Dashboard] Local Playwright scraper detected - using browser-based scraping');
+            }
+          })
+          .catch(() => {
+            console.log('[Dashboard] No Playwright scraper available - using HTTP scraping');
+          });
       });
   }, []);
 
@@ -119,11 +135,11 @@ export default function Dashboard() {
     setLoading(prev => ({ ...prev, [product.barcode]: true }));
 
     try {
-      // Try local Playwright scraper first (if available)
-      if (useLocalScraper) {
-        console.log(`[Price Check] Using local Playwright scraper for ${product.name}`);
+      // Try Playwright scraper first (cloud or local)
+      if (usePlaywright && scraperUrl) {
+        console.log(`[Price Check] Using Playwright scraper for ${product.name}`);
         
-        const localResponse = await fetch(`${LOCAL_SCRAPER_URL}/scrape`, {
+        const localResponse = await fetch(`${scraperUrl}/scrape`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -535,10 +551,12 @@ export default function Dashboard() {
             <p className="text-[var(--muted)]">
               מעקב והשוואת מחירים מול ספקים בישראל
             </p>
-            {useLocalScraper && (
+            {usePlaywright && (
               <div className="flex items-center gap-2 mt-1">
                 <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span className="text-xs text-green-500">Playwright (דפדפן מקומי)</span>
+                <span className="text-xs text-green-500">
+                  {scraperUrl?.includes('onrender.com') ? 'Playwright (ענן)' : 'Playwright (מקומי)'}
+                </span>
               </div>
             )}
           </div>
