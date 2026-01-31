@@ -278,8 +278,8 @@ async function scrapeSite(browser, config, productName, recommendedPrice) {
   return providers;
 }
 
-// Number of sites to scrape in parallel (2-3 recommended for 2GB RAM)
-const PARALLEL_SITES = 3;
+// Number of sites to scrape in parallel (1-2 for 2GB RAM to avoid memory issues)
+const PARALLEL_SITES = 1; // Sequential to minimize memory usage
 
 // Background scraping function
 async function runScrapeJob(jobId, productName, recommendedPrice, barcode, excludeSites = []) {
