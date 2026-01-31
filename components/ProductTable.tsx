@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import type { JSX } from 'react';
 import { Product, PriceComparison } from '@/lib/types';
 import {
   DndContext,

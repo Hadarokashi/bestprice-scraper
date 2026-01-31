@@ -439,8 +439,12 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error('Error updating product order:', error);
-      // Optionally reload products to restore correct order
-      fetchProducts();
+      // On error, reload products from API to restore correct order
+      const response = await fetch('/api/products');
+      const result = await response.json();
+      if (result.success) {
+        setProducts(result.data.products);
+      }
     }
   };
 
