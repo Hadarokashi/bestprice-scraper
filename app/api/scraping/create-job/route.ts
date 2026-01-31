@@ -4,7 +4,7 @@ import type { ScraperConfig, ScrapingJob } from '@/lib/types';
 
 export async function POST(request: NextRequest) {
   try {
-    const { productId, productName, barcode } = await request.json();
+    const { productId, productName, barcode, recommendedPrice } = await request.json();
     
     if (!productId || !productName || !barcode) {
       return NextResponse.json(
@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
         product_id: productId,
         product_name: productName,
         barcode,
+        recommended_price: recommendedPrice || null,
         status: 'pending',
         total_scrapers: totalScrapers,
         completed_scrapers: 0,

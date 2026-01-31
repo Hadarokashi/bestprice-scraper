@@ -127,4 +127,3 @@ export interface ScrapingJob {
   createdAt: string;
   updatedAt: string;
 }
-

@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS scraping_jobs (
   product_id TEXT NOT NULL,
   product_name TEXT NOT NULL,
   barcode TEXT NOT NULL,
+  recommended_price NUMERIC,
   status TEXT DEFAULT 'pending', -- pending, processing, completed, failed
   total_scrapers INTEGER,
   completed_scrapers INTEGER DEFAULT 0,

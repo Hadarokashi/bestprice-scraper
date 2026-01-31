@@ -124,7 +124,8 @@ export async function POST(request: NextRequest) {
         };
         
         try {
-          const results = await scrapeGeneric(config, job.product_name);
+          const recommendedPrice = (job as any).recommended_price ? parseFloat((job as any).recommended_price) : undefined;
+          const results = await scrapeGeneric(config, job.product_name, recommendedPrice);
           return { scraper, results, error: null };
         } catch (error) {
           console.error(`[Batch Processor] Error scraping ${scraper.name}:`, error);

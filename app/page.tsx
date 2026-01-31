@@ -108,6 +108,7 @@ export default function Dashboard() {
           productId: product.id,
           barcode: product.barcode,
           productName: product.name,
+          recommendedPrice: product.recommendedPrice,
         }),
         signal,
       });

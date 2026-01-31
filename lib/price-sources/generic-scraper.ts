@@ -210,11 +210,35 @@ function isStrictMatch(foundName: string, searchQuery: string): boolean {
 }
 
 /**
+ * Validate if a price is reasonable for the product
+ */
+function isPriceReasonable(price: number, recommendedPrice?: number): boolean {
+  // Basic sanity check
+  if (price < 50 || price > 50000) {
+    return false;
+  }
+  
+  // If we have a recommended price, validate against it
+  if (recommendedPrice && recommendedPrice > 0) {
+    const minPrice = recommendedPrice * 0.3; // 30% of recommended
+    const maxPrice = recommendedPrice * 1.5; // 150% of recommended
+    
+    if (price < minPrice || price > maxPrice) {
+      console.log(`[Price Validation] Rejected ₪${price} (expected range: ₪${minPrice.toFixed(0)}-₪${maxPrice.toFixed(0)})`);
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+/**
  * Scrape a single website using HTTP and generic extraction
  */
 export async function scrapeGeneric(
   config: ScraperConfig,
-  productName: string
+  productName: string,
+  recommendedPrice?: number
 ): Promise<ProviderPrice[]> {
   const providers: ProviderPrice[] = [];
   
@@ -257,9 +281,9 @@ export async function scrapeGeneric(
       extractedProducts = extractFromCommonSelectors(html, searchUrl);
     }
     
-    // Filter for strict matches only - collect ALL matching products
+    // Filter for strict matches only - collect ALL matching products with valid prices
     for (const product of extractedProducts) {
-      if (isStrictMatch(product.name, productName)) {
+      if (isStrictMatch(product.name, productName) && isPriceReasonable(product.price, recommendedPrice)) {
         const resultNumber = providers.length + 1;
         providers.push({
           providerName: providers.length > 0 ? `${config.name} (${resultNumber})` : config.name,
