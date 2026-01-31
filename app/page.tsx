@@ -9,6 +9,7 @@ import ImportModal from '@/components/ImportModal';
 import SettingsModal from '@/components/SettingsModal';
 import StatsPanel from '@/components/StatsPanel';
 import ProductEditor from '@/components/ProductEditor';
+import ProvidersView from '@/components/ProvidersView';
 import { Product, PriceComparison, AppSettings, PriceSource } from '@/lib/types';
 
 export default function Dashboard() {
@@ -26,6 +27,9 @@ export default function Dashboard() {
   const [showProductEditor, setShowProductEditor] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
   const [initialLoading, setInitialLoading] = useState(true);
+  
+  // Tab navigation state
+  const [activeTab, setActiveTab] = useState<'products' | 'providers'>('products');
   
   // Bulk search state
   const [isSearching, setIsSearching] = useState(false);
@@ -446,100 +450,132 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Stats Panel */}
-        <StatsPanel
-          products={products}
-          priceData={priceData}
-          threshold={settings.threshold}
-          isSearching={isSearching}
-          searchProgress={searchProgress}
-          onExport={handleExportByCategory}
-        />
+        {/* Tab Navigation */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setActiveTab('products')}
+            className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
+              activeTab === 'products'
+                ? 'bg-[var(--primary)] text-white shadow-lg'
+                : 'bg-[var(--background)] border border-[var(--border)] hover:bg-[var(--border)]/30'
+            }`}
+          >
+            📦 מוצרים
+          </button>
+          <button
+            onClick={() => setActiveTab('providers')}
+            className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
+              activeTab === 'providers'
+                ? 'bg-[var(--primary)] text-white shadow-lg'
+                : 'bg-[var(--background)] border border-[var(--border)] hover:bg-[var(--border)]/30'
+            }`}
+          >
+            🏪 ספקים
+          </button>
+        </div>
+
+        {/* Stats Panel - Only show on products tab */}
+        {activeTab === 'products' && (
+          <StatsPanel
+            products={products}
+            priceData={priceData}
+            threshold={settings.threshold}
+            isSearching={isSearching}
+            searchProgress={searchProgress}
+            onExport={handleExportByCategory}
+          />
+        )}
       </header>
 
       {/* Main Content Area - Scrollable */}
       <div className="flex-1 overflow-hidden p-6 pt-6">
-        <div className="h-full flex gap-6">
-          {/* Product table - Scrollable */}
-          <div className="flex-1 flex flex-col min-w-0 space-y-4 overflow-hidden">
-            {/* Actions bar */}
-            <div className="flex-shrink-0 rounded-2xl p-4 bg-[var(--card)] border border-[var(--border)] shadow-lg">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex-1 min-w-[200px]">
-                  <input
-                    type="text"
-                    placeholder="🔍 חיפוש לפי שם, מק״ט או ברקוד..."
-                    value={searchFilter}
-                    onChange={(e) => setSearchFilter(e.target.value)}
-                    className="w-full"
-                  />
+        {activeTab === 'products' ? (
+          <div className="h-full flex gap-6">
+            {/* Product table - Scrollable */}
+            <div className="flex-1 flex flex-col min-w-0 space-y-4 overflow-hidden">
+              {/* Actions bar */}
+              <div className="flex-shrink-0 rounded-2xl p-4 bg-[var(--card)] border border-[var(--border)] shadow-lg">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex-1 min-w-[200px]">
+                    <input
+                      type="text"
+                      placeholder="🔍 חיפוש לפי שם, מק״ט או ברקוד..."
+                      value={searchFilter}
+                      onChange={(e) => setSearchFilter(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                  <button
+                    onClick={() => setShowImportModal(true)}
+                    className="btn-secondary"
+                  >
+                    📁 ייבוא
+                  </button>
+                  <button
+                    onClick={() => setShowProductEditor(true)}
+                    className="btn-secondary"
+                  >
+                    ✏️ עריכה
+                  </button>
+                  
+                  {/* Search/Stop buttons */}
+                  {isSearching ? (
+                    <button
+                      onClick={handleStopSearch}
+                      className="btn-danger"
+                    >
+                      ⏹️ עצור
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleBulkCheck()}
+                      disabled={filteredProducts.length === 0}
+                      className="btn-primary"
+                    >
+                      🔍 בדוק הכל ({filteredProducts.length})
+                    </button>
+                  )}
                 </div>
-                <button
-                  onClick={() => setShowImportModal(true)}
-                  className="btn-secondary"
-                >
-                  📁 ייבוא
-                </button>
-                <button
-                  onClick={() => setShowProductEditor(true)}
-                  className="btn-secondary"
-                >
-                  ✏️ עריכה
-                </button>
-                
-                {/* Search/Stop buttons */}
-                {isSearching ? (
-                  <button
-                    onClick={handleStopSearch}
-                    className="btn-danger"
-                  >
-                    ⏹️ עצור
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleBulkCheck()}
-                    disabled={filteredProducts.length === 0}
-                    className="btn-primary"
-                  >
-                    🔍 בדוק הכל ({filteredProducts.length})
-                  </button>
-                )}
+              </div>
+
+              {/* Products table - Scrollable */}
+              <div className="flex-1 rounded-2xl overflow-hidden border border-[var(--border)] shadow-lg bg-[var(--card)] overflow-y-auto">
+                <ProductTable
+                  products={filteredProducts}
+                  priceData={priceData}
+                  threshold={settings.threshold}
+                  onCheckPrice={handleCheckPrice}
+                  onSelectProduct={setSelectedProduct}
+                  onCheckSelected={handleCheckSelected}
+                  selectedBarcode={selectedProduct?.barcode}
+                  loading={loading}
+                  filter={productFilter}
+                  onFilterChange={setProductFilter}
+                />
               </div>
             </div>
 
-            {/* Products table - Scrollable */}
-            <div className="flex-1 rounded-2xl overflow-hidden border border-[var(--border)] shadow-lg bg-[var(--card)] overflow-y-auto">
-              <ProductTable
-                products={filteredProducts}
-                priceData={priceData}
+            {/* Sidebar - Fixed, doesn't scroll with table */}
+            <div className="hidden lg:block w-[380px] flex-shrink-0 space-y-4 overflow-y-auto">
+              {/* Threshold slider */}
+              <ThresholdSlider
+                value={settings.threshold}
+                onChange={handleThresholdChange}
+              />
+
+              {/* Price results */}
+              <PriceResults
+                product={selectedProduct}
+                comparison={selectedProduct ? priceData[selectedProduct.barcode] : null}
                 threshold={settings.threshold}
-                onCheckPrice={handleCheckPrice}
-                onSelectProduct={setSelectedProduct}
-                onCheckSelected={handleCheckSelected}
-                selectedBarcode={selectedProduct?.barcode}
-                loading={loading}
-                filter={productFilter}
-                onFilterChange={setProductFilter}
               />
             </div>
           </div>
-
-          {/* Sidebar - Fixed, doesn't scroll with table */}
-          <div className="hidden lg:block w-[380px] flex-shrink-0 space-y-4 overflow-y-auto">
-            {/* Threshold slider */}
-            <ThresholdSlider
-              value={settings.threshold}
-              onChange={handleThresholdChange}
-            />
-
-            {/* Price results */}
-            <PriceResults
-              product={selectedProduct}
-              comparison={selectedProduct ? priceData[selectedProduct.barcode] : null}
-              threshold={settings.threshold}
-            />
+        ) : (
+          <div className="h-full overflow-y-auto">
+            <ProvidersView />
           </div>
-        </div>
+        )}
       </div>
 
       {/* Modals */}
