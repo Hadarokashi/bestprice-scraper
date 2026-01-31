@@ -131,6 +131,16 @@ function isPriceValid(price, recommendedPrice) {
 // Extract prices from page
 async function extractPrices(page, config) {
   const products = [];
+  const baseUrl = config.baseUrl;
+  
+  // Helper to make URLs absolute
+  const makeAbsolute = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('//')) return 'https:' + url;
+    if (url.startsWith('/')) return baseUrl + url;
+    return baseUrl + '/' + url;
+  };
   
   try {
     await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
@@ -144,7 +154,7 @@ async function extractPrices(page, config) {
           if (data['@type'] === 'Product' && data.name && data.offers) {
             const offer = Array.isArray(data.offers) ? data.offers[0] : data.offers;
             const price = parseFloat(offer.price || offer.lowPrice);
-            if (price > 0) results.push({ name: data.name, price, url: offer.url || data.url || '' });
+            if (price > 0) results.push({ name: data.name, price, url: offer.url || data.url || window.location.href });
           }
         } catch {}
       });
@@ -152,7 +162,7 @@ async function extractPrices(page, config) {
     });
     
     if (jsonLdProducts.length > 0) {
-      products.push(...jsonLdProducts);
+      products.push(...jsonLdProducts.map(p => ({ ...p, url: makeAbsolute(p.url) })));
       return products;
     }
     
@@ -162,7 +172,11 @@ async function extractPrices(page, config) {
       document.querySelectorAll('.product, .products li, .product-item, [data-product-id]').forEach(card => {
         const nameEl = card.querySelector('.woocommerce-loop-product__title, .product-title, .product-name, h2, h3');
         const priceEl = card.querySelector('.price .woocommerce-Price-amount, .price ins .amount, .price .amount, .product-price');
-        const linkEl = card.querySelector('a[href*="product"], a.woocommerce-LoopProduct-link');
+        // Try multiple link selectors
+        const linkEl = card.querySelector('a[href*="product"]') || 
+                       card.querySelector('a.woocommerce-LoopProduct-link') ||
+                       card.querySelector('a[href]:not([href="#"])') ||
+                       card.closest('a[href]');
         
         if (nameEl && priceEl) {
           const name = nameEl.textContent?.trim() || '';
@@ -176,11 +190,11 @@ async function extractPrices(page, config) {
     });
     
     if (wooProducts.length > 0) {
-      products.push(...wooProducts);
+      products.push(...wooProducts.map(p => ({ ...p, url: makeAbsolute(p.url) })));
       return products;
     }
     
-    // Generic extraction
+    // Generic extraction - improved link detection
     const genericProducts = await page.evaluate(() => {
       const results = [];
       const priceRegex = /(?:₪|ILS)\s*(\d{1,5}(?:[,\.]\d{1,2})?)|(\d{1,5}(?:[,\.]\d{1,2})?)\s*(?:₪|ILS)/;
@@ -189,8 +203,12 @@ async function extractPrices(page, config) {
         const text = el.textContent?.trim() || '';
         const match = text.match(priceRegex);
         if (match) {
-          const nameEl = el.querySelector('h1, h2, h3, h4, .title, .name');
-          const linkEl = el.querySelector('a');
+          const nameEl = el.querySelector('h1, h2, h3, h4, .title, .name, [class*="title"], [class*="name"]');
+          // Try multiple link selectors
+          const linkEl = el.querySelector('a[href*="product"]') ||
+                         el.querySelector('a[href*="item"]') ||
+                         el.querySelector('a[href]:not([href="#"]):not([href="javascript"])') ||
+                         el.closest('a[href]');
           if (nameEl) {
             const name = nameEl.textContent?.trim() || '';
             const priceStr = (match[1] || match[2]).replace(',', '.');
@@ -207,7 +225,7 @@ async function extractPrices(page, config) {
       return results;
     });
     
-    products.push(...genericProducts);
+    products.push(...genericProducts.map(p => ({ ...p, url: makeAbsolute(p.url) })));
   } catch (error) {
     console.error(`Extraction error for ${config.name}:`, error.message);
   }
@@ -240,14 +258,15 @@ async function scrapeSite(browser, config, productName, recommendedPrice) {
     for (const product of products) {
       if (isProductMatch(product.name, productName) && isPriceValid(product.price, recommendedPrice)) {
         const num = providers.length + 1;
+        const productUrl = product.url || searchUrl;
         providers.push({
           providerName: num > 1 ? `${config.name} (${num})` : config.name,
-          providerUrl: product.url || searchUrl,
+          providerUrl: productUrl,
           price: product.price,
           currency: 'ILS',
           lastUpdated: new Date().toISOString(),
         });
-        console.log(`[${config.name}] Match: ${product.name} - ₪${product.price}`);
+        console.log(`[${config.name}] Match: ${product.name} - ₪${product.price} - URL: ${productUrl}`);
       }
     }
   } catch (error) {
