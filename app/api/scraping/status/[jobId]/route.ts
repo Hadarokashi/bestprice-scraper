@@ -4,10 +4,10 @@ import type { ScrapingJob } from '@/lib/types';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
-    const jobId = params.jobId;
+    const { jobId } = await params;
     
     // Get job status
     const { data: job, error } = await supabase
