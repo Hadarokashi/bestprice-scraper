@@ -220,11 +220,12 @@ function isPriceReasonable(price: number, recommendedPrice?: number): boolean {
   
   // If we have a recommended price, validate against it
   if (recommendedPrice && recommendedPrice > 0) {
-    const minPrice = recommendedPrice * 0.3; // 30% of recommended
-    const maxPrice = recommendedPrice * 1.5; // 150% of recommended
+    // Much stricter range for audio equipment: 60%-130% of recommended
+    const minPrice = recommendedPrice * 0.6;  // 60% minimum
+    const maxPrice = recommendedPrice * 1.3;  // 130% maximum
     
     if (price < minPrice || price > maxPrice) {
-      console.log(`[Price Validation] Rejected ₪${price} (expected range: ₪${minPrice.toFixed(0)}-₪${maxPrice.toFixed(0)})`);
+      console.log(`[Price Validation] Rejected ₪${price} for recommended ₪${recommendedPrice} (expected range: ₪${minPrice.toFixed(0)}-₪${maxPrice.toFixed(0)})`);
       return false;
     }
   }
