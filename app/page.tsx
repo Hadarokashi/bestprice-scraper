@@ -189,6 +189,27 @@ export default function Dashboard() {
               // Check if completed
               if (statusResult.data.status === 'completed' || statusResult.data.status === 'failed') {
                 console.log(`[Price Check] Job ${jobId} ${statusResult.data.status} - Found ${statusResult.data.providers?.length || 0} results`);
+                
+                // Save results to Supabase so Villy can see them
+                try {
+                  await fetch('/api/prices', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      barcode: product.barcode,
+                      productId: product.id,
+                      recommendedPrice: product.recommendedPrice,
+                      threshold: settings.threshold,
+                      providers: statusResult.data.providers || [],
+                      flaggedProviders,
+                      scanMetadata: statusResult.data.scanMetadata,
+                    }),
+                  });
+                  console.log(`[Price Check] Saved results to cache for ${product.name}`);
+                } catch (saveError) {
+                  console.error('[Price Check] Failed to save to cache:', saveError);
+                }
+                
                 setLoading(prev => ({ ...prev, [product.barcode]: false }));
                 return;
               }

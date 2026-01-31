@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { PriceCache, PriceComparison, ApiResponse } from '@/lib/types';
 
@@ -29,6 +29,50 @@ export async function GET(): Promise<NextResponse<ApiResponse<PriceCache>>> {
     return NextResponse.json({ success: true, data: cache });
   } catch (error) {
     console.error('GET /api/prices error:', error);
+    return NextResponse.json(
+      { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
+  }
+}
+
+// POST /api/prices - Save price comparison results
+export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<null>>> {
+  try {
+    const body = await request.json();
+    const { barcode, productId, recommendedPrice, threshold, providers, flaggedProviders, scanMetadata } = body;
+
+    if (!barcode) {
+      return NextResponse.json(
+        { success: false, error: 'barcode is required' },
+        { status: 400 }
+      );
+    }
+
+    // Upsert into price_cache
+    const { error } = await supabase
+      .from('price_cache')
+      .upsert({
+        barcode,
+        product_id: productId,
+        recommended_price: recommendedPrice,
+        threshold,
+        providers: providers || [],
+        flagged_providers: flaggedProviders || [],
+        scan_metadata: scanMetadata || null,
+        last_searched: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'barcode',
+      });
+
+    if (error) throw error;
+
+    console.log(`[Price Cache] Saved results for barcode ${barcode}: ${providers?.length || 0} providers`);
+
+    return NextResponse.json({ success: true, data: null });
+  } catch (error) {
+    console.error('POST /api/prices error:', error);
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
