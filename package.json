@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "scraper": "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright npx tsx scripts/local-scraper-server.ts",
+    "scrape": "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright npx tsx scripts/scrape-prices.ts",
+    "setup-playwright": "npx playwright install chromium"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -15,6 +18,8 @@
     "@supabase/supabase-js": "^2.89.0",
     "next": "16.1.1",
     "papaparse": "^5.5.3",
+    "playwright": "^1.58.1",
+    "playwright-core": "^1.58.1",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
@@ -27,6 +32,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

@@ -95,11 +95,74 @@ export default function Dashboard() {
     }
   };
 
+  // Local Playwright server URL
+  const LOCAL_SCRAPER_URL = 'http://localhost:3001';
+  const [useLocalScraper, setUseLocalScraper] = useState(false);
+  
+  // Check if local scraper is available on mount
+  useEffect(() => {
+    fetch(`${LOCAL_SCRAPER_URL}/health`, { signal: AbortSignal.timeout(2000) })
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'ok') {
+          setUseLocalScraper(true);
+          console.log('[Dashboard] Local Playwright scraper detected - using browser-based scraping');
+        }
+      })
+      .catch(() => {
+        console.log('[Dashboard] Local scraper not available - using HTTP scraping');
+      });
+  }, []);
+
   // Check price for a single product using queue-based scraping
   const handleCheckPrice = useCallback(async (product: Product, signal?: AbortSignal) => {
     setLoading(prev => ({ ...prev, [product.barcode]: true }));
 
     try {
+      // Try local Playwright scraper first (if available)
+      if (useLocalScraper) {
+        console.log(`[Price Check] Using local Playwright scraper for ${product.name}`);
+        
+        const localResponse = await fetch(`${LOCAL_SCRAPER_URL}/scrape`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productName: product.name,
+            barcode: product.barcode,
+            recommendedPrice: product.recommendedPrice,
+          }),
+          signal,
+        });
+
+        const localResult = await localResponse.json();
+        
+        if (localResult.success) {
+          const thresholdPrice = product.recommendedPrice * (1 - settings.threshold / 100);
+          const flaggedProviders = (localResult.data.providers || []).filter((p: any) => p.price < thresholdPrice);
+          
+          setPriceData(prev => ({
+            ...prev,
+            [product.barcode]: {
+              productId: product.id,
+              barcode: product.barcode,
+              recommendedPrice: product.recommendedPrice,
+              threshold: settings.threshold,
+              providers: localResult.data.providers || [],
+              flaggedProviders,
+              lastSearched: new Date().toISOString(),
+              scanMetadata: localResult.data.scanMetadata,
+            },
+          }));
+          
+          console.log(`[Price Check] Playwright found ${localResult.data.providers?.length || 0} results for ${product.name}`);
+          setLoading(prev => ({ ...prev, [product.barcode]: false }));
+          return;
+        }
+      }
+      
+      // Fall back to queue-based HTTP scraping
+      console.log(`[Price Check] Using HTTP scraping for ${product.name}`);
+      
       // Step 1: Create scraping job
       const createJobResponse = await fetch('/api/scraping/create-job', {
         method: 'POST',
@@ -472,6 +535,12 @@ export default function Dashboard() {
             <p className="text-[var(--muted)]">
               מעקב והשוואת מחירים מול ספקים בישראל
             </p>
+            {useLocalScraper && (
+              <div className="flex items-center gap-2 mt-1">
+                <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span className="text-xs text-green-500">Playwright (דפדפן מקומי)</span>
+              </div>
+            )}
           </div>
           
           <div className="flex items-center gap-4">

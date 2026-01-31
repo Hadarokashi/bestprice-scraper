@@ -57,7 +57,7 @@ export interface AppSettings {
 }
 
 // Available price sources
-export type PriceSource = 'serpapi' | 'zap' | 'manual' | 'combined';
+export type PriceSource = 'serpapi' | 'zap' | 'manual' | 'combined' | 'scraper' | 'playwright';
 
 // Raw CSV row from Hebrew product file
 export interface RawProductRow {

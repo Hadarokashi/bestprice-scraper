@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { scrapeGeneric } from '@/lib/price-sources/generic-scraper';
+import { scrapeWithPlaywright, closeBrowser } from '@/lib/price-sources/playwright-scraper';
 import { searchWithZap } from '@/lib/price-sources/zap-scraper';
 import type { ScraperConfig, ProviderPrice, WebsiteScanStatus } from '@/lib/types';
 
 const BATCH_SIZE = 5; // Process 5 scrapers at a time
+const USE_PLAYWRIGHT = !!process.env.BROWSERLESS_API_KEY;
 
 export async function POST(request: NextRequest) {
   try {
@@ -132,6 +134,8 @@ export async function POST(request: NextRequest) {
 
     // Process scrapers in parallel
     if (scrapers && scrapers.length > 0) {
+      console.log(`[Batch Processor] Using ${USE_PLAYWRIGHT ? 'Playwright (headless browser)' : 'HTTP fetch'} for scraping`);
+      
       const scrapePromises = scrapers.map(async (scraper: any) => {
         const config: ScraperConfig = {
           id: scraper.id,
@@ -143,7 +147,10 @@ export async function POST(request: NextRequest) {
         };
         
         try {
-          const results = await scrapeGeneric(config, job.product_name, recommendedPrice);
+          // Use Playwright if BROWSERLESS_API_KEY is set, otherwise fall back to HTTP
+          const results = USE_PLAYWRIGHT
+            ? await scrapeWithPlaywright(config, job.product_name, recommendedPrice)
+            : await scrapeGeneric(config, job.product_name, recommendedPrice);
           return { scraper, results, error: null };
         } catch (error) {
           console.error(`[Batch Processor] Error scraping ${scraper.name}:`, error);
@@ -152,6 +159,15 @@ export async function POST(request: NextRequest) {
       });
       
       const batchResults = await Promise.all(scrapePromises);
+      
+      // Close browser after batch (if using Playwright)
+      if (USE_PLAYWRIGHT) {
+        try {
+          await closeBrowser();
+        } catch (e) {
+          console.log('[Batch Processor] Browser close error (non-fatal):', e);
+        }
+      }
       
       // Process results and track scans
       for (const { scraper, results, error } of batchResults) {
