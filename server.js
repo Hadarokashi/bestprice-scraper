@@ -282,14 +282,26 @@ async function scrapeSite(browser, config, productName, recommendedPrice) {
 const PARALLEL_SITES = 3;
 
 // Background scraping function
-async function runScrapeJob(jobId, productName, recommendedPrice, barcode) {
+async function runScrapeJob(jobId, productName, recommendedPrice, barcode, excludeSites = []) {
   const job = jobs.get(jobId);
   if (!job) return;
+  
+  // Filter out excluded sites (sites already found on Zap)
+  const sitesToScan = excludeSites.length > 0
+    ? SCRAPER_CONFIGS.filter(c => !excludeSites.includes(c.name))
+    : SCRAPER_CONFIGS;
+  
+  // Update job with correct total
+  job.totalSites = sitesToScan.length;
   
   let browser = null;
   
   try {
-    console.log(`\n🔍 [Job ${jobId}] Starting scrape for "${productName}" (${PARALLEL_SITES} sites in parallel)`);
+    console.log(`\n🔍 [Job ${jobId}] Starting scrape for "${productName}"`);
+    console.log(`   Scanning ${sitesToScan.length} sites (excluded ${excludeSites.length} sites found on Zap)`);
+    if (excludeSites.length > 0) {
+      console.log(`   Excluded: ${excludeSites.slice(0, 5).join(', ')}${excludeSites.length > 5 ? '...' : ''}`);
+    }
     
     browser = await chromium.launch({
       headless: true,
@@ -297,10 +309,10 @@ async function runScrapeJob(jobId, productName, recommendedPrice, barcode) {
     });
     
     // Process sites in batches of PARALLEL_SITES
-    for (let i = 0; i < SCRAPER_CONFIGS.length; i += PARALLEL_SITES) {
+    for (let i = 0; i < sitesToScan.length; i += PARALLEL_SITES) {
       if (job.status === 'cancelled') break;
       
-      const batch = SCRAPER_CONFIGS.slice(i, i + PARALLEL_SITES);
+      const batch = sitesToScan.slice(i, i + PARALLEL_SITES);
       console.log(`[Job ${jobId}] Processing batch ${Math.floor(i / PARALLEL_SITES) + 1}: ${batch.map(c => c.name).join(', ')}`);
       
       const batchResults = await Promise.all(
@@ -333,12 +345,12 @@ async function runScrapeJob(jobId, productName, recommendedPrice, barcode) {
         }
         job.completedSites++;
       }
-      job.progress = Math.round((job.completedSites / SCRAPER_CONFIGS.length) * 100);
+      job.progress = Math.round((job.completedSites / sitesToScan.length) * 100);
     }
     
     job.status = 'completed';
     job.completedAt = new Date().toISOString();
-    console.log(`✅ [Job ${jobId}] Completed - Found ${job.providers.length} results`);
+    console.log(`✅ [Job ${jobId}] Completed - Found ${job.providers.length} results from ${sitesToScan.length} sites`);
     
   } catch (error) {
     console.error(`❌ [Job ${jobId}] Fatal error:`, error.message);
@@ -356,11 +368,17 @@ function generateJobId() {
 
 // Create scrape job - returns immediately
 app.post('/scrape', async (req, res) => {
-  const { productName, recommendedPrice, barcode } = req.body;
+  const { productName, recommendedPrice, barcode, excludeSites } = req.body;
   
   if (!productName) {
     return res.status(400).json({ success: false, error: 'productName is required' });
   }
+  
+  // Calculate sites to scan based on excludeSites
+  const excludeList = Array.isArray(excludeSites) ? excludeSites : [];
+  const sitesToScan = excludeList.length > 0
+    ? SCRAPER_CONFIGS.filter(c => !excludeList.includes(c.name))
+    : SCRAPER_CONFIGS;
   
   const jobId = generateJobId();
   
@@ -374,15 +392,16 @@ app.post('/scrape', async (req, res) => {
     providers: [],
     scans: [],
     completedSites: 0,
-    totalSites: SCRAPER_CONFIGS.length,
+    totalSites: sitesToScan.length,
     progress: 0,
     createdAt: new Date().toISOString(),
+    excludedSites: excludeList.length,
   };
   
   jobs.set(jobId, job);
   
   // Start scraping in background (don't await)
-  runScrapeJob(jobId, productName, recommendedPrice, barcode);
+  runScrapeJob(jobId, productName, recommendedPrice, barcode, excludeList);
   
   // Return immediately with job ID
   res.json({
@@ -390,7 +409,9 @@ app.post('/scrape', async (req, res) => {
     data: {
       jobId,
       status: 'processing',
-      message: 'Scraping started. Poll /status/:jobId for results.',
+      totalSites: sitesToScan.length,
+      excludedSites: excludeList.length,
+      message: `Scraping ${sitesToScan.length} sites (${excludeList.length} excluded). Poll /status/:jobId for results.`,
     },
   });
 });
@@ -426,11 +447,16 @@ app.get('/status/:jobId', (req, res) => {
 
 // Legacy endpoint - waits for completion (for backwards compatibility)
 app.post('/scrape-sync', async (req, res) => {
-  const { productName, recommendedPrice, barcode } = req.body;
+  const { productName, recommendedPrice, barcode, excludeSites } = req.body;
   
   if (!productName) {
     return res.status(400).json({ success: false, error: 'productName is required' });
   }
+  
+  const excludeList = Array.isArray(excludeSites) ? excludeSites : [];
+  const sitesToScan = excludeList.length > 0
+    ? SCRAPER_CONFIGS.filter(c => !excludeList.includes(c.name))
+    : SCRAPER_CONFIGS;
   
   // Create and run job
   const jobId = generateJobId();
@@ -443,7 +469,7 @@ app.post('/scrape-sync', async (req, res) => {
     providers: [],
     scans: [],
     completedSites: 0,
-    totalSites: SCRAPER_CONFIGS.length,
+    totalSites: sitesToScan.length,
     progress: 0,
     createdAt: new Date().toISOString(),
   };
@@ -451,7 +477,7 @@ app.post('/scrape-sync', async (req, res) => {
   jobs.set(jobId, job);
   
   // Wait for completion
-  await runScrapeJob(jobId, productName, recommendedPrice, barcode);
+  await runScrapeJob(jobId, productName, recommendedPrice, barcode, excludeList);
   
   const completedJob = jobs.get(jobId);
   
