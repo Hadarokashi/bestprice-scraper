@@ -5,6 +5,7 @@ interface ExtractedProduct {
   name: string;
   price: number;
   url: string;
+  source: 'jsonld' | 'meta' | 'regex';
 }
 
 /**
@@ -55,6 +56,7 @@ function extractFromJsonLd(html: string): ExtractedProduct[] {
               name: data.name,
               price,
               url: offer.url || data.url || '',
+              source: 'jsonld',
             });
           }
         }
@@ -72,6 +74,7 @@ function extractFromJsonLd(html: string): ExtractedProduct[] {
                   name: product.name,
                   price,
                   url: product.url || offer?.url || '',
+                  source: 'jsonld',
                 });
               }
             }
@@ -115,7 +118,7 @@ function extractFromMetaTags(html: string): ExtractedProduct[] {
       if (match) {
         const price = parseFloat(match[1].replace(/[^\d.]/g, ''));
         if (price > 0 && title) {
-          products.push({ name: title, price, url });
+          products.push({ name: title, price, url, source: 'meta' });
           break;
         }
       }
@@ -154,6 +157,7 @@ function extractFromCommonSelectors(html: string, baseUrl: string): ExtractedPro
             name,
             price,
             url: baseUrl,
+            source: 'regex',
           });
           break; // Take first reasonable price
         }
@@ -211,8 +215,9 @@ function isStrictMatch(foundName: string, searchQuery: string): boolean {
 
 /**
  * Validate if a price is reasonable for the product
+ * @param source - where the price came from ('jsonld', 'meta', 'regex')
  */
-function isPriceReasonable(price: number, recommendedPrice?: number): boolean {
+function isPriceReasonable(price: number, recommendedPrice?: number, source?: string): boolean {
   // Basic sanity check
   if (price < 50 || price > 50000) {
     return false;
@@ -220,12 +225,25 @@ function isPriceReasonable(price: number, recommendedPrice?: number): boolean {
   
   // If we have a recommended price, validate against it
   if (recommendedPrice && recommendedPrice > 0) {
-    // Much stricter range for audio equipment: 60%-130% of recommended
-    const minPrice = recommendedPrice * 0.6;  // 60% minimum
-    const maxPrice = recommendedPrice * 1.3;  // 130% maximum
+    // Different validation ranges based on source reliability
+    let minPercent: number;
+    let maxPercent: number;
+    
+    if (source === 'jsonld' || source === 'meta') {
+      // JSON-LD and meta tags are reliable - wider range acceptable
+      minPercent = 0.5;  // 50% minimum
+      maxPercent = 1.5;  // 150% maximum
+    } else {
+      // Regex extraction is less reliable - stricter range
+      minPercent = 0.7;  // 70% minimum
+      maxPercent = 1.2;  // 120% maximum
+    }
+    
+    const minPrice = recommendedPrice * minPercent;
+    const maxPrice = recommendedPrice * maxPercent;
     
     if (price < minPrice || price > maxPrice) {
-      console.log(`[Price Validation] Rejected ₪${price} for recommended ₪${recommendedPrice} (expected range: ₪${minPrice.toFixed(0)}-₪${maxPrice.toFixed(0)})`);
+      console.log(`[Price Validation] Rejected ₪${price} from ${source || 'unknown'} for recommended ₪${recommendedPrice} (expected: ₪${minPrice.toFixed(0)}-₪${maxPrice.toFixed(0)})`);
       return false;
     }
   }
@@ -272,19 +290,21 @@ export async function scrapeGeneric(
     const html = await response.text();
     
     // Try extraction methods in order of reliability
+    // ONLY use JSON-LD and meta tags - regex is too unreliable and causes false positives
     let extractedProducts: ExtractedProduct[] = [];
     
     extractedProducts = extractFromJsonLd(html);
     if (extractedProducts.length === 0) {
       extractedProducts = extractFromMetaTags(html);
     }
-    if (extractedProducts.length === 0) {
-      extractedProducts = extractFromCommonSelectors(html, searchUrl);
-    }
+    // DISABLED: regex extraction causes too many false positives (like ₪299 from ads)
+    // if (extractedProducts.length === 0) {
+    //   extractedProducts = extractFromCommonSelectors(html, searchUrl);
+    // }
     
     // Filter for strict matches only - collect ALL matching products with valid prices
     for (const product of extractedProducts) {
-      if (isStrictMatch(product.name, productName) && isPriceReasonable(product.price, recommendedPrice)) {
+      if (isStrictMatch(product.name, productName) && isPriceReasonable(product.price, recommendedPrice, product.source)) {
         const resultNumber = providers.length + 1;
         providers.push({
           providerName: providers.length > 0 ? `${config.name} (${resultNumber})` : config.name,
