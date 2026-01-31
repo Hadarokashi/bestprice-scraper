@@ -223,6 +223,12 @@ function isPriceReasonable(price: number, recommendedPrice?: number, source?: st
     return false;
   }
   
+  // For regex source WITHOUT recommended price - reject entirely (too unreliable)
+  if (source === 'regex' && (!recommendedPrice || recommendedPrice <= 0)) {
+    console.log(`[Price Validation] Rejected ₪${price} from regex - no recommended price to validate against`);
+    return false;
+  }
+  
   // If we have a recommended price, validate against it
   if (recommendedPrice && recommendedPrice > 0) {
     // Different validation ranges based on source reliability
@@ -300,8 +306,8 @@ export async function scrapeGeneric(
       extractedProducts = extractFromMetaTags(html);
     }
     
-    // Finally try regex extraction but ONLY if we have recommended price for validation
-    if (extractedProducts.length === 0 && recommendedPrice && recommendedPrice > 0) {
+    // Finally try regex extraction (least reliable - will be validated by price range)
+    if (extractedProducts.length === 0) {
       extractedProducts = extractFromCommonSelectors(html, searchUrl);
     }
     

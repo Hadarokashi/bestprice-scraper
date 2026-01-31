@@ -111,6 +111,25 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    // Get recommended price from job or fallback to products table
+    let recommendedPrice = (job as any).recommended_price ? parseFloat((job as any).recommended_price) : undefined;
+    
+    // If not in job, try to get from products table
+    if (!recommendedPrice && job.product_id) {
+      const { data: product } = await supabase
+        .from('products')
+        .select('recommended_price')
+        .eq('id', job.product_id)
+        .single();
+      
+      if (product?.recommended_price) {
+        recommendedPrice = parseFloat(product.recommended_price);
+        console.log(`[Batch Processor] Got recommended price ₪${recommendedPrice} from products table`);
+      }
+    }
+    
+    console.log(`[Batch Processor] Using recommended price: ₪${recommendedPrice || 'N/A'}`);
+
     // Process scrapers in parallel
     if (scrapers && scrapers.length > 0) {
       const scrapePromises = scrapers.map(async (scraper: any) => {
@@ -124,7 +143,6 @@ export async function POST(request: NextRequest) {
         };
         
         try {
-          const recommendedPrice = (job as any).recommended_price ? parseFloat((job as any).recommended_price) : undefined;
           const results = await scrapeGeneric(config, job.product_name, recommendedPrice);
           return { scraper, results, error: null };
         } catch (error) {
