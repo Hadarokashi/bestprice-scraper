@@ -8,6 +8,7 @@ export async function GET(): Promise<NextResponse<ApiResponse<ProductsStore>>> {
     const { data, error } = await supabase
       .from('products')
       .select('*')
+      .order('display_order', { ascending: true, nullsFirst: false })
       .order('name');
 
     if (error) throw error;
@@ -21,6 +22,7 @@ export async function GET(): Promise<NextResponse<ApiResponse<ProductsStore>>> {
       salePrice: row.sale_price ? parseFloat(row.sale_price) : undefined,
       consumerSalePrice: row.consumer_sale_price ? parseFloat(row.consumer_sale_price) : undefined,
       category: row.category || undefined,
+      displayOrder: row.display_order || undefined,
     }));
 
     return NextResponse.json({ 

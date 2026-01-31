@@ -145,6 +145,11 @@ export default function Dashboard() {
         // Update UI with partial results
         const thresholdPrice = product.recommendedPrice * (1 - settings.threshold / 100);
         const flaggedProviders = lastResults.filter((p: any) => p.price < thresholdPrice);
+        
+        // Get scan metadata from status endpoint
+        const statusResponse = await fetch(`/api/scraping/status/${job.id}`, { signal });
+        const statusResult = await statusResponse.json();
+        const websiteScans = statusResult.data?.website_scans || [];
 
         setPriceData(prev => ({
           ...prev,
@@ -156,6 +161,11 @@ export default function Dashboard() {
             providers: lastResults,
             flaggedProviders,
             lastSearched: new Date().toISOString(),
+            scanMetadata: {
+              totalWebsites: batchResult.data.totalScrapers || 0,
+              scannedWebsites: websiteScans.length,
+              websites: websiteScans,
+            },
           },
         }));
 
@@ -410,6 +420,30 @@ export default function Dashboard() {
     setProducts(updatedProducts);
   };
 
+  // Handle product reorder from drag-and-drop
+  const handleReorder = async (newProducts: Product[]) => {
+    // Update local state immediately for smooth UX
+    setProducts(newProducts);
+    
+    // Update display_order in database
+    try {
+      for (let i = 0; i < newProducts.length; i++) {
+        await fetch('/api/products/reorder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId: newProducts[i].id,
+            newOrder: i,
+          }),
+        });
+      }
+    } catch (error) {
+      console.error('Error updating product order:', error);
+      // Optionally reload products to restore correct order
+      fetchProducts();
+    }
+  };
+
   if (initialLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -551,6 +585,7 @@ export default function Dashboard() {
                   loading={loading}
                   filter={productFilter}
                   onFilterChange={setProductFilter}
+                  onReorder={handleReorder}
                 />
               </div>
             </div>

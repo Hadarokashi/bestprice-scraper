@@ -8,6 +8,7 @@ export interface Product {
   salePrice?: number;
   consumerSalePrice?: number;
   category?: string;
+  displayOrder?: number;
 }
 
 // Provider price result from search
@@ -20,6 +21,21 @@ export interface ProviderPrice {
   source: PriceSource;
 }
 
+// Website scan status
+export interface WebsiteScanStatus {
+  name: string;
+  status: 'found' | 'not_found' | 'error' | 'pending';
+  resultsCount?: number;
+  error?: string;
+}
+
+// Scan metadata for tracking which websites were checked
+export interface ScanMetadata {
+  totalWebsites: number;
+  scannedWebsites: number;
+  websites: WebsiteScanStatus[];
+}
+
 // Price comparison result for a product
 export interface PriceComparison {
   productId: string;
@@ -30,6 +46,7 @@ export interface PriceComparison {
   flaggedProviders: ProviderPrice[];
   lastSearched: string;
   error?: string;
+  scanMetadata?: ScanMetadata;
 }
 
 // Settings for the application

@@ -39,9 +39,10 @@ export async function GET(
         completedScrapers: job.completed_scrapers,
         progress,
         results: job.results || [],
+        website_scans: (job as any).website_scans || [],
         createdAt: job.created_at,
         updatedAt: job.updated_at,
-      } as ScrapingJob & { progress: number },
+      } as ScrapingJob & { progress: number; website_scans: any[] },
     });
   } catch (error) {
     console.error('Error in status:', error);

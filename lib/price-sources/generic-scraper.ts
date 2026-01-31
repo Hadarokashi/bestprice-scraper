@@ -257,11 +257,12 @@ export async function scrapeGeneric(
       extractedProducts = extractFromCommonSelectors(html, searchUrl);
     }
     
-    // Filter for strict matches only
+    // Filter for strict matches only - collect ALL matching products
     for (const product of extractedProducts) {
       if (isStrictMatch(product.name, productName)) {
+        const resultNumber = providers.length + 1;
         providers.push({
-          providerName: config.name,
+          providerName: providers.length > 0 ? `${config.name} (${resultNumber})` : config.name,
           providerUrl: product.url || searchUrl,
           price: product.price,
           currency: 'ILS',
@@ -269,8 +270,8 @@ export async function scrapeGeneric(
           source: 'manual' as any, // We'll update the type system later
         });
         
-        console.log(`[Generic Scraper] ${config.name}: Found match - ${product.name} - ₪${product.price}`);
-        break; // Take first match
+        console.log(`[Generic Scraper] ${config.name}: Match #${resultNumber} - ${product.name} - ₪${product.price}`);
+        // Continue checking all products - no break
       }
     }
     

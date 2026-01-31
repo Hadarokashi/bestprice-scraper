@@ -118,6 +118,53 @@ export default function PriceResults({ product, comparison, threshold }: PriceRe
             עודכן: {new Date(comparison.lastSearched).toLocaleString('he-IL')}
           </div>
         )}
+        
+        {/* Website Scan Summary */}
+        {comparison?.scanMetadata && (
+          <details className="mt-4 pt-4 border-t border-[var(--border)]">
+            <summary className="cursor-pointer p-2 bg-[var(--background)] rounded hover:bg-[var(--border)]/30 transition-colors flex items-center gap-2 font-medium text-sm">
+              <span>🌐</span>
+              <span>אתרים שנסרקו</span>
+              <span className="mr-auto text-[var(--success)] bg-[var(--success)]/10 px-2 py-0.5 rounded">
+                {comparison.scanMetadata.scannedWebsites}/{comparison.scanMetadata.totalWebsites}
+              </span>
+            </summary>
+            <div className="mt-2 space-y-1 max-h-[200px] overflow-y-auto">
+              {comparison.scanMetadata.websites.map((site, idx) => (
+                <div 
+                  key={idx} 
+                  className="flex justify-between items-center text-xs p-2 bg-[var(--card)] rounded border border-[var(--border)]/50"
+                >
+                  <span className="font-medium">{site.name}</span>
+                  <span className={`flex items-center gap-1 ${
+                    site.status === 'found' ? 'text-[var(--success)]' : 
+                    site.status === 'error' ? 'text-[var(--danger)]' : 
+                    'text-[var(--muted)]'
+                  }`}>
+                    {site.status === 'found' && (
+                      <>
+                        <span>✓</span>
+                        <span>{site.resultsCount} נמצאו</span>
+                      </>
+                    )}
+                    {site.status === 'error' && (
+                      <>
+                        <span>✗</span>
+                        <span title={site.error}>שגיאה</span>
+                      </>
+                    )}
+                    {site.status === 'not_found' && (
+                      <>
+                        <span>—</span>
+                        <span>לא נמצא</span>
+                      </>
+                    )}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </details>
+        )}
       </div>
 
       {/* Manual Search Links */}

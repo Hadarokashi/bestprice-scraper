@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { scrapeGeneric } from '@/lib/price-sources/generic-scraper';
 import { searchWithZap } from '@/lib/price-sources/zap-scraper';
-import type { ScraperConfig, ProviderPrice } from '@/lib/types';
+import type { ScraperConfig, ProviderPrice, WebsiteScanStatus } from '@/lib/types';
 
 const BATCH_SIZE = 5; // Process 5 scrapers at a time
 
@@ -57,6 +57,9 @@ export async function POST(request: NextRequest) {
     const allResults: ProviderPrice[] = job.results || [];
     let completedCount = job.completed_scrapers || 0;
     
+    // Initialize or retrieve website scan tracking
+    const websiteScans: WebsiteScanStatus[] = (job as any).website_scans || [];
+    
     // First, check Zap if we haven't yet
     if (completedCount === 0) {
       console.log(`[Batch Processor] Checking Zap for: ${job.product_name}`);
@@ -69,9 +72,26 @@ export async function POST(request: NextRequest) {
         if (zapResult.success && zapResult.providers.length > 0) {
           allResults.push(...zapResult.providers);
           console.log(`[Batch Processor] Zap found ${zapResult.providers.length} providers`);
+          
+          // Track Zap scan
+          websiteScans.push({
+            name: 'Zap.co.il',
+            status: 'found',
+            resultsCount: zapResult.providers.length,
+          });
+        } else {
+          websiteScans.push({
+            name: 'Zap.co.il',
+            status: 'not_found',
+          });
         }
       } catch (error) {
         console.error('[Batch Processor] Zap error:', error);
+        websiteScans.push({
+          name: 'Zap.co.il',
+          status: 'error',
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
       }
     }
     
@@ -105,18 +125,36 @@ export async function POST(request: NextRequest) {
         
         try {
           const results = await scrapeGeneric(config, job.product_name);
-          return results;
+          return { scraper, results, error: null };
         } catch (error) {
           console.error(`[Batch Processor] Error scraping ${scraper.name}:`, error);
-          return [];
+          return { scraper, results: [], error: error instanceof Error ? error.message : 'Unknown error' };
         }
       });
       
       const batchResults = await Promise.all(scrapePromises);
       
-      // Flatten and add to results
-      for (const results of batchResults) {
-        allResults.push(...results);
+      // Process results and track scans
+      for (const { scraper, results, error } of batchResults) {
+        if (error) {
+          websiteScans.push({
+            name: scraper.name,
+            status: 'error',
+            error,
+          });
+        } else if (results.length > 0) {
+          allResults.push(...results);
+          websiteScans.push({
+            name: scraper.name,
+            status: 'found',
+            resultsCount: results.length,
+          });
+        } else {
+          websiteScans.push({
+            name: scraper.name,
+            status: 'not_found',
+          });
+        }
       }
       
       completedCount += scrapers.length;
@@ -126,13 +164,14 @@ export async function POST(request: NextRequest) {
     const isComplete = completedCount >= job.total_scrapers;
     const newStatus = isComplete ? 'completed' : 'processing';
     
-    // Update job with results
+    // Update job with results and scan metadata
     await supabase
       .from('scraping_jobs')
       .update({
         status: newStatus,
         completed_scrapers: completedCount,
         results: allResults,
+        website_scans: websiteScans,
         updated_at: new Date().toISOString(),
       })
       .eq('id', jobId);

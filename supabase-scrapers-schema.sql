@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS scraping_jobs (
   total_scrapers INTEGER,
   completed_scrapers INTEGER DEFAULT 0,
   results JSONB DEFAULT '[]',
+  website_scans JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );

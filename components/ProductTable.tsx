@@ -2,6 +2,23 @@
 
 import { useState } from 'react';
 import { Product, PriceComparison } from '@/lib/types';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 export type FilterType = 'all' | 'unmatched' | 'flagged' | 'good' | 'not-searched';
 
@@ -16,6 +33,7 @@ interface ProductTableProps {
   loading?: { [barcode: string]: boolean };
   filter: FilterType;
   onFilterChange: (filter: FilterType) => void;
+  onReorder: (products: Product[]) => void;
 }
 
 export default function ProductTable({
@@ -29,9 +47,29 @@ export default function ProductTable({
   loading = {},
   filter,
   onFilterChange,
+  onReorder,
 }: ProductTableProps) {
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = products.findIndex((p) => p.id === active.id);
+      const newIndex = products.findIndex((p) => p.id === over.id);
+
+      const newProducts = arrayMove(products, oldIndex, newIndex);
+      onReorder(newProducts);
+    }
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('he-IL', {
@@ -224,6 +262,7 @@ export default function ProductTable({
                   className="w-4 h-4 rounded border-[var(--border)] bg-[var(--card)] text-[var(--primary)] cursor-pointer"
                 />
               </th>
+              <th className="w-10">⋮⋮</th>
               <th>שם מוצר</th>
               <th>מק״ט</th>
               <th>ברקוד</th>
@@ -233,84 +272,36 @@ export default function ProductTable({
               <th>פעולות</th>
             </tr>
           </thead>
-          <tbody>
-            {filteredProducts.map((product, index) => {
-              const lowestPrice = getLowestPrice(product.barcode);
-              const isSelected = selectedBarcode === product.barcode;
-              const isChecked = selectedProducts.has(product.barcode);
-              const isLoading = loading[product.barcode];
-              
-              return (
-                <tr
-                  key={product.id}
-                  className={`animate-fade-in cursor-pointer transition-colors ${
-                    isSelected ? 'bg-[var(--primary)]/10' : ''
-                  } ${isChecked ? 'bg-[var(--primary)]/5' : ''}`}
-                  style={{ animationDelay: `${Math.min(index * 0.02, 0.5)}s`, opacity: 0 }}
-                  onClick={() => onSelectProduct(product)}
-                >
-                  <td onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => toggleProduct(product.barcode)}
-                      className="w-4 h-4 rounded border-[var(--border)] bg-[var(--card)] text-[var(--primary)] cursor-pointer"
-                    />
-                  </td>
-                  <td className="font-medium">{product.name}</td>
-                  <td className="text-[var(--muted)] text-sm">{product.sku}</td>
-                  <td className="font-mono text-xs">{product.barcode}</td>
-                  <td className="font-semibold">{formatPrice(product.recommendedPrice)}</td>
-                  <td>
-                    {lowestPrice ? (
-                      <span className={lowestPrice < product.recommendedPrice * (1 - threshold / 100) 
-                        ? 'text-[var(--danger)] font-semibold' 
-                        : 'text-[var(--success)]'
-                      }>
-                        {formatPrice(lowestPrice)}
-                      </span>
-                    ) : (
-                      <span className="text-[var(--muted)]">—</span>
-                    )}
-                  </td>
-                  <td>{getStatusBadge(product.barcode)}</td>
-                  <td>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onCheckPrice(product);
-                      }}
-                      disabled={isLoading}
-                      className="btn-secondary text-sm py-1 px-2 disabled:opacity-50"
-                    >
-                      {isLoading ? (
-                        <span className="flex items-center gap-1">
-                          <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                              fill="none"
-                            />
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            />
-                          </svg>
-                        </span>
-                      ) : (
-                        '🔍'
-                      )}
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={filteredProducts.map((p) => p.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <tbody>
+                {filteredProducts.map((product, index) => (
+                  <SortableRow
+                    key={product.id}
+                    product={product}
+                    index={index}
+                    isSelected={selectedBarcode === product.barcode}
+                    isChecked={selectedProducts.has(product.barcode)}
+                    isLoading={loading[product.barcode]}
+                    lowestPrice={getLowestPrice(product.barcode)}
+                    threshold={threshold}
+                    formatPrice={formatPrice}
+                    getStatusBadge={getStatusBadge}
+                    toggleProduct={toggleProduct}
+                    onSelectProduct={onSelectProduct}
+                    onCheckPrice={onCheckPrice}
+                  />
+                ))}
+              </tbody>
+            </SortableContext>
+          </DndContext>
         </table>
         
         {filteredProducts.length === 0 && (
@@ -328,5 +319,124 @@ export default function ProductTable({
         )}
       </div>
     </div>
+  );
+}
+
+function SortableRow({
+  product,
+  index,
+  isSelected,
+  isChecked,
+  isLoading,
+  lowestPrice,
+  threshold,
+  formatPrice,
+  getStatusBadge,
+  toggleProduct,
+  onSelectProduct,
+  onCheckPrice,
+}: {
+  product: Product;
+  index: number;
+  isSelected: boolean;
+  isChecked: boolean;
+  isLoading?: boolean;
+  lowestPrice: number | null;
+  threshold: number;
+  formatPrice: (price: number) => string;
+  getStatusBadge: (barcode: string) => JSX.Element;
+  toggleProduct: (barcode: string) => void;
+  onSelectProduct: (product: Product) => void;
+  onCheckPrice: (product: Product) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: product.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <tr
+      ref={setNodeRef}
+      style={style}
+      className={`animate-fade-in transition-colors ${
+        isSelected ? 'bg-[var(--primary)]/10' : ''
+      } ${isChecked ? 'bg-[var(--primary)]/5' : ''}`}
+      onClick={() => onSelectProduct(product)}
+    >
+      <td onClick={(e) => e.stopPropagation()}>
+        <input
+          type="checkbox"
+          checked={isChecked}
+          onChange={() => toggleProduct(product.barcode)}
+          className="w-4 h-4 rounded border-[var(--border)] bg-[var(--card)] text-[var(--primary)] cursor-pointer"
+        />
+      </td>
+      <td
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing text-[var(--muted)] hover:text-[var(--foreground)]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        ⋮⋮
+      </td>
+      <td className="font-medium">{product.name}</td>
+      <td className="text-[var(--muted)] text-sm">{product.sku}</td>
+      <td className="font-mono text-xs">{product.barcode}</td>
+      <td className="font-semibold">{formatPrice(product.recommendedPrice)}</td>
+      <td>
+        {lowestPrice ? (
+          <span className={lowestPrice < product.recommendedPrice * (1 - threshold / 100) 
+            ? 'text-[var(--danger)] font-semibold' 
+            : 'text-[var(--success)]'
+          }>
+            {formatPrice(lowestPrice)}
+          </span>
+        ) : (
+          <span className="text-[var(--muted)]">—</span>
+        )}
+      </td>
+      <td>{getStatusBadge(product.barcode)}</td>
+      <td>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onCheckPrice(product);
+          }}
+          disabled={isLoading}
+          className="btn-secondary text-sm py-1 px-2 disabled:opacity-50"
+        >
+          {isLoading ? (
+            <span className="flex items-center gap-1">
+              <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+            </span>
+          ) : (
+            '🔍'
+          )}
+        </button>
+      </td>
+    </tr>
   );
 }
