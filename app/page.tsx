@@ -380,7 +380,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-4xl font-bold gradient-text mb-1">
-              שׁוֹמֵרְמְחִיר
+              BestPrice
             </h1>
             <p className="text-[var(--muted)]">
               מעקב והשוואת מחירים מול ספקים בישראל

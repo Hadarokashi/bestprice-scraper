@@ -119,6 +119,17 @@ export default function PriceResults({ product, comparison, threshold }: PriceRe
           </div>
         )}
       </div>
+
+      {/* Manual Search Links */}
+      <div className="px-5 py-3 border-t-2 border-[var(--border)] bg-[var(--primary)]/5">
+        <span className="text-[var(--primary)] text-sm font-bold flex items-center gap-2">
+          🔎 חיפוש ידני
+        </span>
+      </div>
+      <div className="p-4 space-y-2">
+        <p className="text-xs text-[var(--muted)] mb-3">חפש במנועי חיפוש ואתרי מסחר נוספים:</p>
+        <ManualSearchLinks productName={product.name} />
+      </div>
     </div>
   );
 }
@@ -182,6 +193,171 @@ function ProviderCard({
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function ManualSearchLinks({ productName }: { productName: string }) {
+  const searchQuery = encodeURIComponent(productName);
+  
+  // Helper to build search URLs
+  const buildSearchUrl = (baseUrl: string) => {
+    // Normalize URL
+    let url = baseUrl;
+    if (!url.startsWith('http')) {
+      url = `https://${url}`;
+    }
+    if (!url.endsWith('/')) {
+      url += '/';
+    }
+    
+    // Common search patterns
+    if (url.includes('zap.co.il')) {
+      return `https://www.zap.co.il/search.aspx?keyword=${searchQuery}`;
+    }
+    
+    // Default: try ?s= or ?q= or just append search path
+    return `${url}?s=${searchQuery}`;
+  };
+  
+  const musicStores = [
+    { name: 'Bconnect', url: 'https://bconnect.co.il' },
+    { name: 'Diez', url: 'https://diez.co.il/' },
+    { name: 'Next-Pro', url: 'https://www.next-pro.co.il/' },
+    { name: 'הד סאונד', url: 'https://headsound.co.il/' },
+    { name: 'טרטל', url: 'https://www.turtle.co.il/' },
+    { name: 'עולם המוסיקה', url: 'https://www.musicworld.co.il/' },
+    { name: 'מג\'יקל נוטס', url: 'https://www.magical-notes.co.il/' },
+    { name: 'אודיולאב', url: 'https://audiolab.co.il/' },
+    { name: 'לבמה', url: 'https://la-bama.co.il/' },
+    { name: 'מיוזיק סנטר', url: 'https://www.music-center.co.il/' },
+    { name: 'אסקול', url: 'https://www.askol.co.il/' },
+    { name: 'Speed of sound', url: 'https://www.speedofsound.co.il/' },
+    { name: 'Ginges', url: 'https://www.ginges.co.il/' },
+    { name: 'Signal', url: 'https://www.signal-audio.co.il/' },
+    { name: 'Orior', url: 'https://www.orior.co.il/' },
+    { name: 'Kilombo', url: 'https://kilombo.co.il' },
+    { name: 'FunkyDJ', url: 'https://www.funkydj.co.il/' },
+    { name: 'שלמון', url: 'https://shalmonmusic.co.il/' },
+    { name: 'קול המוסיקה', url: 'https://kolhamusica.com/' },
+    { name: 'חלילית', url: 'https://www.halilit.com/' },
+    { name: 'מצלול', url: 'https://mitzlol.com' },
+    { name: 'פעימות', url: 'https://peimot.com' },
+    { name: 'אפקט', url: 'https://www.effect.co.il/' },
+    { name: 'שכטר', url: 'https://shechtermusic.com' },
+    { name: 'סאונד צ\'ק', url: 'https://www.sound-check.co.il/' },
+    { name: 'דראם בית', url: 'https://www.drumbite.co.il/' },
+  ];
+  
+  const electronicsStores = [
+    { name: 'KSP', url: 'https://ksp.co.il' },
+    { name: 'Ivory', url: 'https://www.ivory.co.il' },
+    { name: 'BUG', url: 'https://www.bug.co.il' },
+    { name: 'לידר', url: 'https://www.leadercomputers.co.il/' },
+    { name: 'Wallashops', url: 'https://www.wallashops.co.il' },
+    { name: 'מחסני חשמל', url: 'https://www.payngo.co.il' },
+    { name: 'Olsale', url: 'https://www.olsale.co.il' },
+    { name: 'LastPrice', url: 'https://www.lastprice.co.il' },
+    { name: 'Kravitz', url: 'https://www.kravitz.co.il' },
+    { name: 'HTZone', url: 'https://www.htzone.co.il' },
+    { name: 'ALM', url: 'https://www.alm.co.il' },
+    { name: 'Gamestorm', url: 'https://www.gamestorm.co.il/' },
+    { name: 'ZapStore', url: 'https://shop.zap.co.il/' },
+  ];
+  
+  const internationalStores = [
+    { name: 'Sweetwater', url: 'https://www.sweetwater.com' },
+    { name: 'Thomann', url: 'https://www.thomann.de' },
+    { name: 'Thomann Music', url: 'https://www.thomannmusic.com/' },
+  ];
+
+  return (
+    <div className="space-y-3">
+      {/* Quick Search - Zap & Google */}
+      <div className="flex gap-2">
+        <a
+          href={`https://www.zap.co.il/search.aspx?keyword=${searchQuery}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 flex items-center justify-center gap-2 p-2.5 rounded-lg border bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20 transition-all text-sm font-medium"
+        >
+          <span>🔍</span>
+          <span>Zap</span>
+        </a>
+        <a
+          href={`https://www.google.com/search?q=${searchQuery}+מחיר+ישראל`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 flex items-center justify-center gap-2 p-2.5 rounded-lg border bg-green-500/10 border-green-500/30 hover:bg-green-500/20 transition-all text-sm font-medium"
+        >
+          <span>🌐</span>
+          <span>Google</span>
+        </a>
+      </div>
+
+      {/* Expandable sections */}
+      <details className="group">
+        <summary className="cursor-pointer p-2 rounded bg-[var(--background)] hover:bg-[var(--border)]/30 transition-all text-xs font-medium list-none flex items-center justify-between">
+          <span>🎵 חנויות מוסיקה ({musicStores.length})</span>
+          <span className="group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <div className="mt-2 grid grid-cols-2 gap-1.5 max-h-[200px] overflow-y-auto p-1">
+          {musicStores.map((site) => (
+            <a
+              key={site.name}
+              href={buildSearchUrl(site.url)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 p-2 rounded border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--primary)]/5 hover:border-[var(--primary)]/30 transition-all text-xs"
+            >
+              <span className="truncate">{site.name}</span>
+              <span className="mr-auto text-[10px] opacity-50">→</span>
+            </a>
+          ))}
+        </div>
+      </details>
+
+      <details className="group">
+        <summary className="cursor-pointer p-2 rounded bg-[var(--background)] hover:bg-[var(--border)]/30 transition-all text-xs font-medium list-none flex items-center justify-between">
+          <span>💻 חנויות אלקטרוניקה ({electronicsStores.length})</span>
+          <span className="group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <div className="mt-2 grid grid-cols-2 gap-1.5 max-h-[200px] overflow-y-auto p-1">
+          {electronicsStores.map((site) => (
+            <a
+              key={site.name}
+              href={buildSearchUrl(site.url)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 p-2 rounded border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--primary)]/5 hover:border-[var(--primary)]/30 transition-all text-xs"
+            >
+              <span className="truncate">{site.name}</span>
+              <span className="mr-auto text-[10px] opacity-50">→</span>
+            </a>
+          ))}
+        </div>
+      </details>
+
+      <details className="group">
+        <summary className="cursor-pointer p-2 rounded bg-[var(--background)] hover:bg-[var(--border)]/30 transition-all text-xs font-medium list-none flex items-center justify-between">
+          <span>🌍 אתרים בינלאומיים ({internationalStores.length})</span>
+          <span className="group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <div className="mt-2 grid grid-cols-2 gap-1.5 p-1">
+          {internationalStores.map((site) => (
+            <a
+              key={site.name}
+              href={buildSearchUrl(site.url)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 p-2 rounded border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--primary)]/5 hover:border-[var(--primary)]/30 transition-all text-xs"
+            >
+              <span className="truncate">{site.name}</span>
+              <span className="mr-auto text-[10px] opacity-50">→</span>
+            </a>
+          ))}
+        </div>
+      </details>
     </div>
   );
 }

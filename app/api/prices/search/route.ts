@@ -95,9 +95,7 @@ async function upsertPriceCache(comparison: PriceComparison): Promise<void> {
       last_searched: comparison.lastSearched,
       error: comparison.error || null,
       updated_at: new Date().toISOString(),
-    }, { onConflict: 'barcode' });
-
-  if (error) {
+    }, { onConflict: 'barcode' });  if (error) {
     console.error('Error upserting price cache:', error);
   }
 }
