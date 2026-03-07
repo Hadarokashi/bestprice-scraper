@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { Product, PriceComparison, ProductScanState } from '@/lib/types';
+import { formatLastRunLabel } from '@/lib/scan-utils';
 import {
   DndContext,
   closestCenter,
@@ -134,6 +135,10 @@ export default function ProductTable({
     return Math.min(...comparison.providers.map(p => p.price));
   };
 
+  const getLastRun = (barcode: string) => {
+    return formatLastRunLabel(priceData[barcode]?.lastSearched);
+  };
+
   // Filter counts
   const counts = {
     all: products.length,
@@ -188,7 +193,7 @@ export default function ProductTable({
   };
 
   return (
-    <div>
+    <div className="flex h-full min-h-0 flex-col">
       {/* Filter tabs */}
       <div className="flex flex-wrap gap-2 p-4 border-b border-[var(--border)]">
         <button
@@ -267,9 +272,9 @@ export default function ProductTable({
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto">
-        <table>
-          <thead>
+      <div className="flex-1 min-h-0 overflow-auto">
+        <table className="min-w-full">
+          <thead className="sticky top-0 z-10 bg-[var(--card)] shadow-sm">
             <tr>
               <th className="w-10">
                 <input
@@ -286,6 +291,7 @@ export default function ProductTable({
               <th>מחיר מומלץ</th>
               <th>מחיר נמוך</th>
               <th>סטטוס</th>
+              <th>הרצה אחרונה</th>
               <th>פעולות</th>
             </tr>
           </thead>
@@ -311,6 +317,7 @@ export default function ProductTable({
                     threshold={threshold}
                     formatPrice={formatPrice}
                     getStatusBadge={getStatusBadge}
+                    lastRun={getLastRun(product.barcode)}
                     toggleProduct={toggleProduct}
                     onSelectProduct={onSelectProduct}
                     onCheckPrice={onCheckPrice}
@@ -349,6 +356,7 @@ function SortableRow({
   threshold,
   formatPrice,
   getStatusBadge,
+  lastRun,
   toggleProduct,
   onSelectProduct,
   onCheckPrice,
@@ -362,6 +370,7 @@ function SortableRow({
   threshold: number;
   formatPrice: (price: number) => string;
   getStatusBadge: (barcode: string) => JSX.Element;
+  lastRun: string;
   toggleProduct: (barcode: string) => void;
   onSelectProduct: (product: Product) => void;
   onCheckPrice: (product: Product) => void;
@@ -421,6 +430,7 @@ function SortableRow({
         )}
       </td>
       <td>{getStatusBadge(product.barcode)}</td>
+      <td className="text-xs text-[var(--muted)] whitespace-nowrap">{lastRun}</td>
       <td>
         <button
           onClick={(e) => {

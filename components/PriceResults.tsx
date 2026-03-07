@@ -50,12 +50,22 @@ export default function PriceResults({ product, comparison, threshold }: PriceRe
         <div className="flex flex-wrap gap-2 text-xs text-[var(--muted)]">
           <span className="bg-[var(--background)] px-2 py-1 rounded">מק״ט: {product.sku}</span>
           <span className="bg-[var(--background)] px-2 py-1 rounded">ברקוד: {product.barcode}</span>
+          {comparison?.lastSearched && (
+            <span className="bg-[var(--background)] px-2 py-1 rounded">
+              הרצה אחרונה: {new Date(comparison.lastSearched).toLocaleString('he-IL')}
+            </span>
+          )}
         </div>
         {comparison?.scanMetadata && (
           <div className="mt-3 flex flex-wrap gap-2 text-xs">
             <span className="bg-[var(--primary)]/10 text-[var(--primary)] px-2 py-1 rounded">
               {scanPhase || 'completed'}
             </span>
+            {comparison.scanMetadata.cached && (
+              <span className="bg-[var(--success)]/10 text-[var(--success)] px-2 py-1 rounded">
+                מטמון
+              </span>
+            )}
             {comparison.scanMetadata.message && (
               <span className="bg-[var(--background)] px-2 py-1 rounded text-[var(--muted)]">
                 {comparison.scanMetadata.message}

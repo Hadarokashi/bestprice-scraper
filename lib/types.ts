@@ -191,4 +191,6 @@ export interface ProductScanState {
   currentSite?: string;
   message?: string;
   mode?: ScanMode;
+  lastRunAt?: string;
+  cached?: boolean;
 }

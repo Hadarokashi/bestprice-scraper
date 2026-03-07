@@ -23,7 +23,10 @@ import {
 import {
   buildScanStateFromComparison,
   DEFAULT_SCAN_SETTINGS,
+  formatLastRunLabel,
+  markComparisonAsCached,
   mapSettingsWithDefaults,
+  shouldReuseCachedComparison,
 } from '@/lib/scan-utils';
 
 interface ScanJobResponse {
@@ -209,6 +212,30 @@ export default function Dashboard() {
   }, [runScanMode]);
 
   const runScanJob = useCallback(async (product: Product, signal?: AbortSignal) => {
+    const existingComparison = priceData[product.barcode];
+    const freshnessHours = settings.cacheFreshnessHours || DEFAULT_SCAN_SETTINGS.cacheFreshnessHours;
+
+    if (shouldReuseCachedComparison(existingComparison, freshnessHours)) {
+      const cachedComparison = markComparisonAsCached(
+        existingComparison!,
+        `נעשה שימוש במטמון מהיום (${formatLastRunLabel(existingComparison?.lastSearched)})`
+      );
+
+      setPriceData((prev) => ({
+        ...prev,
+        [product.barcode]: cachedComparison,
+      }));
+
+      const cachedState = buildScanStateFromComparison(cachedComparison, false);
+      if (cachedState) {
+        setScanStates((prev) => ({
+          ...prev,
+          [product.barcode]: cachedState,
+        }));
+      }
+      return;
+    }
+
     setLoading((prev) => ({ ...prev, [product.barcode]: true }));
     createQueuedState(product, 'יוצר משימת סריקה');
 
@@ -287,7 +314,7 @@ export default function Dashboard() {
     } finally {
       setLoading((prev) => ({ ...prev, [product.barcode]: false }));
     }
-  }, [applyJobUpdate, createQueuedState, runScanMode, runSitePreset]);
+  }, [applyJobUpdate, createQueuedState, priceData, runScanMode, runSitePreset, settings.cacheFreshnessHours]);
 
   // Check price for a single product using the unified job contract
   const handleCheckPrice = useCallback(async (product: Product, signal?: AbortSignal) => {
@@ -642,15 +669,15 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content Area - Scrollable */}
-      <div className="flex-1 overflow-hidden p-6 pt-6">
+      <div className="flex-1 min-h-0 overflow-hidden p-6 pt-6">
         {activeTab === 'products' ? (
-          <div className="h-full flex gap-6">
+          <div className="h-full min-h-0 flex gap-6">
             {/* Product table - Scrollable */}
-            <div className="flex-1 flex flex-col min-w-0 space-y-4 overflow-hidden">
+            <div className="flex-1 flex min-h-0 flex-col min-w-0 space-y-4 overflow-hidden">
               {/* Actions bar */}
               <div className="flex-shrink-0 rounded-2xl p-4 bg-[var(--card)] border border-[var(--border)] shadow-lg">
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex-1 min-w-[200px]">
+                  <div className="flex-1 min-w-[220px]">
                     <input
                       type="text"
                       placeholder="🔍 חיפוש לפי שם, מק״ט או ברקוד..."
@@ -659,29 +686,41 @@ export default function Dashboard() {
                       className="w-full"
                     />
                   </div>
-                  <select
-                    value={runScanMode}
-                    onChange={(e) => setRunScanMode(e.target.value as ScanMode)}
-                    className="min-w-[180px]"
-                    title="שיטת הסריקה להרצה הבאה"
-                  >
-                    <option value="zap_then_remaining">Zap ואז אתרים חסרים</option>
-                    <option value="zap_only">Zap בלבד</option>
-                    <option value="playwright_only">Playwright בלבד</option>
-                    <option value="selected_sites">אתרים נבחרים</option>
-                    <option value="retry_failed">אתרים שנכשלו</option>
-                  </select>
-                  <select
-                    value={runSitePreset}
-                    onChange={(e) => setRunSitePreset(e.target.value as ScanSitePreset)}
-                    className="min-w-[160px]"
-                    title="Preset אתרים להרצה הבאה"
-                  >
-                    <option value="enabled">כל האתרים</option>
-                    <option value="music">חנויות מוסיקה</option>
-                    <option value="electronics">חנויות אלקטרוניקה</option>
-                    <option value="selected">אתרים נבחרים באדמין</option>
-                  </select>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="min-w-[220px]">
+                      <label className="mb-1 block text-xs font-medium text-[var(--muted)]">
+                        שיטת סריקה
+                      </label>
+                      <select
+                        value={runScanMode}
+                        onChange={(e) => setRunScanMode(e.target.value as ScanMode)}
+                        className="min-w-[220px] text-sm"
+                        title="שיטת הסריקה להרצה הבאה"
+                      >
+                        <option value="zap_then_remaining">Zap ואז אתרים חסרים</option>
+                        <option value="zap_only">Zap בלבד</option>
+                        <option value="playwright_only">Playwright בלבד</option>
+                        <option value="selected_sites">אתרים נבחרים</option>
+                        <option value="retry_failed">אתרים שנכשלו</option>
+                      </select>
+                    </div>
+                    <div className="min-w-[200px]">
+                      <label className="mb-1 block text-xs font-medium text-[var(--muted)]">
+                        קבוצת אתרים
+                      </label>
+                      <select
+                        value={runSitePreset}
+                        onChange={(e) => setRunSitePreset(e.target.value as ScanSitePreset)}
+                        className="min-w-[200px] text-sm"
+                        title="Preset אתרים להרצה הבאה"
+                      >
+                        <option value="enabled">כל האתרים</option>
+                        <option value="music">חנויות מוסיקה</option>
+                        <option value="electronics">חנויות אלקטרוניקה</option>
+                        <option value="selected">אתרים נבחרים באדמין</option>
+                      </select>
+                    </div>
+                  </div>
                   <button
                     onClick={() => setShowImportModal(true)}
                     className="btn-secondary"
@@ -716,7 +755,7 @@ export default function Dashboard() {
               </div>
 
               {/* Products table - Scrollable */}
-              <div className="flex-1 rounded-2xl overflow-hidden border border-[var(--border)] shadow-lg bg-[var(--card)] overflow-y-auto">
+              <div className="flex-1 min-h-0 rounded-2xl overflow-hidden border border-[var(--border)] shadow-lg bg-[var(--card)]">
                 <ProductTable
                   products={filteredProducts}
                   priceData={priceData}
@@ -735,7 +774,7 @@ export default function Dashboard() {
             </div>
 
             {/* Sidebar - Fixed, doesn't scroll with table */}
-            <div className="hidden lg:block w-[380px] flex-shrink-0 space-y-4 overflow-y-auto">
+            <div className="hidden lg:block w-[380px] min-h-0 flex-shrink-0 space-y-4 overflow-y-auto">
               {/* Threshold slider */}
               <ThresholdSlider
                 value={settings.threshold}

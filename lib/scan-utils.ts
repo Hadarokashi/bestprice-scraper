@@ -226,7 +226,104 @@ export function buildScanStateFromComparison(
     currentSite: metadata?.currentSite,
     message: metadata?.message,
     mode: metadata?.mode,
+    lastRunAt: comparison?.lastSearched,
+    cached: metadata?.cached,
   };
+}
+
+export function isCompletedScan(comparison?: PriceComparison | null): boolean {
+  if (!comparison) {
+    return false;
+  }
+
+  const metadata = comparison.scanMetadata;
+  if (!metadata) {
+    return false;
+  }
+
+  if (comparison.phase && !['completed', 'cached'].includes(comparison.phase)) {
+    return false;
+  }
+
+  return metadata.totalWebsites > 0 && metadata.scannedWebsites >= metadata.totalWebsites;
+}
+
+export function isSameCalendarDay(isoString?: string): boolean {
+  if (!isoString) {
+    return false;
+  }
+
+  const date = new Date(isoString);
+  const now = new Date();
+
+  return (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate()
+  );
+}
+
+export function isComparisonFresh(
+  comparison: PriceComparison | undefined,
+  freshnessHours = DEFAULT_SCAN_SETTINGS.cacheFreshnessHours
+): boolean {
+  if (!comparison?.lastSearched) {
+    return false;
+  }
+
+  const diffMs = Date.now() - new Date(comparison.lastSearched).getTime();
+  if (Number.isNaN(diffMs) || diffMs < 0) {
+    return false;
+  }
+
+  const freshnessMs = freshnessHours * 60 * 60 * 1000;
+  return diffMs <= freshnessMs || isSameCalendarDay(comparison.lastSearched);
+}
+
+export function shouldReuseCachedComparison(
+  comparison: PriceComparison | undefined,
+  freshnessHours = DEFAULT_SCAN_SETTINGS.cacheFreshnessHours
+): boolean {
+  return isCompletedScan(comparison) && isComparisonFresh(comparison, freshnessHours);
+}
+
+export function markComparisonAsCached(
+  comparison: PriceComparison,
+  message: string
+): PriceComparison {
+  return {
+    ...comparison,
+    phase: 'cached',
+    scanMetadata: comparison.scanMetadata
+      ? {
+          ...comparison.scanMetadata,
+          cached: true,
+          phase: 'cached',
+          message,
+        }
+      : {
+          totalWebsites: 0,
+          scannedWebsites: 0,
+          websites: [],
+          cached: true,
+          phase: 'cached',
+          message,
+        },
+  };
+}
+
+export function formatLastRunLabel(isoString?: string): string {
+  if (!isoString) {
+    return 'לא הורץ';
+  }
+
+  return new Date(isoString).toLocaleString('he-IL', {
+    year: '2-digit',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 export function mapSettingsWithDefaults(settings?: AppSettings | null): AppSettings {
