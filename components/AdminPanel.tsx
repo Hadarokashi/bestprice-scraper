@@ -172,7 +172,8 @@ export default function AdminPanel({
       await onRefresh();
     } catch (error) {
       console.error('Failed to save schedule:', error);
-      alert('שגיאה בשמירת לוח זמנים');
+      const msg = error instanceof Error ? error.message : 'שגיאה לא ידועה';
+      alert(`שגיאה בשמירת לוח זמנים: ${msg}`);
     } finally {
       setSavingSchedule(false);
     }

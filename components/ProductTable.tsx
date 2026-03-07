@@ -195,7 +195,7 @@ export default function ProductTable({
   return (
     <div className="flex h-full min-h-0 flex-col">
       {/* Filter tabs */}
-      <div className="flex flex-wrap gap-2 p-4 border-b border-[var(--border)]">
+      <div className="flex flex-wrap gap-2 p-3 md:p-4 border-b border-[var(--border)] overflow-x-auto">
         <button
           onClick={() => { onFilterChange('all'); clearSelection(); }}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
@@ -272,7 +272,7 @@ export default function ProductTable({
       )}
 
       {/* Table */}
-      <div className="flex-1 min-h-0 overflow-auto">
+      <div className="flex-1 min-h-0 overflow-auto touch-pan-x">
         <table className="min-w-full">
           <thead className="sticky top-0 z-10 bg-[var(--card)] shadow-sm">
             <tr>
@@ -438,7 +438,7 @@ function SortableRow({
             onCheckPrice(product);
           }}
           disabled={isLoading}
-          className="btn-secondary text-sm py-1 px-2 disabled:opacity-50"
+          className="btn-secondary text-sm py-2 px-3 min-h-[44px] min-w-[44px] disabled:opacity-50"
         >
           {isLoading ? (
             <span className="flex items-center gap-1" title={scanState?.message || scanState?.label}>

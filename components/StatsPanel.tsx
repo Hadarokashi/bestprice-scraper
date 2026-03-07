@@ -54,7 +54,7 @@ export default function StatsPanel({
   return (
     <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-lg overflow-hidden">
       {/* Header */}
-      <div className="px-5 py-3 border-b border-[var(--border)] bg-[var(--background)] flex items-center justify-between">
+      <div className="px-4 md:px-5 py-3 border-b border-[var(--border)] bg-[var(--background)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <h2 className="font-bold flex items-center gap-2">
           📊 סקירת מצב
         </h2>
@@ -98,7 +98,7 @@ export default function StatsPanel({
       )}
 
       {/* Stats grid */}
-      <div className="p-4 grid grid-cols-5 gap-3">
+      <div className="p-4 grid grid-cols-2 sm:grid-cols-5 gap-3">
         {/* Total */}
         <StatCard
           value={stats.total}

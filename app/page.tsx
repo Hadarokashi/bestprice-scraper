@@ -590,13 +590,13 @@ export default function Dashboard() {
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Header - Fixed */}
-      <header className="flex-shrink-0 p-6 pb-0">
-        <div className="flex items-center justify-between mb-6">
+      <header className="flex-shrink-0 p-4 md:p-6 pb-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 md:mb-6">
           <div>
-            <h1 className="text-4xl font-bold gradient-text mb-1">
+            <h1 className="text-2xl md:text-4xl font-bold gradient-text mb-1">
               BestPrice
             </h1>
-            <p className="text-[var(--muted)]">
+            <p className="text-sm md:text-base text-[var(--muted)]">
               מעקב והשוואת מחירים מול ספקים בישראל
             </p>
             {usePlaywright && (
@@ -609,26 +609,26 @@ export default function Dashboard() {
             )}
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             {flaggedCount > 0 && (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--danger)]/10 border border-[var(--danger)]/30">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--danger)]/10 border border-[var(--danger)]/30">
                 <AlertBadge count={flaggedCount} />
-                <span className="text-[var(--danger)] font-medium">
+                <span className="text-[var(--danger)] font-medium text-sm sm:text-base">
                   חריגים
                 </span>
               </div>
             )}
-            <button onClick={() => setShowSettingsModal(true)} className="btn-secondary">
+            <button onClick={() => setShowSettingsModal(true)} className="btn-secondary min-h-[44px]">
               ⚙️ הגדרות
             </button>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-4 md:mb-6 overflow-x-auto pb-1 -mx-1">
           <button
             onClick={() => setActiveTab('products')}
-            className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
+            className={`flex-shrink-0 px-4 md:px-6 py-2.5 rounded-lg font-medium transition-all text-sm md:text-base ${
               activeTab === 'products'
                 ? 'bg-[var(--primary)] text-white shadow-lg'
                 : 'bg-[var(--background)] border border-[var(--border)] hover:bg-[var(--border)]/30'
@@ -638,7 +638,7 @@ export default function Dashboard() {
           </button>
           <button
             onClick={() => setActiveTab('providers')}
-            className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
+            className={`flex-shrink-0 px-4 md:px-6 py-2.5 rounded-lg font-medium transition-all text-sm md:text-base ${
               activeTab === 'providers'
                 ? 'bg-[var(--primary)] text-white shadow-lg'
                 : 'bg-[var(--background)] border border-[var(--border)] hover:bg-[var(--border)]/30'
@@ -648,7 +648,7 @@ export default function Dashboard() {
           </button>
           <button
             onClick={() => setActiveTab('admin')}
-            className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
+            className={`flex-shrink-0 px-4 md:px-6 py-2.5 rounded-lg font-medium transition-all text-sm md:text-base ${
               activeTab === 'admin'
                 ? 'bg-[var(--primary)] text-white shadow-lg'
                 : 'bg-[var(--background)] border border-[var(--border)] hover:bg-[var(--border)]/30'
@@ -672,32 +672,32 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content Area - Scrollable */}
-      <div className="flex-1 min-h-0 overflow-hidden p-6 pt-6">
+      <div className="flex-1 min-h-0 overflow-hidden p-4 md:p-6 pt-4 md:pt-6">
         {activeTab === 'products' ? (
-          <div className="h-full min-h-0 flex gap-6">
+          <div className="h-full min-h-0 flex flex-col lg:flex-row gap-4 lg:gap-6">
             {/* Product table - Scrollable */}
             <div className="flex-1 flex min-h-0 flex-col min-w-0 space-y-4 overflow-hidden">
               {/* Actions bar */}
               <div className="flex-shrink-0 rounded-2xl p-4 bg-[var(--card)] border border-[var(--border)] shadow-lg">
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex-1 min-w-[220px]">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3">
+                  <div className="flex-1 min-w-0">
                     <input
                       type="text"
                       placeholder="🔍 חיפוש לפי שם, מק״ט או ברקוד..."
                       value={searchFilter}
                       onChange={(e) => setSearchFilter(e.target.value)}
-                      className="w-full"
+                      className="w-full min-h-[44px]"
                     />
                   </div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="min-w-[220px]">
+                  <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:items-center">
+                    <div className="flex-1 min-w-0 sm:min-w-[180px]">
                       <label className="mb-1 block text-xs font-medium text-[var(--muted)]">
                         שיטת סריקה
                       </label>
                       <select
                         value={runScanMode}
                         onChange={(e) => setRunScanMode(e.target.value as ScanMode)}
-                        className="min-w-[220px] text-sm"
+                        className="w-full sm:min-w-[180px] text-sm min-h-[44px]"
                         title="שיטת הסריקה להרצה הבאה"
                       >
                         <option value="zap_then_remaining">Zap ואז אתרים חסרים</option>
@@ -707,14 +707,14 @@ export default function Dashboard() {
                         <option value="retry_failed">אתרים שנכשלו</option>
                       </select>
                     </div>
-                    <div className="min-w-[200px]">
+                    <div className="flex-1 min-w-0 sm:min-w-[160px]">
                       <label className="mb-1 block text-xs font-medium text-[var(--muted)]">
                         קבוצת אתרים
                       </label>
                       <select
                         value={runSitePreset}
                         onChange={(e) => setRunSitePreset(e.target.value as ScanSitePreset)}
-                        className="min-w-[200px] text-sm"
+                        className="w-full sm:min-w-[160px] text-sm min-h-[44px]"
                         title="Preset אתרים להרצה הבאה"
                       >
                         <option value="enabled">כל האתרים</option>
@@ -724,36 +724,38 @@ export default function Dashboard() {
                       </select>
                     </div>
                   </div>
-                  <button
-                    onClick={() => setShowImportModal(true)}
-                    className="btn-secondary"
-                  >
-                    📁 ייבוא
-                  </button>
-                  <button
-                    onClick={() => setShowProductEditor(true)}
-                    className="btn-secondary"
-                  >
-                    ✏️ עריכה
-                  </button>
+                  <div className="flex flex-wrap gap-2 sm:gap-3">
+                    <button
+                      onClick={() => setShowImportModal(true)}
+                      className="btn-secondary min-h-[44px] flex-1 sm:flex-none"
+                    >
+                      📁 ייבוא
+                    </button>
+                    <button
+                      onClick={() => setShowProductEditor(true)}
+                      className="btn-secondary min-h-[44px] flex-1 sm:flex-none"
+                    >
+                      ✏️ עריכה
+                    </button>
                   
-                  {/* Search/Stop buttons */}
-                  {isSearching ? (
-                    <button
-                      onClick={handleStopSearch}
-                      className="btn-danger"
-                    >
-                      ⏹️ עצור
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleBulkCheck()}
-                      disabled={filteredProducts.length === 0}
-                      className="btn-primary"
-                    >
-                      🔍 בדוק הכל ({filteredProducts.length})
-                    </button>
-                  )}
+                    {/* Search/Stop buttons */}
+                    {isSearching ? (
+                      <button
+                        onClick={handleStopSearch}
+                        className="btn-danger min-h-[44px] flex-1 sm:flex-none"
+                      >
+                        ⏹️ עצור
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleBulkCheck()}
+                        disabled={filteredProducts.length === 0}
+                        className="btn-primary min-h-[44px] flex-1 sm:flex-none"
+                      >
+                        🔍 בדוק הכל ({filteredProducts.length})
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -776,21 +778,52 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Sidebar - Fixed, doesn't scroll with table */}
+            {/* Sidebar - Desktop only */}
             <div className="hidden lg:block w-[380px] min-h-0 flex-shrink-0 space-y-4 overflow-y-auto">
-              {/* Threshold slider */}
               <ThresholdSlider
                 value={settings.threshold}
                 onChange={handleThresholdChange}
               />
-
-              {/* Price results */}
               <PriceResults
                 product={selectedProduct}
                 comparison={selectedProduct ? priceData[selectedProduct.barcode] : null}
                 threshold={settings.threshold}
               />
             </div>
+
+            {/* Mobile bottom sheet - Price results when product selected */}
+            {selectedProduct && (
+              <>
+                <div
+                  className="lg:hidden fixed inset-0 z-40 bg-black/40"
+                  onClick={() => setSelectedProduct(null)}
+                  aria-hidden="true"
+                />
+                <div className="lg:hidden fixed inset-x-0 bottom-0 z-50 bg-[var(--card)] border-t border-[var(--border)] shadow-2xl rounded-t-2xl max-h-[70vh] flex flex-col pb-[env(safe-area-inset-bottom)]">
+                <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
+                  <span className="font-medium">פרטי מוצר ומחירים</span>
+                  <button
+                    onClick={() => setSelectedProduct(null)}
+                    className="p-2 -m-2 rounded-lg hover:bg-[var(--border)]/50 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    aria-label="סגור"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
+                  <ThresholdSlider
+                    value={settings.threshold}
+                    onChange={handleThresholdChange}
+                  />
+                  <PriceResults
+                    product={selectedProduct}
+                    comparison={priceData[selectedProduct.barcode] ?? null}
+                    threshold={settings.threshold}
+                  />
+                </div>
+              </div>
+              </>
+            )}
           </div>
         ) : activeTab === 'providers' ? (
           <div className="h-full overflow-y-auto">

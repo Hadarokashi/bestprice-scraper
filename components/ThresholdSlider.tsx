@@ -24,7 +24,7 @@ export default function ThresholdSlider({ value, onChange }: ThresholdSliderProp
           max="50"
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full"
+          className="w-full h-10 touch-none"
         />
         
         <div className="flex justify-between text-xs text-[var(--muted)] mt-2">
