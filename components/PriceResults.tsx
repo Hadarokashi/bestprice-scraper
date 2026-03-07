@@ -35,6 +35,7 @@ export default function PriceResults({ product, comparison, threshold }: PriceRe
 
   const thresholdPrice = product.recommendedPrice * (1 - threshold / 100);
   const sortedProviders = comparison?.providers.slice().sort((a, b) => a.price - b.price) || [];
+  const scanPhase = comparison?.phase || comparison?.scanMetadata?.phase;
 
   return (
     <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-lg overflow-hidden">
@@ -50,6 +51,23 @@ export default function PriceResults({ product, comparison, threshold }: PriceRe
           <span className="bg-[var(--background)] px-2 py-1 rounded">מק״ט: {product.sku}</span>
           <span className="bg-[var(--background)] px-2 py-1 rounded">ברקוד: {product.barcode}</span>
         </div>
+        {comparison?.scanMetadata && (
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <span className="bg-[var(--primary)]/10 text-[var(--primary)] px-2 py-1 rounded">
+              {scanPhase || 'completed'}
+            </span>
+            {comparison.scanMetadata.message && (
+              <span className="bg-[var(--background)] px-2 py-1 rounded text-[var(--muted)]">
+                {comparison.scanMetadata.message}
+              </span>
+            )}
+            {comparison.scanMetadata.currentSite && (
+              <span className="bg-[var(--background)] px-2 py-1 rounded text-[var(--muted)]">
+                כעת: {comparison.scanMetadata.currentSite}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Price Overview */}

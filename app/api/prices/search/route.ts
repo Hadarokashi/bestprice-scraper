@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { searchPrices } from '@/lib/price-sources';
 import { PriceComparison, ApiResponse, PriceSource } from '@/lib/types';
+import { upsertPriceComparison } from '@/lib/price-cache';
 
 // POST /api/prices/search - Search for prices
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<PriceComparison>>> {
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
         error: result.error,
       };
 
-      await upsertPriceCache(errorComparison);
+      await upsertPriceComparison(errorComparison);
 
       return NextResponse.json({ success: true, data: errorComparison });
     }
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     };
 
     // Update cache in Supabase
-    await upsertPriceCache(comparison);
+    await upsertPriceComparison(comparison);
 
     return NextResponse.json({ success: true, data: comparison });
   } catch (error) {
@@ -79,23 +80,5 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
-  }
-}
-
-async function upsertPriceCache(comparison: PriceComparison): Promise<void> {
-  const { error } = await supabase
-    .from('price_cache')
-    .upsert({
-      barcode: comparison.barcode,
-      product_id: comparison.productId,
-      recommended_price: comparison.recommendedPrice,
-      threshold: comparison.threshold,
-      providers: comparison.providers,
-      flagged_providers: comparison.flaggedProviders,
-      last_searched: comparison.lastSearched,
-      error: comparison.error || null,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'barcode' });  if (error) {
-    console.error('Error upserting price cache:', error);
   }
 }

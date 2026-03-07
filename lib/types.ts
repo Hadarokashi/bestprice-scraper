@@ -21,12 +21,45 @@ export interface ProviderPrice {
   source: PriceSource;
 }
 
+export type ScanMode =
+  | 'zap_only'
+  | 'zap_then_remaining'
+  | 'selected_sites'
+  | 'retry_failed'
+  | 'playwright_only';
+
+export type ScanSitePreset = 'enabled' | 'music' | 'electronics' | 'selected';
+
+export type ScanPhase =
+  | 'idle'
+  | 'queued'
+  | 'checking_zap'
+  | 'zap_complete'
+  | 'scanning_sites'
+  | 'completed'
+  | 'partial'
+  | 'failed'
+  | 'cached';
+
 // Website scan status
 export interface WebsiteScanStatus {
+  type?: 'site' | 'meta';
   name: string;
   status: 'found' | 'not_found' | 'error' | 'pending';
   resultsCount?: number;
   error?: string;
+  category?: 'music' | 'electronics' | 'general';
+  currentSite?: string;
+  message?: string;
+  phase?: ScanPhase;
+  progress?: number;
+  externalJobId?: string;
+  workerUrl?: string;
+  excludedSites?: string[];
+  includedSites?: string[];
+  mode?: ScanMode;
+  skippedReason?: string;
+  providerCount?: number;
 }
 
 // Scan metadata for tracking which websites were checked
@@ -34,6 +67,15 @@ export interface ScanMetadata {
   totalWebsites: number;
   scannedWebsites: number;
   websites: WebsiteScanStatus[];
+  phase?: ScanPhase;
+  message?: string;
+  currentSite?: string;
+  currentBatch?: string;
+  mode?: ScanMode;
+  providerCount?: number;
+  cached?: boolean;
+  startedAt?: string;
+  completedAt?: string;
 }
 
 // Price comparison result for a product
@@ -47,6 +89,8 @@ export interface PriceComparison {
   lastSearched: string;
   error?: string;
   scanMetadata?: ScanMetadata;
+  jobId?: string;
+  phase?: ScanPhase;
 }
 
 // Settings for the application
@@ -54,6 +98,10 @@ export interface AppSettings {
   threshold: number; // Percentage below recommended price to flag (e.g., 10 = 10%)
   priceSource: PriceSource;
   serpApiKey?: string;
+  scanMode?: ScanMode;
+  sitePreset?: ScanSitePreset;
+  cacheFreshnessHours?: number;
+  maxConcurrentJobs?: number;
 }
 
 // Available price sources
@@ -110,6 +158,9 @@ export interface ScraperConfig {
   enabled: boolean;
   priority: number;
   searchPattern?: string;
+  category?: 'music' | 'electronics' | 'general';
+  method?: 'http' | 'playwright' | 'zap';
+  timeoutMs?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -120,10 +171,24 @@ export interface ScrapingJob {
   productId: string;
   productName: string;
   barcode: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'partial';
   totalScrapers: number;
   completedScrapers: number;
   results: ProviderPrice[];
   createdAt: string;
   updatedAt: string;
+  progress?: number;
+  phase?: ScanPhase;
+  scanMetadata?: ScanMetadata;
+}
+
+export interface ProductScanState {
+  jobId?: string;
+  phase: ScanPhase;
+  label: string;
+  progress: number;
+  providerCount: number;
+  currentSite?: string;
+  message?: string;
+  mode?: ScanMode;
 }

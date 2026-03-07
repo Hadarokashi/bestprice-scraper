@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { JSX } from 'react';
-import { Product, PriceComparison } from '@/lib/types';
+import { Product, PriceComparison, ProductScanState } from '@/lib/types';
 import {
   DndContext,
   closestCenter,
@@ -26,6 +26,7 @@ export type FilterType = 'all' | 'unmatched' | 'flagged' | 'good' | 'not-searche
 interface ProductTableProps {
   products: Product[];
   priceData: { [barcode: string]: PriceComparison };
+  scanStates?: { [barcode: string]: ProductScanState };
   threshold: number;
   onCheckPrice: (product: Product) => void;
   onSelectProduct: (product: Product) => void;
@@ -40,6 +41,7 @@ interface ProductTableProps {
 export default function ProductTable({
   products,
   priceData,
+  scanStates = {},
   threshold,
   onCheckPrice,
   onSelectProduct,
@@ -89,6 +91,20 @@ export default function ProductTable({
   };
 
   const getStatusBadge = (barcode: string) => {
+    const scanState = scanStates[barcode];
+    if (scanState && ['queued', 'checking_zap', 'zap_complete', 'scanning_sites'].includes(scanState.phase)) {
+      return (
+        <div className="flex flex-col gap-1">
+          <span className="badge bg-[var(--primary)]/15 text-[var(--primary)]">
+            {scanState.label}
+          </span>
+          <span className="text-[10px] text-[var(--muted)]">
+            {scanState.message || `${scanState.progress}%`}
+          </span>
+        </div>
+      );
+    }
+
     const status = getProductStatus(barcode);
     switch (status) {
       case 'not-searched':
@@ -283,14 +299,14 @@ export default function ProductTable({
               strategy={verticalListSortingStrategy}
             >
               <tbody>
-                {filteredProducts.map((product, index) => (
+                {filteredProducts.map((product) => (
                   <SortableRow
                     key={product.id}
                     product={product}
-                    index={index}
                     isSelected={selectedBarcode === product.barcode}
                     isChecked={selectedProducts.has(product.barcode)}
                     isLoading={loading[product.barcode]}
+                    scanState={scanStates[product.barcode]}
                     lowestPrice={getLowestPrice(product.barcode)}
                     threshold={threshold}
                     formatPrice={formatPrice}
@@ -325,10 +341,10 @@ export default function ProductTable({
 
 function SortableRow({
   product,
-  index,
   isSelected,
   isChecked,
   isLoading,
+  scanState,
   lowestPrice,
   threshold,
   formatPrice,
@@ -338,10 +354,10 @@ function SortableRow({
   onCheckPrice,
 }: {
   product: Product;
-  index: number;
   isSelected: boolean;
   isChecked: boolean;
   isLoading?: boolean;
+  scanState?: ProductScanState;
   lowestPrice: number | null;
   threshold: number;
   formatPrice: (price: number) => string;
@@ -415,7 +431,7 @@ function SortableRow({
           className="btn-secondary text-sm py-1 px-2 disabled:opacity-50"
         >
           {isLoading ? (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1" title={scanState?.message || scanState?.label}>
               <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
                 <circle
                   className="opacity-25"

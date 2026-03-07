@@ -1,5 +1,23 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import type { ProviderPrice } from '@/lib/types';
+
+interface ProviderSummary {
+  name: string;
+  totalProducts: number;
+  flaggedProducts: number;
+  products: Array<{
+    productId: string;
+    barcode: string;
+    recommendedPrice: number;
+    providerPrice: number;
+    providerUrl: string;
+    lastChecked: string;
+    isFlagged: boolean;
+    priceDifference: number;
+    percentDifference: string;
+  }>;
+}
 
 export async function GET() {
   try {
@@ -11,13 +29,13 @@ export async function GET() {
     if (error) throw error;
     
     // Aggregate by provider
-    const providerMap = new Map<string, any>();
+    const providerMap = new Map<string, ProviderSummary>();
     
     for (const cache of priceCache || []) {
-      const providers = cache.providers_data || [];
+      const providers = (cache.providers || []) as ProviderPrice[];
       
       for (const provider of providers) {
-        const key = provider.provider_name;
+        const key = provider.providerName;
         
         if (!providerMap.has(key)) {
           providerMap.set(key, {
@@ -29,6 +47,7 @@ export async function GET() {
         }
         
         const providerData = providerMap.get(key);
+        if (!providerData) continue;
         providerData.totalProducts++;
         
         // Check if flagged
@@ -45,8 +64,8 @@ export async function GET() {
           barcode: cache.barcode,
           recommendedPrice: cache.recommended_price,
           providerPrice: provider.price,
-          providerUrl: provider.provider_url,
-          lastChecked: provider.last_updated,
+          providerUrl: provider.providerUrl,
+          lastChecked: provider.lastUpdated || cache.last_searched,
           isFlagged,
           priceDifference: cache.recommended_price - provider.price,
           percentDifference: ((cache.recommended_price - provider.price) / cache.recommended_price * 100).toFixed(1),

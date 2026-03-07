@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import type { ScanMetadata } from './types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -27,6 +28,7 @@ export interface DbPriceCache {
   threshold: number;
   providers: ProviderData[];
   flagged_providers: ProviderData[];
+  scan_metadata?: ScanMetadata;
   last_searched: string;
   error?: string;
 }
@@ -44,6 +46,7 @@ export interface DbSettings {
   id?: number;
   threshold: number;
   price_source: string;
+  scan_policy?: Record<string, unknown>;
   updated_at?: string;
 }
 

@@ -11,6 +11,7 @@ export interface PriceSearchParams {
   productName: string;
   barcode: string;
   sku?: string;
+  recommendedPrice?: number;
 }
 
 export interface PriceSearchResult {

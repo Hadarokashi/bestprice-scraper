@@ -28,15 +28,22 @@ interface ZapProductJsonLd {
 
 /**
  * Extract all JSON-LD scripts and find Product type
+ * Note: Zap uses HTML-encoded + as &#x2B; in script type
  */
 function extractProductJsonLd(html: string): ZapProductJsonLd | null {
-  const scripts = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g) || [];
+  // Match both regular and HTML-encoded versions of ld+json
+  // &#x2B; is the HTML entity for +
+  const scripts = html.match(/<script type="application\/ld(?:\+|&#x2B;)json">([\s\S]*?)<\/script>/gi) || [];
   
   for (const script of scripts) {
     try {
-      const content = script.replace(/<script[^>]*>|<\/script>/g, '');
+      const content = script
+        .replace(/<script[^>]*>/i, '')
+        .replace(/<\/script>/i, '')
+        .trim();
       const data = JSON.parse(content);
       if (data['@type'] === 'Product') {
+        console.log(`[Zap] Found Product JSON-LD with ${data.offers?.offerCount || '?'} offers`);
         return data as ZapProductJsonLd;
       }
     } catch {
@@ -350,7 +357,44 @@ export async function searchWithZap(
         if (!modelResponse.ok) continue;
 
         const modelHtml = await modelResponse.text();
-        const productData = extractProductJsonLd(modelHtml);
+        
+        // Try to extract from JSON-LD first
+        let productData = extractProductJsonLd(modelHtml);
+        
+        // If no JSON-LD Product, try to extract from meta description
+        if (!productData?.offers) {
+          const metaMatch = modelHtml.match(/<meta name="description" content="([^"]+)"/);
+          const titleMatch = modelHtml.match(/<title>([^<]+)<\/title>/);
+          
+          if (metaMatch && titleMatch) {
+            // Extract price from meta - MUST be followed by ₪ symbol
+            // Patterns: "החל מ - 830₪", "מ - 830&amp;rlm;₪", "מ - 830&rlm;₪"
+            // The price in Zap meta always appears as "מ - XXX₪" (from - XXX₪)
+            // HTML entities may be encoded as &amp; or &
+            const priceMatch = metaMatch[1].match(/מ\s*[-–]\s*(\d{2,6})(?:&(?:amp;)?rlm;)?₪/);
+            const productName = titleMatch[1].replace(/ - זאפ.*$/, '').trim();
+            
+            if (priceMatch && productName) {
+              const extractedPrice = parseInt(priceMatch[1]);
+              
+              // Sanity check: price should be reasonable (at least 50₪ and not more than 100,000₪)
+              if (extractedPrice >= 50 && extractedPrice <= 100000) {
+                productData = {
+                  '@type': 'Product',
+                  name: productName,
+                  offers: {
+                    '@type': 'AggregateOffer',
+                    lowPrice: priceMatch[1],
+                    offerCount: '1',
+                  },
+                };
+                console.log(`[Zap] Extracted from meta: ${productName} - ₪${extractedPrice}`);
+              } else {
+                console.log(`[Zap] Rejected invalid price ₪${extractedPrice} for ${productName}`);
+              }
+            }
+          }
+        }
 
         if (!productData?.offers || !productData.name) continue;
 
@@ -398,7 +442,13 @@ export async function searchWithZap(
     // If no individual offers, use aggregate data
     if (providers.length === 0 && offers.lowPrice) {
       const lowPrice = parseFloat(offers.lowPrice);
-      if (lowPrice > 0) {
+      
+      // Validate price is reasonable compared to recommended price
+      // Price should be between 30% and 200% of recommended price
+      const minReasonable = params.recommendedPrice ? params.recommendedPrice * 0.3 : 50;
+      const maxReasonable = params.recommendedPrice ? params.recommendedPrice * 2 : 100000;
+      
+      if (lowPrice >= minReasonable && lowPrice <= maxReasonable) {
         providers.push({
           providerName: `Zap.co.il (${offers.offerCount || '?'} חנויות)`,
           providerUrl: bestMatch.modelUrl,
@@ -407,6 +457,8 @@ export async function searchWithZap(
           lastUpdated: new Date().toISOString(),
           source: 'zap',
         });
+      } else {
+        console.log(`[Zap] Rejected unreasonable price ₪${lowPrice} (expected ₪${minReasonable}-₪${maxReasonable})`);
       }
     }
 

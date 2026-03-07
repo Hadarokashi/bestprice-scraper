@@ -1,31 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
 import { PriceCache, PriceComparison, ApiResponse } from '@/lib/types';
+import { supabase } from '@/lib/supabase';
+import { loadPriceCache, upsertPriceComparison } from '@/lib/price-cache';
 
 // GET /api/prices - Get all cached prices
 export async function GET(): Promise<NextResponse<ApiResponse<PriceCache>>> {
   try {
-    const { data, error } = await supabase
-      .from('price_cache')
-      .select('*');
-
-    if (error) throw error;
-
-    // Convert to PriceCache format (barcode -> PriceComparison)
-    const cache: PriceCache = {};
-    for (const row of data || []) {
-      cache[row.barcode] = {
-        productId: row.product_id,
-        barcode: row.barcode,
-        recommendedPrice: parseFloat(row.recommended_price),
-        threshold: row.threshold,
-        providers: row.providers || [],
-        flaggedProviders: row.flagged_providers || [],
-        lastSearched: row.last_searched,
-        error: row.error || undefined,
-      };
-    }
-
+    const cache = await loadPriceCache();
     return NextResponse.json({ success: true, data: cache });
   } catch (error) {
     console.error('GET /api/prices error:', error);
@@ -49,24 +30,19 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       );
     }
 
-    // Upsert into price_cache
-    const { error } = await supabase
-      .from('price_cache')
-      .upsert({
-        barcode,
-        product_id: productId,
-        recommended_price: recommendedPrice,
-        threshold,
-        providers: providers || [],
-        flagged_providers: flaggedProviders || [],
-        scan_metadata: scanMetadata || null,
-        last_searched: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      }, {
-        onConflict: 'barcode',
-      });
+    const comparison: PriceComparison = {
+      productId,
+      barcode,
+      recommendedPrice,
+      threshold,
+      providers: providers || [],
+      flaggedProviders: flaggedProviders || [],
+      lastSearched: new Date().toISOString(),
+      scanMetadata: scanMetadata || undefined,
+      error: body.error || undefined,
+    };
 
-    if (error) throw error;
+    await upsertPriceComparison(comparison);
 
     console.log(`[Price Cache] Saved results for barcode ${barcode}: ${providers?.length || 0} providers`);
 

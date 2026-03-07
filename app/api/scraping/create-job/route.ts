@@ -1,10 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import type { ScraperConfig, ScrapingJob } from '@/lib/types';
+import type { ScrapingJob } from '@/lib/types';
+import {
+  createJobMetaEntry,
+  DEFAULT_SCAN_SETTINGS,
+  filterScrapersByPreset,
+  toScraperConfig,
+} from '@/lib/scan-utils';
 
 export async function POST(request: NextRequest) {
   try {
-    const { productId, productName, barcode, recommendedPrice } = await request.json();
+    const {
+      productId,
+      productName,
+      barcode,
+      recommendedPrice,
+      scanMode = DEFAULT_SCAN_SETTINGS.scanMode,
+      sitePreset = DEFAULT_SCAN_SETTINGS.sitePreset,
+      selectedSites = [],
+      forceRefresh = true,
+    } = await request.json();
     
     if (!productId || !productName || !barcode) {
       return NextResponse.json(
@@ -28,9 +43,24 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const totalScrapers = (scrapers || []).length;
+    const filteredScrapers = filterScrapersByPreset(
+      (scrapers || []).map((scraper) => toScraperConfig(scraper)),
+      sitePreset,
+      selectedSites
+    );
+    const totalScrapers = filteredScrapers.length + (scanMode === 'playwright_only' ? 0 : 1);
     
     // Create scraping job
+    const initialWebsiteScans = [
+      createJobMetaEntry({
+        status: 'pending',
+        phase: 'queued',
+        mode: scanMode,
+        includedSites: filteredScrapers.map((scraper) => scraper.name),
+        message: forceRefresh ? 'מוכן להתחיל סריקה חדשה' : 'בודק אם יש מטמון זמין',
+      }),
+    ];
+
     const { data: job, error: jobError } = await supabase
       .from('scraping_jobs')
       .insert({
@@ -42,6 +72,7 @@ export async function POST(request: NextRequest) {
         total_scrapers: totalScrapers,
         completed_scrapers: 0,
         results: [],
+        website_scans: initialWebsiteScans,
       })
       .select()
       .single();
@@ -65,6 +96,8 @@ export async function POST(request: NextRequest) {
         totalScrapers: job.total_scrapers,
         completedScrapers: job.completed_scrapers,
         results: job.results,
+        progress: 0,
+        phase: 'queued',
         createdAt: job.created_at,
         updatedAt: job.updated_at,
       } as ScrapingJob,

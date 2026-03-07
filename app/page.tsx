@@ -10,16 +10,38 @@ import SettingsModal from '@/components/SettingsModal';
 import StatsPanel from '@/components/StatsPanel';
 import ProductEditor from '@/components/ProductEditor';
 import ProvidersView from '@/components/ProvidersView';
-import { Product, PriceComparison, AppSettings, PriceSource } from '@/lib/types';
+import AdminPanel from '@/components/AdminPanel';
+import {
+  AppSettings,
+  PriceComparison,
+  PriceSource,
+  Product,
+  ProductScanState,
+  ScanMode,
+  ScanSitePreset,
+} from '@/lib/types';
+import {
+  buildScanStateFromComparison,
+  DEFAULT_SCAN_SETTINGS,
+  mapSettingsWithDefaults,
+} from '@/lib/scan-utils';
+
+interface ScanJobResponse {
+  status: string;
+  comparison?: PriceComparison;
+}
 
 export default function Dashboard() {
   // State
   const [products, setProducts] = useState<Product[]>([]);
   const [priceData, setPriceData] = useState<{ [barcode: string]: PriceComparison }>({});
-  const [settings, setSettings] = useState<AppSettings>({
+  const [scanStates, setScanStates] = useState<{ [barcode: string]: ProductScanState }>({});
+  const [settings, setSettings] = useState<AppSettings>(mapSettingsWithDefaults({
     threshold: 10,
-    priceSource: 'zap', // Always use Zap.co.il
-  });
+    priceSource: 'zap',
+  }));
+  const [runScanMode, setRunScanMode] = useState<ScanMode>(DEFAULT_SCAN_SETTINGS.scanMode);
+  const [runSitePreset, setRunSitePreset] = useState<ScanSitePreset>(DEFAULT_SCAN_SETTINGS.sitePreset);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<{ [barcode: string]: boolean }>({});
   const [showImportModal, setShowImportModal] = useState(false);
@@ -29,7 +51,7 @@ export default function Dashboard() {
   const [initialLoading, setInitialLoading] = useState(true);
   
   // Tab navigation state
-  const [activeTab, setActiveTab] = useState<'products' | 'providers'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'providers' | 'admin'>('products');
   
   // Bulk search state
   const [isSearching, setIsSearching] = useState(false);
@@ -39,25 +61,41 @@ export default function Dashboard() {
   // Filter state
   const [productFilter, setProductFilter] = useState<FilterType>('all');
 
+  const loadDashboardData = useCallback(async () => {
+    const [productsRes, pricesRes, settingsRes] = await Promise.all([
+      fetch('/api/products').then((r) => r.json()),
+      fetch('/api/prices').then((r) => r.json()),
+      fetch('/api/settings').then((r) => r.json()),
+    ]);
+
+    if (productsRes.success && productsRes.data) {
+      setProducts(productsRes.data.products || []);
+    }
+
+    if (pricesRes.success && pricesRes.data) {
+      setPriceData(pricesRes.data);
+      setScanStates(
+        Object.entries(pricesRes.data).reduce((acc, [barcode, comparison]) => {
+          const state = buildScanStateFromComparison(comparison as PriceComparison, false);
+          if (state) {
+            acc[barcode] = state;
+          }
+          return acc;
+        }, {} as { [barcode: string]: ProductScanState })
+      );
+    }
+
+    if (settingsRes.success && settingsRes.data) {
+      setSettings(mapSettingsWithDefaults(settingsRes.data));
+    }
+  }, []);
+
   // Load initial data
   useEffect(() => {
-    Promise.all([
-      fetch('/api/products').then(r => r.json()),
-      fetch('/api/prices').then(r => r.json()),
-      fetch('/api/settings').then(r => r.json()),
-    ]).then(([productsRes, pricesRes, settingsRes]) => {
-      if (productsRes.success && productsRes.data) {
-        setProducts(productsRes.data.products || []);
-      }
-      if (pricesRes.success && pricesRes.data) {
-        setPriceData(pricesRes.data);
-      }
-      if (settingsRes.success && settingsRes.data) {
-        setSettings(settingsRes.data);
-      }
-      setInitialLoading(false);
-    }).catch(console.error);
-  }, []);
+    loadDashboardData()
+      .catch(console.error)
+      .finally(() => setInitialLoading(false));
+  }, [loadDashboardData]);
 
   // Count flagged products
   const flaggedCount = Object.values(priceData).reduce(
@@ -130,236 +168,161 @@ export default function Dashboard() {
       });
   }, []);
 
-  // Check price for a single product using queue-based scraping
-  const handleCheckPrice = useCallback(async (product: Product, signal?: AbortSignal) => {
-    setLoading(prev => ({ ...prev, [product.barcode]: true }));
+  useEffect(() => {
+    setRunScanMode(settings.scanMode || DEFAULT_SCAN_SETTINGS.scanMode);
+    setRunSitePreset(settings.sitePreset || DEFAULT_SCAN_SETTINGS.sitePreset);
+  }, [settings.scanMode, settings.sitePreset]);
+
+  const applyJobUpdate = useCallback((product: Product, data: ScanJobResponse) => {
+    const comparison = data?.comparison;
+    if (!comparison) {
+      return;
+    }
+
+    setPriceData((prev) => ({
+      ...prev,
+      [product.barcode]: comparison,
+    }));
+
+    const scanState = buildScanStateFromComparison(comparison, data?.status === 'processing');
+    if (scanState) {
+      setScanStates((prev) => ({
+        ...prev,
+        [product.barcode]: scanState,
+      }));
+    }
+  }, []);
+
+  const createQueuedState = useCallback((product: Product, message = 'מחכה בתור') => {
+    setScanStates((prev) => ({
+      ...prev,
+      [product.barcode]: {
+        jobId: prev[product.barcode]?.jobId,
+        phase: 'queued',
+        label: 'מחכה בתור',
+        progress: 0,
+        providerCount: prev[product.barcode]?.providerCount || 0,
+        message,
+        mode: runScanMode,
+      },
+    }));
+  }, [runScanMode]);
+
+  const runScanJob = useCallback(async (product: Product, signal?: AbortSignal) => {
+    setLoading((prev) => ({ ...prev, [product.barcode]: true }));
+    createQueuedState(product, 'יוצר משימת סריקה');
 
     try {
-      // Try Playwright scraper first (cloud or local)
-      if (usePlaywright && scraperUrl) {
-        console.log(`[Price Check] Using Playwright scraper for ${product.name}`);
-        
-        // Start the scrape job
-        const startResponse = await fetch(`${scraperUrl}/scrape`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            productName: product.name,
-            barcode: product.barcode,
-            recommendedPrice: product.recommendedPrice,
-          }),
-          signal,
-        });
-
-        const startResult = await startResponse.json();
-        
-        if (startResult.success && startResult.data.jobId) {
-          const jobId = startResult.data.jobId;
-          console.log(`[Price Check] Started job ${jobId} for ${product.name}`);
-          
-          // Poll for results
-          let attempts = 0;
-          const maxAttempts = 60; // 2 minutes max
-          
-          while (attempts < maxAttempts && !signal?.aborted) {
-            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
-            
-            const statusResponse = await fetch(`${scraperUrl}/status/${jobId}`, { signal });
-            const statusResult = await statusResponse.json();
-            
-            if (statusResult.success) {
-              const thresholdPrice = product.recommendedPrice * (1 - settings.threshold / 100);
-              const flaggedProviders = (statusResult.data.providers || []).filter((p: any) => p.price < thresholdPrice);
-              
-              // Update UI with current progress
-              setPriceData(prev => ({
-                ...prev,
-                [product.barcode]: {
-                  productId: product.id,
-                  barcode: product.barcode,
-                  recommendedPrice: product.recommendedPrice,
-                  threshold: settings.threshold,
-                  providers: statusResult.data.providers || [],
-                  flaggedProviders,
-                  lastSearched: new Date().toISOString(),
-                  scanMetadata: statusResult.data.scanMetadata,
-                },
-              }));
-              
-              // Check if completed
-              if (statusResult.data.status === 'completed' || statusResult.data.status === 'failed') {
-                console.log(`[Price Check] Job ${jobId} ${statusResult.data.status} - Found ${statusResult.data.providers?.length || 0} results`);
-                
-                // Save results to Supabase so Villy can see them
-                try {
-                  await fetch('/api/prices', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      barcode: product.barcode,
-                      productId: product.id,
-                      recommendedPrice: product.recommendedPrice,
-                      threshold: settings.threshold,
-                      providers: statusResult.data.providers || [],
-                      flaggedProviders,
-                      scanMetadata: statusResult.data.scanMetadata,
-                    }),
-                  });
-                  console.log(`[Price Check] Saved results to cache for ${product.name}`);
-                } catch (saveError) {
-                  console.error('[Price Check] Failed to save to cache:', saveError);
-                }
-                
-                setLoading(prev => ({ ...prev, [product.barcode]: false }));
-                return;
-              }
-              
-              console.log(`[Price Check] Job ${jobId} progress: ${statusResult.data.progress}%`);
-            }
-            
-            attempts++;
-          }
-          
-          console.log(`[Price Check] Job ${jobId} timeout after ${attempts} attempts`);
-          setLoading(prev => ({ ...prev, [product.barcode]: false }));
-          return;
-        }
-      }
-      
-      // Fall back to queue-based HTTP scraping
-      console.log(`[Price Check] Using HTTP scraping for ${product.name}`);
-      
-      // Step 1: Create scraping job
-      const createJobResponse = await fetch('/api/scraping/create-job', {
+      const startResponse = await fetch('/api/scraping/create-job', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId: product.id,
-          barcode: product.barcode,
           productName: product.name,
+          barcode: product.barcode,
           recommendedPrice: product.recommendedPrice,
+          scanMode: runScanMode,
+          sitePreset: runSitePreset,
         }),
         signal,
       });
 
-      const createJobResult = await createJobResponse.json();
-      if (!createJobResult.success) {
-        throw new Error(createJobResult.error || 'Failed to create job');
+      const startResult = await startResponse.json();
+      if (!startResult.success || !startResult.data?.id) {
+        throw new Error(startResult.error || 'Failed to create scan job');
       }
 
-      const job = createJobResult.data;
-      console.log(`[Price Check] Created job ${job.id} for ${product.name}`);
+      const jobId = startResult.data.id;
+      let status = 'pending';
 
-      // Step 2: Process in batches until complete
-      let isComplete = false;
-      let lastResults: any[] = [];
+      setScanStates((prev) => ({
+        ...prev,
+        [product.barcode]: {
+          jobId,
+          phase: 'queued',
+          label: 'מחכה בתור',
+          progress: 0,
+          providerCount: 0,
+          message: 'ממתין לתחילת עיבוד',
+          mode: runScanMode,
+        },
+      }));
 
-      while (!isComplete && !signal?.aborted) {
-        // Process next batch
-        const batchResponse = await fetch('/api/scraping/process-batch', {
+      while (!signal?.aborted && !['completed', 'failed', 'partial'].includes(status)) {
+        const tickResponse = await fetch('/api/scraping/process-batch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ jobId: job.id }),
+          body: JSON.stringify({ jobId }),
           signal,
         });
 
-        const batchResult = await batchResponse.json();
-        if (!batchResult.success) {
-          console.error('[Price Check] Batch error:', batchResult.error);
-          break;
+        const tickResult = await tickResponse.json();
+        if (!tickResult.success) {
+          throw new Error(tickResult.error || 'Failed to process scan job');
         }
 
-        lastResults = batchResult.data.results || [];
-        isComplete = batchResult.data.status === 'completed';
+        status = tickResult.data.status;
+        applyJobUpdate(product, tickResult.data);
 
-        // Update UI with partial results
-        const thresholdPrice = product.recommendedPrice * (1 - settings.threshold / 100);
-        const flaggedProviders = lastResults.filter((p: any) => p.price < thresholdPrice);
-        
-        // Get scan metadata from status endpoint
-        const statusResponse = await fetch(`/api/scraping/status/${job.id}`, { signal });
-        const statusResult = await statusResponse.json();
-        const websiteScans = statusResult.data?.website_scans || [];
-
-        setPriceData(prev => ({
-          ...prev,
-          [product.barcode]: {
-            productId: product.id,
-            barcode: product.barcode,
-            recommendedPrice: product.recommendedPrice,
-            threshold: settings.threshold,
-            providers: lastResults,
-            flaggedProviders,
-            lastSearched: new Date().toISOString(),
-            scanMetadata: {
-              totalWebsites: batchResult.data.totalScrapers || 0,
-              scannedWebsites: websiteScans.length,
-              websites: websiteScans,
-            },
-          },
-        }));
-
-        console.log(`[Price Check] Progress: ${batchResult.data.completedScrapers}/${batchResult.data.totalScrapers} - Found ${lastResults.length} providers`);
-
-        // Small delay between batches
-        if (!isComplete) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+        if (!['completed', 'failed', 'partial'].includes(status)) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
         }
       }
-
-      console.log(`[Price Check] Completed ${product.name}: ${lastResults.length} providers found`);
     } catch (error) {
-      if ((error as Error).name === 'AbortError') {
-        console.log(`Search aborted for ${product.name}`);
-      } else {
+      if ((error as Error).name !== 'AbortError') {
         console.error('Price search error:', error);
-        // Show error state
-        setPriceData(prev => ({
+        setScanStates((prev) => ({
           ...prev,
           [product.barcode]: {
-            productId: product.id,
-            barcode: product.barcode,
-            recommendedPrice: product.recommendedPrice,
-            threshold: settings.threshold,
-            providers: [],
-            flaggedProviders: [],
-            lastSearched: new Date().toISOString(),
-            error: error instanceof Error ? error.message : 'Unknown error',
+            jobId: prev[product.barcode]?.jobId,
+            phase: 'failed',
+            label: 'שגיאה',
+            progress: 0,
+            providerCount: 0,
+            message: error instanceof Error ? error.message : 'Unknown error',
+            mode: runScanMode,
           },
         }));
       }
     } finally {
-      setLoading(prev => ({ ...prev, [product.barcode]: false }));
+      setLoading((prev) => ({ ...prev, [product.barcode]: false }));
     }
-  }, [settings.threshold]);
+  }, [applyJobUpdate, createQueuedState, runScanMode, runSitePreset]);
 
-  // Bulk price check with abort support
+  // Check price for a single product using the unified job contract
+  const handleCheckPrice = useCallback(async (product: Product, signal?: AbortSignal) => {
+    await runScanJob(product, signal);
+  }, [runScanJob]);
+
+  // Bulk price check with queued jobs and configurable concurrency
   const handleBulkCheck = async (productsToCheck?: Product[]) => {
-    // Create new abort controller
     abortControllerRef.current = new AbortController();
     const signal = abortControllerRef.current.signal;
-    
+
     const checkList = productsToCheck || filteredProducts;
-    
+    const maxConcurrentJobs = settings.maxConcurrentJobs || DEFAULT_SCAN_SETTINGS.maxConcurrentJobs;
+
     setIsSearching(true);
     setSearchProgress({ current: 0, total: checkList.length });
 
-    for (let i = 0; i < checkList.length; i++) {
-      // Check if aborted
-      if (signal.aborted) {
-        console.log('Bulk search stopped by user');
-        break;
-      }
+    for (const product of checkList) {
+      createQueuedState(product);
+    }
 
-      const product = checkList[i];
-      setSearchProgress({ current: i + 1, total: checkList.length });
-      
-      await handleCheckPrice(product, signal);
-      
-      // Small delay to avoid rate limiting
-      if (!signal.aborted) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
+    let completedCount = 0;
+
+    for (let i = 0; i < checkList.length; i += maxConcurrentJobs) {
+      if (signal.aborted) break;
+
+      const batch = checkList.slice(i, i + maxConcurrentJobs);
+      await Promise.all(
+        batch.map(async (product) => {
+          if (signal.aborted) return;
+          await runScanJob(product, signal);
+          completedCount += 1;
+          setSearchProgress({ current: completedCount, total: checkList.length });
+        })
+      );
     }
 
     setIsSearching(false);
@@ -386,6 +349,10 @@ export default function Dashboard() {
   const handleSaveSettings = async (newSettings: {
     threshold: number;
     priceSource: PriceSource;
+    scanMode: ScanMode;
+    sitePreset: ScanSitePreset;
+    cacheFreshnessHours: number;
+    maxConcurrentJobs: number;
     serpApiKey?: string;
   }) => {
     const response = await fetch('/api/settings', {
@@ -396,11 +363,15 @@ export default function Dashboard() {
 
     const result = await response.json();
     if (result.success) {
-      setSettings(prev => ({
-        ...prev,
+      setSettings(mapSettingsWithDefaults({
+        ...settings,
         threshold: newSettings.threshold,
         priceSource: newSettings.priceSource,
-        serpApiKey: newSettings.serpApiKey ? '***configured***' : prev.serpApiKey,
+        scanMode: newSettings.scanMode,
+        sitePreset: newSettings.sitePreset,
+        cacheFreshnessHours: newSettings.cacheFreshnessHours,
+        maxConcurrentJobs: newSettings.maxConcurrentJobs,
+        serpApiKey: newSettings.serpApiKey ? '***configured***' : settings.serpApiKey,
       }));
     }
   };
@@ -542,9 +513,6 @@ export default function Dashboard() {
     URL.revokeObjectURL(url);
   };
 
-  // Legacy export for flagged (keeping for backward compatibility)
-  const handleExportFlagged = () => handleExportByCategory('flagged');
-
   // Handle product save from editor
   const handleProductsSave = (updatedProducts: Product[]) => {
     setProducts(updatedProducts);
@@ -648,6 +616,16 @@ export default function Dashboard() {
           >
             🏪 ספקים
           </button>
+          <button
+            onClick={() => setActiveTab('admin')}
+            className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
+              activeTab === 'admin'
+                ? 'bg-[var(--primary)] text-white shadow-lg'
+                : 'bg-[var(--background)] border border-[var(--border)] hover:bg-[var(--border)]/30'
+            }`}
+          >
+            🛠️ אדמין
+          </button>
         </div>
 
         {/* Stats Panel - Only show on products tab */}
@@ -681,6 +659,29 @@ export default function Dashboard() {
                       className="w-full"
                     />
                   </div>
+                  <select
+                    value={runScanMode}
+                    onChange={(e) => setRunScanMode(e.target.value as ScanMode)}
+                    className="min-w-[180px]"
+                    title="שיטת הסריקה להרצה הבאה"
+                  >
+                    <option value="zap_then_remaining">Zap ואז אתרים חסרים</option>
+                    <option value="zap_only">Zap בלבד</option>
+                    <option value="playwright_only">Playwright בלבד</option>
+                    <option value="selected_sites">אתרים נבחרים</option>
+                    <option value="retry_failed">אתרים שנכשלו</option>
+                  </select>
+                  <select
+                    value={runSitePreset}
+                    onChange={(e) => setRunSitePreset(e.target.value as ScanSitePreset)}
+                    className="min-w-[160px]"
+                    title="Preset אתרים להרצה הבאה"
+                  >
+                    <option value="enabled">כל האתרים</option>
+                    <option value="music">חנויות מוסיקה</option>
+                    <option value="electronics">חנויות אלקטרוניקה</option>
+                    <option value="selected">אתרים נבחרים באדמין</option>
+                  </select>
                   <button
                     onClick={() => setShowImportModal(true)}
                     className="btn-secondary"
@@ -719,6 +720,7 @@ export default function Dashboard() {
                 <ProductTable
                   products={filteredProducts}
                   priceData={priceData}
+                  scanStates={scanStates}
                   threshold={settings.threshold}
                   onCheckPrice={handleCheckPrice}
                   onSelectProduct={setSelectedProduct}
@@ -748,9 +750,17 @@ export default function Dashboard() {
               />
             </div>
           </div>
-        ) : (
+        ) : activeTab === 'providers' ? (
           <div className="h-full overflow-y-auto">
             <ProvidersView />
+          </div>
+        ) : (
+          <div className="h-full overflow-y-auto">
+            <AdminPanel
+              settings={settings}
+              onRefresh={loadDashboardData}
+              onOpenSettings={() => setShowSettingsModal(true)}
+            />
           </div>
         )}
       </div>
@@ -766,6 +776,10 @@ export default function Dashboard() {
         onClose={() => setShowSettingsModal(false)}
         threshold={settings.threshold}
         priceSource={settings.priceSource}
+        scanMode={settings.scanMode}
+        sitePreset={settings.sitePreset}
+        cacheFreshnessHours={settings.cacheFreshnessHours}
+        maxConcurrentJobs={settings.maxConcurrentJobs}
         hasApiKey={!!settings.serpApiKey}
         onSave={handleSaveSettings}
       />

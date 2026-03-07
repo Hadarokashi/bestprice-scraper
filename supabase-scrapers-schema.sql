@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS scrapers (
   enabled BOOLEAN DEFAULT true,
   priority INTEGER DEFAULT 5,
   search_pattern TEXT, -- e.g., "/?s={query}" or "/search?q={query}"
+  category TEXT DEFAULT 'general',
+  method TEXT DEFAULT 'playwright',
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );

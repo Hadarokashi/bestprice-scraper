@@ -1,5 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import type { ProviderPrice } from '@/lib/types';
+
+interface ProviderExportRow {
+  'שם מוצר': string;
+  'ברקוד': string;
+  'מק"ט': string;
+  'מחיר מומלץ': string;
+  'מחיר ספק': string;
+  'הפרש מחיר': string;
+  'אחוז הנחה': string;
+  'סטטוס': string;
+  'קישור': string;
+  'תאריך בדיקה': string;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,11 +42,11 @@ export async function POST(request: NextRequest) {
     // Create product lookup map
     const productMap = new Map(products?.map(p => [p.id, p]) || []);
     
-    const providerProducts: any[] = [];
+    const providerProducts: ProviderExportRow[] = [];
     
     for (const cache of priceCache || []) {
-      const providers = cache.providers_data || [];
-      const provider = providers.find((p: any) => p.provider_name === providerName);
+      const providers = (cache.providers || []) as ProviderPrice[];
+      const provider = providers.find((p) => p.providerName === providerName);
       
       if (provider) {
         const product = productMap.get(cache.product_id);
@@ -49,8 +63,8 @@ export async function POST(request: NextRequest) {
           'הפרש מחיר': (cache.recommended_price - provider.price).toFixed(2),
           'אחוז הנחה': (((cache.recommended_price - provider.price) / cache.recommended_price) * 100).toFixed(1) + '%',
           'סטטוס': isFlagged ? 'חריג' : 'תקין',
-          'קישור': provider.provider_url || '',
-          'תאריך בדיקה': new Date(provider.last_updated || cache.last_searched).toLocaleDateString('he-IL'),
+          'קישור': provider.providerUrl || '',
+          'תאריך בדיקה': new Date(provider.lastUpdated || cache.last_searched).toLocaleDateString('he-IL'),
         });
       }
     }

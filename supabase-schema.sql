@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS price_cache (
   threshold INTEGER NOT NULL DEFAULT 10,
   providers JSONB NOT NULL DEFAULT '[]',
   flagged_providers JSONB NOT NULL DEFAULT '[]',
+  scan_metadata JSONB DEFAULT '{}'::jsonb,
   last_searched TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   error TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -32,6 +33,7 @@ CREATE TABLE IF NOT EXISTS settings (
   id SERIAL PRIMARY KEY,
   threshold INTEGER NOT NULL DEFAULT 10,
   price_source TEXT NOT NULL DEFAULT 'zap',
+  scan_policy JSONB DEFAULT '{}'::jsonb,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
