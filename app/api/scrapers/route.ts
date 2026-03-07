@@ -54,7 +54,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
         row.id = s.id;
       }
 
-      const { error } = await supabase.from('scrapers').upsert(row, { onConflict: 'id' });
+      let { error } = await supabase.from('scrapers').upsert(row, { onConflict: 'id' });
+
+      if (error && String(error.message || '').includes('category')) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { category: _c, method: _m, ...fallbackRow } = row;
+        ({ error } = await supabase.from('scrapers').upsert(fallbackRow, { onConflict: 'id' }));
+      }
+
       if (error) throw error;
 
       const { data: allData, error: fetchError } = await supabase
@@ -91,10 +98,26 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       updated_at: new Date().toISOString(),
     }));
 
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('scrapers')
       .upsert(payload, { onConflict: 'id' })
       .select('*');
+
+    if (error && String(error.message || '').includes('category')) {
+      const fallbackPayload = scrapers.map((scraper: ScraperConfig) => ({
+        id: scraper.id,
+        name: scraper.name,
+        base_url: scraper.baseUrl,
+        enabled: scraper.enabled,
+        priority: scraper.priority,
+        search_pattern: scraper.searchPattern || null,
+        updated_at: new Date().toISOString(),
+      }));
+      ({ data, error } = await supabase
+        .from('scrapers')
+        .upsert(fallbackPayload, { onConflict: 'id' })
+        .select('*'));
+    }
 
     if (error) throw error;
 

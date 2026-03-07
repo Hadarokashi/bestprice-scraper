@@ -60,6 +60,12 @@ export function getSiteCategory(name: string): 'music' | 'electronics' | 'genera
 
 export function toScraperConfig(row: Record<string, unknown>): ScraperConfig {
   const name = String(row.name || '');
+  const dbCategory = row.category ? String(row.category) : undefined;
+  const validCategories = ['music', 'electronics', 'general'];
+  const category = dbCategory && validCategories.includes(dbCategory)
+    ? (dbCategory as 'music' | 'electronics' | 'general')
+    : getSiteCategory(name);
+
   return {
     id: String(row.id || ''),
     name,
@@ -67,7 +73,7 @@ export function toScraperConfig(row: Record<string, unknown>): ScraperConfig {
     enabled: Boolean(row.enabled),
     priority: Number(row.priority || 0),
     searchPattern: row.search_pattern ? String(row.search_pattern) : undefined,
-    category: getSiteCategory(name),
+    category,
     method: name === 'Zap.co.il' ? 'zap' : 'playwright',
     timeoutMs: row.timeout_ms ? Number(row.timeout_ms) : undefined,
     createdAt: row.created_at ? String(row.created_at) : undefined,

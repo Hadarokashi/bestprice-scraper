@@ -19,6 +19,7 @@ import {
   ProductScanState,
   ScanMode,
   ScanSitePreset,
+  ScheduleConfig,
 } from '@/lib/types';
 import {
   buildScanStateFromComparison,
@@ -381,6 +382,7 @@ export default function Dashboard() {
     cacheFreshnessHours: number;
     maxConcurrentJobs: number;
     serpApiKey?: string;
+    schedule?: ScheduleConfig;
   }) => {
     const response = await fetch('/api/settings', {
       method: 'POST',
@@ -399,6 +401,7 @@ export default function Dashboard() {
         cacheFreshnessHours: newSettings.cacheFreshnessHours,
         maxConcurrentJobs: newSettings.maxConcurrentJobs,
         serpApiKey: newSettings.serpApiKey ? '***configured***' : settings.serpApiKey,
+        schedule: newSettings.schedule || settings.schedule,
       }));
     }
   };
