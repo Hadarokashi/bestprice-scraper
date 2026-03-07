@@ -81,6 +81,30 @@ const SCRAPER_CONFIGS = [
   { id: '62', name: 'King Games', baseUrl: 'https://www.king-games.co.il', searchPattern: '/?s={query}', enabled: true },
 ];
 
+const GENERIC_PRODUCT_TOKENS = new Set([
+  'pro',
+  'plus',
+  'max',
+  'mini',
+  'ultra',
+  'zero',
+  'smart',
+  'black',
+  'white',
+  'blue',
+  'red',
+  'green',
+  'gray',
+  'grey',
+  'silver',
+  'gold',
+  'pink',
+  'ram',
+  'gb',
+  '5g',
+  '4g',
+]);
+
 // Build search URL
 function buildSearchUrl(config, query) {
   const encodedQuery = encodeURIComponent(query);
@@ -93,6 +117,10 @@ function buildSearchUrl(config, query) {
 // Check if product name matches search query
 function isProductMatch(foundName, searchQuery) {
   const normalize = (s) => s.toLowerCase().replace(/[^\w\s\u0590-\u05FF]/g, '').replace(/\s+/g, ' ').trim();
+  const getTokens = (s) => s
+    .split(' ')
+    .filter((word) => word.length > 2)
+    .filter((word) => !GENERIC_PRODUCT_TOKENS.has(word));
   
   const found = normalize(foundName);
   const search = normalize(searchQuery);
@@ -112,9 +140,21 @@ function isProductMatch(foundName, searchQuery) {
   
   const searchWords = search.split(' ').filter(w => w.length > 2);
   const foundWords = found.split(' ');
+  const meaningfulSearchWords = getTokens(search);
   const matchedWords = searchWords.filter(word => 
     foundWords.some(fw => fw.includes(word) || word.includes(fw))
   );
+
+  const meaningfulMatches = meaningfulSearchWords.filter(word =>
+    foundWords.some(fw => fw.includes(word) || word.includes(fw))
+  );
+
+  if (meaningfulSearchWords.length > 0) {
+    const requiredMeaningfulMatches = meaningfulSearchWords.length === 1
+      ? 1
+      : Math.min(2, meaningfulSearchWords.length);
+    if (meaningfulMatches.length < requiredMeaningfulMatches) return false;
+  }
   
   return matchedWords.length >= Math.ceil(searchWords.length * 0.5);
 }
