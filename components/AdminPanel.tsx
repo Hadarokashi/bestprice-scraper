@@ -47,8 +47,12 @@ export default function AdminPanel({
 
   useEffect(() => {
     setLocalSchedule(schedule);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.schedule?.enabled, settings.schedule?.frequency, settings.schedule?.hour]);
+  }, [
+    settings.schedule?.enabled,
+    settings.schedule?.frequency,
+    settings.schedule?.hour,
+    settings.schedule?.timezone,
+  ]);
 
   useEffect(() => {
     void fetchScrapers();
@@ -154,7 +158,18 @@ export default function AdminPanel({
     try {
       const enabled = localSchedule.frequency !== 'off';
       const scheduleToSave: ScheduleConfig = { ...localSchedule, enabled };
-      await onSaveSettings({ schedule: scheduleToSave });
+
+      const res = await fetch('/api/settings/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ schedule: scheduleToSave }),
+      });
+      const result = await res.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to save schedule');
+      }
+      await onRefresh();
     } catch (error) {
       console.error('Failed to save schedule:', error);
       alert('שגיאה בשמירת לוח זמנים');
