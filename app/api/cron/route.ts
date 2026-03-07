@@ -17,11 +17,6 @@ function shouldRunNow(lastRunAt?: string): boolean {
     new Date().toLocaleString('en-US', { timeZone: tz })
   );
 
-  // Run only at 05:00 Israel local time.
-  if (nowInTz.getHours() !== FIXED_SCHEDULE.hour) {
-    return false;
-  }
-
   if (lastRunAt) {
     const lastRun = new Date(
       new Date(lastRunAt).toLocaleString('en-US', { timeZone: tz })
