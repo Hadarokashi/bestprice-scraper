@@ -11,8 +11,10 @@ app.use(express.json());
 // In-memory job storage
 const jobs = new Map();
 
-// Israeli store configurations - 60 WEBSITES
+// Israeli store configurations - 63 WEBSITES (Zap first!)
 const SCRAPER_CONFIGS = [
+  // ZAP FIRST - Price comparison aggregator (finds many stores at once)
+  { id: '0', name: 'Zap.co.il', baseUrl: 'https://www.zap.co.il', searchPattern: '/search.aspx?keyword={query}', enabled: true, priority: true },
   // Music & Audio Stores
   { id: '1', name: 'Bconnect', baseUrl: 'https://bconnect.co.il', searchPattern: '/?s={query}', enabled: true },
   { id: '2', name: 'Diez', baseUrl: 'https://diez.co.il', searchPattern: '/?s={query}', enabled: true },
@@ -143,7 +145,156 @@ async function extractPrices(page, config) {
   };
   
   try {
-    await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
+    await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+    
+    // Special handling for Zap.co.il - price comparison site
+    if (config.name === 'Zap.co.il') {
+      console.log('[Zap] Using special Zap extraction...');
+      
+      // Wait for search results to load
+      await page.waitForTimeout(2000);
+      
+      // Step 1: Find model links from search results
+      const modelLinks = await page.evaluate(() => {
+        const links = [];
+        document.querySelectorAll('a[href*="model.aspx?modelid="]').forEach(a => {
+          const href = a.getAttribute('href');
+          if (href && !links.includes(href)) {
+            links.push(href.startsWith('http') ? href : 'https://www.zap.co.il' + href);
+          }
+        });
+        return links.slice(0, 3); // Check first 3 models
+      });
+      
+      console.log(`[Zap] Found ${modelLinks.length} model pages to check`);
+      
+      // Step 2: Visit each model page and extract ALL stores
+      for (const modelUrl of modelLinks) {
+        try {
+          console.log(`[Zap] Checking model: ${modelUrl}`);
+          await page.goto(modelUrl, { timeout: 15000 });
+          await page.waitForTimeout(3000); // Wait for stores list to load
+          
+          // Extract all store prices from the model page
+          const storeProducts = await page.evaluate((productName) => {
+            const stores = [];
+            
+            // Zap stores list - each store row has price and store name
+            // Common selectors for Zap store rows
+            const storeRows = document.querySelectorAll(
+              '.PriceListItem, .StoreRow, [class*="store-row"], [class*="price-row"], ' +
+              '.PriceDetails, [class*="PriceListItemBody"], tr[class*="store"], .compare-row'
+            );
+            
+            storeRows.forEach(row => {
+              // Try to find store name
+              const storeNameEl = row.querySelector(
+                '.StoreName, .store-name, [class*="store-name"], [class*="StoreName"], ' +
+                '.PriceListShopName, a[class*="shop"], .shop-name'
+              );
+              // Try to find price
+              const priceEl = row.querySelector(
+                '.PriceValue, .price, [class*="price"]:not([class*="old"]), ' +
+                '.PriceListPrice, [class*="Price"]:not([class*="Old"])'
+              );
+              // Try to find link to store
+              const linkEl = row.querySelector('a[href*="redirect"], a[href*="pid="], a[target="_blank"]');
+              
+              if (storeNameEl && priceEl) {
+                const storeName = storeNameEl.textContent?.trim() || '';
+                const priceText = priceEl.textContent?.replace(/[^\d.,]/g, '').replace(',', '') || '';
+                const price = parseFloat(priceText);
+                const url = linkEl?.getAttribute('href') || window.location.href;
+                
+                if (storeName && price > 50 && price < 100000) {
+                  stores.push({
+                    name: productName || 'Unknown',
+                    price,
+                    url,
+                    seller: storeName,
+                  });
+                }
+              }
+            });
+            
+            // Also try alternative structure - price boxes
+            if (stores.length === 0) {
+              document.querySelectorAll('[class*="priceBox"], [class*="StorePrice"], .store-item').forEach(box => {
+                const allText = box.textContent || '';
+                const priceMatch = allText.match(/(\d{2,6})/);
+                const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
+                
+                if (price > 50 && price < 100000) {
+                  stores.push({
+                    name: productName || 'Unknown',
+                    price,
+                    url: window.location.href,
+                    seller: 'Zap Store',
+                  });
+                }
+              });
+            }
+            
+            // Fallback: get price from meta description
+            if (stores.length === 0) {
+              const metaDesc = document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+              const priceMatch = metaDesc.match(/מ\s*[-–]\s*(\d{2,6})/);
+              if (priceMatch) {
+                const title = document.title?.replace(/ - זאפ.*$/, '').trim() || productName;
+                stores.push({
+                  name: title,
+                  price: parseFloat(priceMatch[1]),
+                  url: window.location.href,
+                  seller: 'Zap (lowest)',
+                });
+              }
+            }
+            
+            return stores;
+          }, productName);
+          
+          console.log(`[Zap] Found ${storeProducts.length} stores on model page`);
+          
+          for (const p of storeProducts) {
+            products.push({ ...p, url: makeAbsolute(p.url) });
+          }
+          
+          // If we found stores, we're done
+          if (products.length > 0) {
+            return products;
+          }
+        } catch (err) {
+          console.log(`[Zap] Error on model page: ${err.message}`);
+        }
+      }
+      
+      // Fallback: try to extract from search results if no model pages worked
+      if (products.length === 0) {
+        console.log('[Zap] Falling back to search results extraction');
+        const searchProducts = await page.evaluate(() => {
+          const results = [];
+          document.querySelectorAll('[class*="product"], [class*="result"]').forEach(card => {
+            const nameEl = card.querySelector('[class*="title"], h2, h3');
+            const priceEl = card.querySelector('[class*="price"]');
+            if (nameEl && priceEl) {
+              const name = nameEl.textContent?.trim() || '';
+              const priceText = priceEl.textContent?.replace(/[^\d.,]/g, '').replace(',', '') || '';
+              const price = parseFloat(priceText);
+              if (name && price > 50 && price < 100000) {
+                results.push({ name, price, url: window.location.href });
+              }
+            }
+          });
+          return results;
+        });
+        
+        for (const p of searchProducts) {
+          products.push({ ...p, url: makeAbsolute(p.url) });
+        }
+      }
+      
+      return products;
+    }
     
     // Try JSON-LD first
     const jsonLdProducts = await page.evaluate(() => {
@@ -282,14 +433,17 @@ async function scrapeSite(browser, config, productName, recommendedPrice) {
 const PARALLEL_SITES = 1; // Sequential to minimize memory usage
 
 // Background scraping function
-async function runScrapeJob(jobId, productName, recommendedPrice, barcode, excludeSites = []) {
+async function runScrapeJob(jobId, productName, recommendedPrice, barcode, excludeSites = [], includeSites = []) {
   const job = jobs.get(jobId);
   if (!job) return;
   
-  // Filter out excluded sites (sites already found on Zap)
-  const sitesToScan = excludeSites.length > 0
-    ? SCRAPER_CONFIGS.filter(c => !excludeSites.includes(c.name))
-    : SCRAPER_CONFIGS;
+  let sitesToScan = SCRAPER_CONFIGS;
+  if (Array.isArray(includeSites) && includeSites.length > 0) {
+    sitesToScan = sitesToScan.filter((config) => includeSites.includes(config.name));
+  }
+  if (excludeSites.length > 0) {
+    sitesToScan = sitesToScan.filter((config) => !excludeSites.includes(config.name));
+  }
   
   // Update job with correct total
   job.totalSites = sitesToScan.length;
@@ -368,7 +522,7 @@ function generateJobId() {
 
 // Create scrape job - returns immediately
 app.post('/scrape', async (req, res) => {
-  const { productName, recommendedPrice, barcode, excludeSites } = req.body;
+  const { productName, recommendedPrice, barcode, excludeSites, includeSites } = req.body;
   
   if (!productName) {
     return res.status(400).json({ success: false, error: 'productName is required' });
@@ -376,9 +530,14 @@ app.post('/scrape', async (req, res) => {
   
   // Calculate sites to scan based on excludeSites
   const excludeList = Array.isArray(excludeSites) ? excludeSites : [];
-  const sitesToScan = excludeList.length > 0
-    ? SCRAPER_CONFIGS.filter(c => !excludeList.includes(c.name))
-    : SCRAPER_CONFIGS;
+  const includeList = Array.isArray(includeSites) ? includeSites : [];
+  let sitesToScan = SCRAPER_CONFIGS;
+  if (includeList.length > 0) {
+    sitesToScan = sitesToScan.filter((config) => includeList.includes(config.name));
+  }
+  if (excludeList.length > 0) {
+    sitesToScan = sitesToScan.filter((config) => !excludeList.includes(config.name));
+  }
   
   const jobId = generateJobId();
   
@@ -396,12 +555,13 @@ app.post('/scrape', async (req, res) => {
     progress: 0,
     createdAt: new Date().toISOString(),
     excludedSites: excludeList.length,
+    includedSites: includeList.length,
   };
   
   jobs.set(jobId, job);
   
   // Start scraping in background (don't await)
-  runScrapeJob(jobId, productName, recommendedPrice, barcode, excludeList);
+  runScrapeJob(jobId, productName, recommendedPrice, barcode, excludeList, includeList);
   
   // Return immediately with job ID
   res.json({
@@ -411,6 +571,7 @@ app.post('/scrape', async (req, res) => {
       status: 'processing',
       totalSites: sitesToScan.length,
       excludedSites: excludeList.length,
+      includedSites: includeList.length,
       message: `Scraping ${sitesToScan.length} sites (${excludeList.length} excluded). Poll /status/:jobId for results.`,
     },
   });
@@ -447,16 +608,21 @@ app.get('/status/:jobId', (req, res) => {
 
 // Legacy endpoint - waits for completion (for backwards compatibility)
 app.post('/scrape-sync', async (req, res) => {
-  const { productName, recommendedPrice, barcode, excludeSites } = req.body;
+  const { productName, recommendedPrice, barcode, excludeSites, includeSites } = req.body;
   
   if (!productName) {
     return res.status(400).json({ success: false, error: 'productName is required' });
   }
   
   const excludeList = Array.isArray(excludeSites) ? excludeSites : [];
-  const sitesToScan = excludeList.length > 0
-    ? SCRAPER_CONFIGS.filter(c => !excludeList.includes(c.name))
-    : SCRAPER_CONFIGS;
+  const includeList = Array.isArray(includeSites) ? includeSites : [];
+  let sitesToScan = SCRAPER_CONFIGS;
+  if (includeList.length > 0) {
+    sitesToScan = sitesToScan.filter((config) => includeList.includes(config.name));
+  }
+  if (excludeList.length > 0) {
+    sitesToScan = sitesToScan.filter((config) => !excludeList.includes(config.name));
+  }
   
   // Create and run job
   const jobId = generateJobId();
@@ -477,7 +643,7 @@ app.post('/scrape-sync', async (req, res) => {
   jobs.set(jobId, job);
   
   // Wait for completion
-  await runScrapeJob(jobId, productName, recommendedPrice, barcode, excludeList);
+  await runScrapeJob(jobId, productName, recommendedPrice, barcode, excludeList, includeList);
   
   const completedJob = jobs.get(jobId);
   
