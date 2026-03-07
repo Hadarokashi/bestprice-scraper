@@ -21,6 +21,21 @@ const EMPTY_SCRAPER: Partial<ScraperConfig> = {
 
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => i);
 
+function toUiErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  if (error && typeof error === 'object') {
+    const err = error as Record<string, unknown>;
+    if (typeof err.message === 'string' && err.message.trim()) return err.message;
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return '[object error]';
+    }
+  }
+  return 'שגיאה לא ידועה';
+}
+
 export default function AdminPanel({
   settings,
   onRefresh,
@@ -167,12 +182,16 @@ export default function AdminPanel({
       const result = await res.json();
 
       if (!result.success) {
-        throw new Error(result.error || 'Failed to save schedule');
+        const apiError =
+          typeof result.error === 'string'
+            ? result.error
+            : toUiErrorMessage(result.error);
+        throw new Error(apiError || 'Failed to save schedule');
       }
       await onRefresh();
     } catch (error) {
       console.error('Failed to save schedule:', error);
-      const msg = error instanceof Error ? error.message : 'שגיאה לא ידועה';
+      const msg = toUiErrorMessage(error);
       alert(`שגיאה בשמירת לוח זמנים: ${msg}`);
     } finally {
       setSavingSchedule(false);

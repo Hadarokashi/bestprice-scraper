@@ -3,6 +3,26 @@ import { supabase } from '@/lib/supabase';
 import type { ApiResponse, ScheduleConfig } from '@/lib/types';
 import { DEFAULT_SCHEDULE } from '@/lib/scan-utils';
 
+function formatErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  if (error && typeof error === 'object') {
+    const err = error as Record<string, unknown>;
+    const parts: string[] = [];
+    if (typeof err.message === 'string' && err.message.trim()) parts.push(err.message);
+    if (typeof err.details === 'string' && err.details.trim()) parts.push(err.details);
+    if (typeof err.hint === 'string' && err.hint.trim()) parts.push(`hint: ${err.hint}`);
+    if (typeof err.code === 'string' && err.code.trim()) parts.push(`code: ${err.code}`);
+    if (parts.length > 0) return parts.join(' | ');
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return '[object error]';
+    }
+  }
+  return 'Unknown error';
+}
+
 // POST /api/settings/schedule - Update only the schedule (dedicated endpoint to avoid fallback issues)
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<{ schedule: ScheduleConfig }>>> {
   try {
@@ -67,7 +87,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
 
     // Fallback: if scan_policy column doesn't exist (older schema), retry without it
     if (upsertError) {
-      const errMsg = upsertError.message || String(upsertError);
+      const errMsg = formatErrorMessage(upsertError);
       const maybeMissingColumn = /column.*scan_policy|scan_policy.*does not exist/i.test(errMsg);
       if (maybeMissingColumn) {
         const fallbackPayload = existing
@@ -93,15 +113,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
           }, { status: 400 });
         }
       }
-      throw upsertError;
+      throw new Error(errMsg);
     }
 
     return NextResponse.json({ success: true, data: { schedule } });
   } catch (error) {
-    const err = error instanceof Error ? error : new Error(String(error));
-    console.error('POST /api/settings/schedule error:', err.message, err);
+    const errMessage = formatErrorMessage(error);
+    console.error('POST /api/settings/schedule error:', errMessage, error);
     return NextResponse.json(
-      { success: false, error: err.message },
+      { success: false, error: errMessage },
       { status: 500 }
     );
   }

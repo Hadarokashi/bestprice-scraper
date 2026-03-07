@@ -1,36 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import type { ScheduleConfig } from '@/lib/types';
-import { DEFAULT_SCHEDULE } from '@/lib/scan-utils';
 
 export const maxDuration = 300;
 
-function shouldRunNow(schedule: ScheduleConfig): boolean {
-  if (!schedule.enabled || schedule.frequency === 'off') return false;
+const FIXED_SCHEDULE: ScheduleConfig = {
+  enabled: true,
+  frequency: 'daily',
+  hour: 5,
+  timezone: 'Asia/Jerusalem',
+};
 
-  const tz = schedule.timezone || 'Asia/Jerusalem';
+function shouldRunNow(lastRunAt?: string): boolean {
+  const tz = FIXED_SCHEDULE.timezone;
   const nowInTz = new Date(
     new Date().toLocaleString('en-US', { timeZone: tz })
   );
 
-  if (schedule.lastRunAt) {
+  // Run only at 05:00 Israel local time.
+  if (nowInTz.getHours() !== FIXED_SCHEDULE.hour) {
+    return false;
+  }
+
+  if (lastRunAt) {
     const lastRun = new Date(
-      new Date(schedule.lastRunAt).toLocaleString('en-US', { timeZone: tz })
+      new Date(lastRunAt).toLocaleString('en-US', { timeZone: tz })
     );
-
-    if (schedule.frequency === 'daily') {
-      const sameDay =
-        lastRun.getFullYear() === nowInTz.getFullYear() &&
-        lastRun.getMonth() === nowInTz.getMonth() &&
-        lastRun.getDate() === nowInTz.getDate();
-      if (sameDay) return false;
-    }
-
-    if (schedule.frequency === 'weekly') {
-      const diffMs = nowInTz.getTime() - lastRun.getTime();
-      const diffDays = diffMs / (1000 * 60 * 60 * 24);
-      if (diffDays < 6.5) return false;
-    }
+    const sameDay =
+      lastRun.getFullYear() === nowInTz.getFullYear() &&
+      lastRun.getMonth() === nowInTz.getMonth() &&
+      lastRun.getDate() === nowInTz.getDate();
+    if (sameDay) return false;
   }
 
   return true;
@@ -57,18 +57,20 @@ export async function GET(request: NextRequest) {
         ? (settingsRow.scan_policy as Record<string, unknown>)
         : {};
 
-    const schedule: ScheduleConfig = {
-      ...DEFAULT_SCHEDULE,
-      ...(typeof scanPolicy.schedule === 'object' && scanPolicy.schedule
+    const savedSchedule =
+      typeof scanPolicy.schedule === 'object' && scanPolicy.schedule
         ? (scanPolicy.schedule as Partial<ScheduleConfig>)
-        : {}),
-    };
+        : undefined;
+    const lastRunAt = savedSchedule?.lastRunAt;
 
-    if (!shouldRunNow(schedule)) {
+    if (!shouldRunNow(lastRunAt)) {
       return NextResponse.json({
         success: true,
         message: 'Not time to run yet',
-        schedule,
+        schedule: {
+          ...FIXED_SCHEDULE,
+          lastRunAt,
+        },
       });
     }
 
@@ -143,7 +145,7 @@ export async function GET(request: NextRequest) {
     }
 
     const now = new Date().toISOString();
-    const updatedSchedule = { ...schedule, lastRunAt: now };
+    const updatedSchedule = { ...FIXED_SCHEDULE, lastRunAt: now };
     const updatedPolicy = { ...scanPolicy, schedule: updatedSchedule };
 
     await supabase
