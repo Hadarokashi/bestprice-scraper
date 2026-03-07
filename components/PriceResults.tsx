@@ -1,6 +1,7 @@
 'use client';
 
-import { Product, PriceComparison, ProviderPrice } from '@/lib/types';
+import { useEffect, useState } from 'react';
+import { Product, PriceComparison, ProviderPrice, ScraperConfig } from '@/lib/types';
 
 interface PriceResultsProps {
   product: Product | null;
@@ -274,81 +275,57 @@ function ProviderCard({
 
 function ManualSearchLinks({ productName }: { productName: string }) {
   const searchQuery = encodeURIComponent(productName);
-  
-  // Helper to build search URLs
-  const buildSearchUrl = (baseUrl: string) => {
-    // Normalize URL
-    let url = baseUrl;
-    if (!url.startsWith('http')) {
-      url = `https://${url}`;
-    }
-    if (!url.endsWith('/')) {
-      url += '/';
-    }
-    
-    // Common search patterns
-    if (url.includes('zap.co.il')) {
+  const [scrapers, setScrapers] = useState<ScraperConfig[]>([]);
+
+  useEffect(() => {
+    fetch('/api/scrapers')
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success) setScrapers(res.data || []);
+      })
+      .catch(() => {});
+  }, []);
+
+  const buildSearchUrl = (scraper: ScraperConfig) => {
+    let base = scraper.baseUrl;
+    if (!base.startsWith('http')) base = `https://${base}`;
+    if (base.includes('zap.co.il')) {
       return `https://www.zap.co.il/search.aspx?keyword=${searchQuery}`;
     }
-    
-    // Default: try ?s= or ?q= or just append search path
-    return `${url}?s=${searchQuery}`;
+    const pattern = scraper.searchPattern || '/?s={query}';
+    return base + pattern.replace('{query}', searchQuery);
   };
-  
-  const musicStores = [
-    { name: 'Bconnect', url: 'https://bconnect.co.il' },
-    { name: 'Diez', url: 'https://diez.co.il/' },
-    { name: 'Next-Pro', url: 'https://www.next-pro.co.il/' },
-    { name: 'הד סאונד', url: 'https://headsound.co.il/' },
-    { name: 'טרטל', url: 'https://www.turtle.co.il/' },
-    { name: 'עולם המוסיקה', url: 'https://www.musicworld.co.il/' },
-    { name: 'מג\'יקל נוטס', url: 'https://www.magical-notes.co.il/' },
-    { name: 'אודיולאב', url: 'https://audiolab.co.il/' },
-    { name: 'לבמה', url: 'https://la-bama.co.il/' },
-    { name: 'מיוזיק סנטר', url: 'https://www.music-center.co.il/' },
-    { name: 'אסקול', url: 'https://www.askol.co.il/' },
-    { name: 'Speed of sound', url: 'https://www.speedofsound.co.il/' },
-    { name: 'Ginges', url: 'https://www.ginges.co.il/' },
-    { name: 'Signal', url: 'https://www.signal-audio.co.il/' },
-    { name: 'Orior', url: 'https://www.orior.co.il/' },
-    { name: 'Kilombo', url: 'https://kilombo.co.il' },
-    { name: 'FunkyDJ', url: 'https://www.funkydj.co.il/' },
-    { name: 'שלמון', url: 'https://shalmonmusic.co.il/' },
-    { name: 'קול המוסיקה', url: 'https://kolhamusica.com/' },
-    { name: 'חלילית', url: 'https://www.halilit.com/' },
-    { name: 'מצלול', url: 'https://mitzlol.com' },
-    { name: 'פעימות', url: 'https://peimot.com' },
-    { name: 'אפקט', url: 'https://www.effect.co.il/' },
-    { name: 'שכטר', url: 'https://shechtermusic.com' },
-    { name: 'סאונד צ\'ק', url: 'https://www.sound-check.co.il/' },
-    { name: 'דראם בית', url: 'https://www.drumbite.co.il/' },
-  ];
-  
-  const electronicsStores = [
-    { name: 'KSP', url: 'https://ksp.co.il' },
-    { name: 'Ivory', url: 'https://www.ivory.co.il' },
-    { name: 'BUG', url: 'https://www.bug.co.il' },
-    { name: 'לידר', url: 'https://www.leadercomputers.co.il/' },
-    { name: 'Wallashops', url: 'https://www.wallashops.co.il' },
-    { name: 'מחסני חשמל', url: 'https://www.payngo.co.il' },
-    { name: 'Olsale', url: 'https://www.olsale.co.il' },
-    { name: 'LastPrice', url: 'https://www.lastprice.co.il' },
-    { name: 'Kravitz', url: 'https://www.kravitz.co.il' },
-    { name: 'HTZone', url: 'https://www.htzone.co.il' },
-    { name: 'ALM', url: 'https://www.alm.co.il' },
-    { name: 'Gamestorm', url: 'https://www.gamestorm.co.il/' },
-    { name: 'ZapStore', url: 'https://shop.zap.co.il/' },
-  ];
-  
-  const internationalStores = [
-    { name: 'Sweetwater', url: 'https://www.sweetwater.com' },
-    { name: 'Thomann', url: 'https://www.thomann.de' },
-    { name: 'Thomann Music', url: 'https://www.thomannmusic.com/' },
-  ];
+
+  const musicStores = scrapers.filter((s) => s.category === 'music');
+  const electronicsStores = scrapers.filter(
+    (s) => s.category === 'electronics' || s.category === 'general'
+  );
+
+  const renderGroup = (label: string, icon: string, stores: ScraperConfig[]) => (
+    <details className="group">
+      <summary className="cursor-pointer p-2 rounded bg-[var(--background)] hover:bg-[var(--border)]/30 transition-all text-xs font-medium list-none flex items-center justify-between">
+        <span>{icon} {label} ({stores.length})</span>
+        <span className="group-open:rotate-180 transition-transform">▼</span>
+      </summary>
+      <div className="mt-2 grid grid-cols-2 gap-1.5 max-h-[200px] overflow-y-auto p-1">
+        {stores.map((site) => (
+          <a
+            key={site.id}
+            href={buildSearchUrl(site)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 p-2 rounded border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--primary)]/5 hover:border-[var(--primary)]/30 transition-all text-xs"
+          >
+            <span className="truncate">{site.name}</span>
+            <span className="mr-auto text-[10px] opacity-50">→</span>
+          </a>
+        ))}
+      </div>
+    </details>
+  );
 
   return (
     <div className="space-y-3">
-      {/* Quick Search - Zap & Google */}
       <div className="flex gap-2">
         <a
           href={`https://www.zap.co.il/search.aspx?keyword=${searchQuery}`}
@@ -370,69 +347,14 @@ function ManualSearchLinks({ productName }: { productName: string }) {
         </a>
       </div>
 
-      {/* Expandable sections */}
-      <details className="group">
-        <summary className="cursor-pointer p-2 rounded bg-[var(--background)] hover:bg-[var(--border)]/30 transition-all text-xs font-medium list-none flex items-center justify-between">
-          <span>🎵 חנויות מוסיקה ({musicStores.length})</span>
-          <span className="group-open:rotate-180 transition-transform">▼</span>
-        </summary>
-        <div className="mt-2 grid grid-cols-2 gap-1.5 max-h-[200px] overflow-y-auto p-1">
-          {musicStores.map((site) => (
-            <a
-              key={site.name}
-              href={buildSearchUrl(site.url)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 p-2 rounded border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--primary)]/5 hover:border-[var(--primary)]/30 transition-all text-xs"
-            >
-              <span className="truncate">{site.name}</span>
-              <span className="mr-auto text-[10px] opacity-50">→</span>
-            </a>
-          ))}
-        </div>
-      </details>
-
-      <details className="group">
-        <summary className="cursor-pointer p-2 rounded bg-[var(--background)] hover:bg-[var(--border)]/30 transition-all text-xs font-medium list-none flex items-center justify-between">
-          <span>💻 חנויות אלקטרוניקה ({electronicsStores.length})</span>
-          <span className="group-open:rotate-180 transition-transform">▼</span>
-        </summary>
-        <div className="mt-2 grid grid-cols-2 gap-1.5 max-h-[200px] overflow-y-auto p-1">
-          {electronicsStores.map((site) => (
-            <a
-              key={site.name}
-              href={buildSearchUrl(site.url)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 p-2 rounded border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--primary)]/5 hover:border-[var(--primary)]/30 transition-all text-xs"
-            >
-              <span className="truncate">{site.name}</span>
-              <span className="mr-auto text-[10px] opacity-50">→</span>
-            </a>
-          ))}
-        </div>
-      </details>
-
-      <details className="group">
-        <summary className="cursor-pointer p-2 rounded bg-[var(--background)] hover:bg-[var(--border)]/30 transition-all text-xs font-medium list-none flex items-center justify-between">
-          <span>🌍 אתרים בינלאומיים ({internationalStores.length})</span>
-          <span className="group-open:rotate-180 transition-transform">▼</span>
-        </summary>
-        <div className="mt-2 grid grid-cols-2 gap-1.5 p-1">
-          {internationalStores.map((site) => (
-            <a
-              key={site.name}
-              href={buildSearchUrl(site.url)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 p-2 rounded border border-[var(--border)] bg-[var(--background)] hover:bg-[var(--primary)]/5 hover:border-[var(--primary)]/30 transition-all text-xs"
-            >
-              <span className="truncate">{site.name}</span>
-              <span className="mr-auto text-[10px] opacity-50">→</span>
-            </a>
-          ))}
-        </div>
-      </details>
+      {scrapers.length === 0 ? (
+        <p className="text-xs text-[var(--muted)] text-center py-2">טוען אתרים...</p>
+      ) : (
+        <>
+          {musicStores.length > 0 && renderGroup('חנויות מוסיקה', '🎵', musicStores)}
+          {electronicsStores.length > 0 && renderGroup('חנויות אלקטרוניקה וכללי', '💻', electronicsStores)}
+        </>
+      )}
     </div>
   );
 }

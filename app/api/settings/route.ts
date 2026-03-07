@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { AppSettings, ApiResponse } from '@/lib/types';
-import { DEFAULT_SCAN_SETTINGS, mapSettingsWithDefaults } from '@/lib/scan-utils';
+import { AppSettings, ApiResponse, ScheduleConfig } from '@/lib/types';
+import { DEFAULT_SCAN_SETTINGS, DEFAULT_SCHEDULE, mapSettingsWithDefaults } from '@/lib/scan-utils';
 
 const DEFAULT_SETTINGS: AppSettings = {
   threshold: 10,
@@ -23,16 +23,24 @@ export async function GET(): Promise<NextResponse<ApiResponse<AppSettings>>> {
     if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows
 
     const scanPolicy = typeof data?.scan_policy === 'object' && data?.scan_policy
-      ? data.scan_policy
+      ? (data.scan_policy as Record<string, unknown>)
       : {};
+
+    const schedule: ScheduleConfig = {
+      ...DEFAULT_SCHEDULE,
+      ...(typeof scanPolicy.schedule === 'object' && scanPolicy.schedule
+        ? (scanPolicy.schedule as Partial<ScheduleConfig>)
+        : {}),
+    };
 
     const settings: AppSettings = mapSettingsWithDefaults(data ? {
       threshold: data.threshold,
       priceSource: data.price_source,
-      scanMode: scanPolicy.scanMode,
-      sitePreset: scanPolicy.sitePreset,
-      cacheFreshnessHours: scanPolicy.cacheFreshnessHours,
-      maxConcurrentJobs: scanPolicy.maxConcurrentJobs,
+      scanMode: scanPolicy.scanMode as AppSettings['scanMode'],
+      sitePreset: scanPolicy.sitePreset as AppSettings['sitePreset'],
+      cacheFreshnessHours: scanPolicy.cacheFreshnessHours as number | undefined,
+      maxConcurrentJobs: scanPolicy.maxConcurrentJobs as number | undefined,
+      schedule,
     } : DEFAULT_SETTINGS);
 
     return NextResponse.json({ success: true, data: settings });
@@ -90,11 +98,22 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     const cacheFreshnessHours = Number(body.cacheFreshnessHours ?? DEFAULT_SETTINGS.cacheFreshnessHours);
     const maxConcurrentJobs = Number(body.maxConcurrentJobs ?? DEFAULT_SETTINGS.maxConcurrentJobs);
 
+    const incomingSchedule = body.schedule as Partial<ScheduleConfig> | undefined;
+    const scheduleConfig: ScheduleConfig = {
+      enabled: incomingSchedule?.enabled ?? DEFAULT_SCHEDULE.enabled,
+      frequency: incomingSchedule?.frequency ?? DEFAULT_SCHEDULE.frequency,
+      hour: incomingSchedule?.hour != null && Number.isFinite(incomingSchedule.hour) ? incomingSchedule.hour : DEFAULT_SCHEDULE.hour,
+      timezone: incomingSchedule?.timezone || DEFAULT_SCHEDULE.timezone,
+      lastRunAt: incomingSchedule?.lastRunAt,
+      nextRunAt: incomingSchedule?.nextRunAt,
+    };
+
     const scanPolicy = {
       scanMode,
       sitePreset,
       cacheFreshnessHours: Number.isFinite(cacheFreshnessHours) ? cacheFreshnessHours : DEFAULT_SETTINGS.cacheFreshnessHours,
       maxConcurrentJobs: Number.isFinite(maxConcurrentJobs) ? maxConcurrentJobs : DEFAULT_SETTINGS.maxConcurrentJobs,
+      schedule: scheduleConfig,
     };
 
     const basePayload = {
@@ -134,6 +153,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       sitePreset,
       cacheFreshnessHours: scanPolicy.cacheFreshnessHours,
       maxConcurrentJobs: scanPolicy.maxConcurrentJobs,
+      schedule: scheduleConfig,
     });
 
     return NextResponse.json({ success: true, data: settings });

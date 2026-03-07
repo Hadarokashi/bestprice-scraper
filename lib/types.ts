@@ -93,6 +93,17 @@ export interface PriceComparison {
   phase?: ScanPhase;
 }
 
+export type ScheduleFrequency = 'off' | 'daily' | 'weekly';
+
+export interface ScheduleConfig {
+  enabled: boolean;
+  frequency: ScheduleFrequency;
+  hour: number; // 0-23
+  timezone: string; // e.g. 'Asia/Jerusalem'
+  lastRunAt?: string;
+  nextRunAt?: string;
+}
+
 // Settings for the application
 export interface AppSettings {
   threshold: number; // Percentage below recommended price to flag (e.g., 10 = 10%)
@@ -102,6 +113,7 @@ export interface AppSettings {
   sitePreset?: ScanSitePreset;
   cacheFreshnessHours?: number;
   maxConcurrentJobs?: number;
+  schedule?: ScheduleConfig;
 }
 
 // Available price sources

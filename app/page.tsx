@@ -799,6 +799,17 @@ export default function Dashboard() {
               settings={settings}
               onRefresh={loadDashboardData}
               onOpenSettings={() => setShowSettingsModal(true)}
+              onSaveSettings={async (patch) => {
+                await handleSaveSettings({
+                  threshold: settings.threshold,
+                  priceSource: settings.priceSource,
+                  scanMode: settings.scanMode || 'zap_then_remaining',
+                  sitePreset: settings.sitePreset || 'enabled',
+                  cacheFreshnessHours: settings.cacheFreshnessHours || 24,
+                  maxConcurrentJobs: settings.maxConcurrentJobs || 2,
+                  ...patch,
+                } as Parameters<typeof handleSaveSettings>[0]);
+              }}
             />
           </div>
         )}

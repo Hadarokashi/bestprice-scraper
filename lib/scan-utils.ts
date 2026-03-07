@@ -3,6 +3,7 @@ import type {
   PriceComparison,
   ProviderPrice,
   ProductScanState,
+  ScheduleConfig,
   ScanMetadata,
   ScanPhase,
   ScanSitePreset,
@@ -326,6 +327,13 @@ export function formatLastRunLabel(isoString?: string): string {
   });
 }
 
+export const DEFAULT_SCHEDULE: ScheduleConfig = {
+  enabled: false,
+  frequency: 'off',
+  hour: 8,
+  timezone: 'Asia/Jerusalem',
+};
+
 export function mapSettingsWithDefaults(settings?: AppSettings | null): AppSettings {
   return {
     threshold: settings?.threshold ?? 10,
@@ -335,6 +343,7 @@ export function mapSettingsWithDefaults(settings?: AppSettings | null): AppSetti
     sitePreset: settings?.sitePreset ?? DEFAULT_SCAN_SETTINGS.sitePreset,
     cacheFreshnessHours: settings?.cacheFreshnessHours ?? DEFAULT_SCAN_SETTINGS.cacheFreshnessHours,
     maxConcurrentJobs: settings?.maxConcurrentJobs ?? DEFAULT_SCAN_SETTINGS.maxConcurrentJobs,
+    schedule: settings?.schedule ?? DEFAULT_SCHEDULE,
   };
 }
 
