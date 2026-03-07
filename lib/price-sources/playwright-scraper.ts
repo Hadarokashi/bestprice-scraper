@@ -7,6 +7,30 @@ interface ScrapedProduct {
   url: string;
 }
 
+const GENERIC_PRODUCT_TOKENS = new Set([
+  'pro',
+  'plus',
+  'max',
+  'mini',
+  'ultra',
+  'zero',
+  'smart',
+  'black',
+  'white',
+  'blue',
+  'red',
+  'green',
+  'gray',
+  'grey',
+  'silver',
+  'gold',
+  'pink',
+  'ram',
+  'gb',
+  '5g',
+  '4g',
+]);
+
 /**
  * Build search URL from scraper config and query
  */
@@ -167,6 +191,11 @@ function isProductMatch(foundName: string, searchQuery: string): boolean {
     .replace(/[^\w\s\u0590-\u05FF]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
+
+  const getTokens = (s: string) => s
+    .split(' ')
+    .filter((word) => word.length > 2)
+    .filter((word) => !GENERIC_PRODUCT_TOKENS.has(word));
   
   const found = normalize(foundName);
   const search = normalize(searchQuery);
@@ -191,10 +220,25 @@ function isProductMatch(foundName: string, searchQuery: string): boolean {
   // Check word overlap
   const searchWords = search.split(' ').filter(w => w.length > 2);
   const foundWords = found.split(' ');
+  const meaningfulSearchWords = getTokens(search);
   
   const matchedWords = searchWords.filter(word => 
     foundWords.some(fw => fw.includes(word) || word.includes(fw))
   );
+
+  const meaningfulMatches = meaningfulSearchWords.filter(word =>
+    foundWords.some(fw => fw.includes(word) || word.includes(fw))
+  );
+
+  if (meaningfulSearchWords.length > 0) {
+    const requiredMeaningfulMatches = meaningfulSearchWords.length === 1
+      ? 1
+      : Math.min(2, meaningfulSearchWords.length);
+
+    if (meaningfulMatches.length < requiredMeaningfulMatches) {
+      return false;
+    }
+  }
   
   return matchedWords.length >= Math.ceil(searchWords.length * 0.5);
 }
