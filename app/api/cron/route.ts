@@ -83,14 +83,25 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_VERCEL_URL
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-        : process.env.VERCEL_URL
-          ? `https://${process.env.VERCEL_URL}`
-          : 'http://localhost:3000';
+    // Always call the same deployment origin that received this cron request.
+    // This avoids failures when NEXT_PUBLIC_VERCEL_URL is missing or misconfigured.
+    const baseUrl = request.nextUrl.origin;
 
-    let scannedCount = 0;
+    const now = new Date().toISOString();
+    const updatedSchedule = { ...FIXED_SCHEDULE, lastRunAt: now };
+    const updatedPolicy = { ...scanPolicy, schedule: updatedSchedule };
+
+    // Persist run start up-front so a timeout later won't make the day look "not run".
+    await supabase
+      .from('settings')
+      .update({
+        scan_policy: updatedPolicy,
+        updated_at: now,
+      })
+      .eq('id', settingsRow?.id || 1);
+
+    let queuedCount = 0;
+    let startedCount = 0;
     const scanMode = (scanPolicy.scanMode as string) || 'zap_then_remaining';
     const sitePreset = (scanPolicy.sitePreset as string) || 'enabled';
 
@@ -110,51 +121,34 @@ export async function GET(request: NextRequest) {
         });
 
         const createResult = await createRes.json();
-        if (!createResult.success || !createResult.data?.id) continue;
-
-        const jobId = createResult.data.id;
-        let status = 'pending';
-        let retries = 0;
-        const maxRetries = 60;
-
-        while (!['completed', 'failed', 'partial'].includes(status) && retries < maxRetries) {
-          const tickRes = await fetch(`${baseUrl}/api/scraping/process-batch`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ jobId }),
-          });
-
-          const tickResult = await tickRes.json();
-          status = tickResult.data?.status || 'failed';
-          retries++;
-
-          if (!['completed', 'failed', 'partial'].includes(status)) {
-            await new Promise((resolve) => setTimeout(resolve, 3000));
-          }
+        if (!createResult.success || !createResult.data?.id) {
+          continue;
         }
+        queuedCount++;
 
-        scannedCount++;
+        // Kick each job once; do not long-poll inside cron to stay within maxDuration.
+        const tickRes = await fetch(`${baseUrl}/api/scraping/process-batch`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jobId: createResult.data.id }),
+        });
+        if (tickRes.ok) {
+          startedCount++;
+        }
       } catch (err) {
         console.error(`Cron: failed to scan product ${product.name}:`, err);
       }
     }
 
-    const now = new Date().toISOString();
-    const updatedSchedule = { ...FIXED_SCHEDULE, lastRunAt: now };
-    const updatedPolicy = { ...scanPolicy, schedule: updatedSchedule };
-
-    await supabase
-      .from('settings')
-      .update({
-        scan_policy: updatedPolicy,
-        updated_at: now,
-      })
-      .eq('id', settingsRow?.id || 1);
-
     return NextResponse.json({
       success: true,
-      message: `Scheduled scan complete: ${scannedCount}/${products.length} products scanned`,
+      message: `Scheduled scan queued ${queuedCount}/${products.length} products, started ${startedCount}`,
       schedule: updatedSchedule,
+      stats: {
+        totalProducts: products.length,
+        queuedCount,
+        startedCount,
+      },
     });
   } catch (error) {
     console.error('Cron scan error:', error);
