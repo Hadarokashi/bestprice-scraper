@@ -83,11 +83,21 @@ export async function GET(request: NextRequest) {
       .eq('id', settingsRow?.id || 1);
 
     const workerBaseUrl = process.env.PLAYWRIGHT_SCRAPER_URL || 'https://bestprice-scraper.onrender.com';
+    const workerSecret =
+      process.env.SCRAPER_API_SECRET ||
+      process.env.PLAYWRIGHT_SCRAPER_SECRET ||
+      cronSecret;
     const orchestratorRes = await fetch(`${workerBaseUrl}/cron/orchestrate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(cronSecret ? { Authorization: `Bearer ${cronSecret}`, 'x-cron-secret': cronSecret } : {}),
+        ...(workerSecret
+          ? {
+              Authorization: `Bearer ${workerSecret}`,
+              'x-cron-secret': workerSecret,
+              'x-scraper-secret': workerSecret,
+            }
+          : {}),
       },
       body: JSON.stringify({
         appBaseUrl: request.nextUrl.origin,

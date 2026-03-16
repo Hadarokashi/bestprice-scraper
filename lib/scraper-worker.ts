@@ -2,6 +2,17 @@ import type { ProviderPrice, ScanMetadata } from './types';
 
 const DEFAULT_CLOUD_WORKER_URL = 'https://bestprice-scraper.onrender.com';
 const DEFAULT_LOCAL_WORKER_URL = 'http://localhost:3001';
+const WORKER_SHARED_SECRET = process.env.SCRAPER_API_SECRET || process.env.PLAYWRIGHT_SCRAPER_SECRET;
+
+function getWorkerAuthHeaders(): Record<string, string> {
+  if (!WORKER_SHARED_SECRET) {
+    return {};
+  }
+  return {
+    Authorization: `Bearer ${WORKER_SHARED_SECRET}`,
+    'x-scraper-secret': WORKER_SHARED_SECRET,
+  };
+}
 
 function getConfiguredWorkerUrls(): string[] {
   const explicit = process.env.PLAYWRIGHT_SCRAPER_URL;
@@ -60,7 +71,10 @@ export async function startWorkerJob(params: {
     `${workerUrl}/scrape`,
     {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...getWorkerAuthHeaders(),
+      },
       body: JSON.stringify(params),
     },
     15000
@@ -85,7 +99,11 @@ export async function getWorkerJobStatus(params: {
 }> {
   const response = await fetchJsonWithTimeout(
     `${params.workerUrl}/status/${params.externalJobId}`,
-    {},
+    {
+      headers: {
+        ...getWorkerAuthHeaders(),
+      },
+    },
     15000
   );
 

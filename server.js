@@ -4,8 +4,31 @@ const { chromium } = require('playwright');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const SCRAPER_API_SECRET =
+  process.env.SCRAPER_API_SECRET ||
+  process.env.PLAYWRIGHT_SCRAPER_SECRET ||
+  process.env.CRON_SECRET ||
+  '';
 
-app.use(cors());
+const allowedOrigins = (
+  process.env.ALLOWED_ORIGINS ||
+  'https://price-tracker-five-beryl.vercel.app,http://localhost:3000'
+)
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error('Not allowed by CORS'));
+    },
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-scraper-secret', 'x-cron-secret'],
+  })
+);
 app.use(express.json());
 
 // In-memory job storage
@@ -31,11 +54,37 @@ function chunkArray(items, size) {
 
 function buildAppHeaders(cronSecret) {
   const headers = { 'Content-Type': 'application/json' };
-  if (cronSecret) {
-    headers.Authorization = `Bearer ${cronSecret}`;
-    headers['x-cron-secret'] = cronSecret;
+  const sharedSecret = SCRAPER_API_SECRET || cronSecret;
+  if (sharedSecret) {
+    headers.Authorization = `Bearer ${sharedSecret}`;
+    headers['x-scraper-secret'] = sharedSecret;
+    headers['x-cron-secret'] = sharedSecret;
   }
   return headers;
+}
+
+function isAuthorizedRequest(req) {
+  if (!SCRAPER_API_SECRET) return true;
+
+  const authHeader = req.headers.authorization;
+  const bearerToken = typeof authHeader === 'string' && authHeader.startsWith('Bearer ')
+    ? authHeader.slice('Bearer '.length).trim()
+    : '';
+  const scraperHeader = typeof req.headers['x-scraper-secret'] === 'string'
+    ? req.headers['x-scraper-secret']
+    : '';
+  const cronHeader = typeof req.headers['x-cron-secret'] === 'string'
+    ? req.headers['x-cron-secret']
+    : '';
+
+  return [bearerToken, scraperHeader, cronHeader].some((token) => token === SCRAPER_API_SECRET);
+}
+
+function requireApiSecret(req, res, next) {
+  if (!isAuthorizedRequest(req)) {
+    return res.status(401).json({ success: false, error: 'Unauthorized' });
+  }
+  return next();
 }
 
 // Israeli store configurations - 63 WEBSITES (Zap first!)
@@ -727,7 +776,7 @@ function generateJobId() {
 }
 
 // Create scrape job - returns immediately
-app.post('/scrape', async (req, res) => {
+app.post('/scrape', requireApiSecret, async (req, res) => {
   const { productName, recommendedPrice, barcode, excludeSites, includeSites } = req.body;
   
   if (!productName) {
@@ -784,7 +833,7 @@ app.post('/scrape', async (req, res) => {
 });
 
 // Get job status and results
-app.get('/status/:jobId', (req, res) => {
+app.get('/status/:jobId', requireApiSecret, (req, res) => {
   const { jobId } = req.params;
   const job = jobs.get(jobId);
   
@@ -813,7 +862,7 @@ app.get('/status/:jobId', (req, res) => {
 });
 
 // Legacy endpoint - waits for completion (for backwards compatibility)
-app.post('/scrape-sync', async (req, res) => {
+app.post('/scrape-sync', requireApiSecret, async (req, res) => {
   const { productName, recommendedPrice, barcode, excludeSites, includeSites } = req.body;
   
   if (!productName) {
@@ -871,18 +920,7 @@ app.post('/scrape-sync', async (req, res) => {
 
 // Trigger daily orchestration from Vercel cron.
 // Starts a background run and returns immediately.
-app.post('/cron/orchestrate', async (req, res) => {
-  const authHeader = req.headers.authorization;
-  const incomingSecret = req.headers['x-cron-secret'];
-  const expectedSecret = process.env.CRON_SECRET;
-
-  if (expectedSecret) {
-    const bearerOk = authHeader === `Bearer ${expectedSecret}`;
-    const headerOk = incomingSecret === expectedSecret;
-    if (!bearerOk && !headerOk) {
-      return res.status(401).json({ success: false, error: 'Unauthorized cron orchestrator request' });
-    }
-  }
+app.post('/cron/orchestrate', requireApiSecret, async (req, res) => {
 
   if (activeCronRunId) {
     const activeRun = cronRuns.get(activeCronRunId);
@@ -938,7 +976,7 @@ app.post('/cron/orchestrate', async (req, res) => {
   });
 });
 
-app.get('/cron/orchestrate/:runId', (req, res) => {
+app.get('/cron/orchestrate/:runId', requireApiSecret, (req, res) => {
   const run = cronRuns.get(req.params.runId);
   if (!run) {
     return res.status(404).json({ success: false, error: 'Run not found' });
@@ -950,25 +988,17 @@ app.get('/cron/orchestrate/:runId', (req, res) => {
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    service: 'bestprice-playwright-scraper',
-    jobs: jobs.size,
-    cronRuns: cronRuns.size,
-    activeCronRunId,
+    service: 'scraper',
+    uptimeSeconds: Math.round(process.uptime()),
   });
 });
 
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({ 
-    service: 'BestPrice Playwright Scraper',
+    service: 'scraper-api',
     status: 'running',
-    endpoints: {
-      'GET /health': 'Health check',
-      'POST /scrape': 'Start async scrape job (returns jobId)',
-      'GET /status/:jobId': 'Get job status and results',
-      'POST /cron/orchestrate': 'Start background daily orchestration run',
-      'GET /cron/orchestrate/:runId': 'Get orchestration run status',
-    },
+    docs: 'private',
   });
 });
 
