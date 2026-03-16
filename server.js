@@ -10,6 +10,33 @@ app.use(express.json());
 
 // In-memory job storage
 const jobs = new Map();
+const cronRuns = new Map();
+let activeCronRunId = null;
+
+const DEFAULT_APP_BASE_URL = 'https://price-tracker-five-beryl.vercel.app';
+const DEFAULT_CRON_BATCH_SIZE = Number(process.env.CRON_BATCH_SIZE || 12);
+const DEFAULT_CRON_BATCH_DELAY_MS = Number(process.env.CRON_BATCH_DELAY_MS || 1500);
+
+function generateCronRunId() {
+  return `cron_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function chunkArray(items, size) {
+  const chunks = [];
+  for (let i = 0; i < items.length; i += size) {
+    chunks.push(items.slice(i, i + size));
+  }
+  return chunks;
+}
+
+function buildAppHeaders(cronSecret) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (cronSecret) {
+    headers.Authorization = `Bearer ${cronSecret}`;
+    headers['x-cron-secret'] = cronSecret;
+  }
+  return headers;
+}
 
 // Israeli store configurations - 63 WEBSITES (Zap first!)
 const SCRAPER_CONFIGS = [
@@ -555,6 +582,145 @@ async function runScrapeJob(jobId, productName, recommendedPrice, barcode, exclu
   }
 }
 
+async function runCronOrchestration({
+  runId,
+  appBaseUrl,
+  cronSecret,
+  batchSize = DEFAULT_CRON_BATCH_SIZE,
+  batchDelayMs = DEFAULT_CRON_BATCH_DELAY_MS,
+}) {
+  const run = cronRuns.get(runId);
+  if (!run) return;
+
+  const headers = buildAppHeaders(cronSecret);
+  const safeBaseUrl = appBaseUrl || DEFAULT_APP_BASE_URL;
+
+  try {
+    run.status = 'running';
+    run.message = 'Fetching products and settings';
+    run.startedAt = new Date().toISOString();
+
+    const [productsRes, settingsRes] = await Promise.all([
+      fetch(`${safeBaseUrl}/api/products`, { headers }),
+      fetch(`${safeBaseUrl}/api/settings`, { headers }),
+    ]);
+
+    if (!productsRes.ok) {
+      const text = await productsRes.text();
+      throw new Error(`products API failed (${productsRes.status}): ${text}`);
+    }
+
+    const productsJson = await productsRes.json();
+    const settingsJson = settingsRes.ok ? await settingsRes.json() : {};
+
+    const products = productsJson?.data?.products || [];
+    const scanMode = settingsJson?.data?.scanMode || 'zap_then_remaining';
+    const sitePreset = settingsJson?.data?.sitePreset || 'enabled';
+
+    run.totalProducts = products.length;
+    run.scanMode = scanMode;
+    run.sitePreset = sitePreset;
+
+    if (products.length === 0) {
+      run.status = 'completed';
+      run.message = 'No products found';
+      run.completedAt = new Date().toISOString();
+      return;
+    }
+
+    const chunks = chunkArray(products, Math.max(1, batchSize));
+    run.totalBatches = chunks.length;
+    run.message = `Processing ${products.length} products in ${chunks.length} batches`;
+
+    for (let batchIndex = 0; batchIndex < chunks.length; batchIndex++) {
+      const batch = chunks[batchIndex];
+      run.currentBatch = batchIndex + 1;
+      run.message = `Batch ${batchIndex + 1}/${chunks.length}`;
+
+      await Promise.all(
+        batch.map(async (product) => {
+          try {
+            const createRes = await fetch(`${safeBaseUrl}/api/scraping/create-job`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({
+                productId: product.id,
+                productName: product.name,
+                barcode: product.barcode,
+                recommendedPrice: Number(product.recommended_price ?? product.recommendedPrice ?? 0),
+                scanMode,
+                sitePreset,
+              }),
+            });
+
+            const createJson = await createRes.json().catch(() => ({}));
+            if (!createRes.ok || !createJson?.success || !createJson?.data?.id) {
+              run.failedCount += 1;
+              run.errors.push({
+                productName: product.name,
+                step: 'create-job',
+                error: createJson?.error || `HTTP ${createRes.status}`,
+              });
+              return;
+            }
+
+            run.queuedCount += 1;
+            const jobId = createJson.data.id;
+
+            const tickRes = await fetch(`${safeBaseUrl}/api/scraping/process-batch`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({ jobId }),
+            });
+
+            if (tickRes.ok) {
+              run.startedCount += 1;
+            } else {
+              const tickText = await tickRes.text();
+              run.failedCount += 1;
+              run.errors.push({
+                productName: product.name,
+                step: 'process-batch',
+                error: `HTTP ${tickRes.status}: ${tickText}`,
+              });
+            }
+          } catch (error) {
+            run.failedCount += 1;
+            run.errors.push({
+              productName: product.name,
+              step: 'unknown',
+              error: error instanceof Error ? error.message : 'Unknown error',
+            });
+          } finally {
+            run.processedCount += 1;
+            run.progress = Math.round((run.processedCount / run.totalProducts) * 100);
+          }
+        })
+      );
+
+      if (batchIndex < chunks.length - 1 && batchDelayMs > 0) {
+        await new Promise((resolve) => setTimeout(resolve, batchDelayMs));
+      }
+    }
+
+    run.status = 'completed';
+    run.message = `Queued ${run.queuedCount}/${run.totalProducts}, started ${run.startedCount}, failed ${run.failedCount}`;
+    run.completedAt = new Date().toISOString();
+  } catch (error) {
+    run.status = 'failed';
+    run.message = error instanceof Error ? error.message : 'Unknown cron orchestration error';
+    run.completedAt = new Date().toISOString();
+    run.errors.push({
+      step: 'fatal',
+      error: run.message,
+    });
+  } finally {
+    if (activeCronRunId === runId) {
+      activeCronRunId = null;
+    }
+  }
+}
+
 // Generate simple job ID
 function generateJobId() {
   return Math.random().toString(36).substring(2, 15);
@@ -703,9 +869,92 @@ app.post('/scrape-sync', async (req, res) => {
   });
 });
 
+// Trigger daily orchestration from Vercel cron.
+// Starts a background run and returns immediately.
+app.post('/cron/orchestrate', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const incomingSecret = req.headers['x-cron-secret'];
+  const expectedSecret = process.env.CRON_SECRET;
+
+  if (expectedSecret) {
+    const bearerOk = authHeader === `Bearer ${expectedSecret}`;
+    const headerOk = incomingSecret === expectedSecret;
+    if (!bearerOk && !headerOk) {
+      return res.status(401).json({ success: false, error: 'Unauthorized cron orchestrator request' });
+    }
+  }
+
+  if (activeCronRunId) {
+    const activeRun = cronRuns.get(activeCronRunId);
+    if (activeRun && ['queued', 'running'].includes(activeRun.status)) {
+      return res.json({
+        success: true,
+        data: {
+          runId: activeRun.id,
+          status: activeRun.status,
+          message: 'Cron orchestration already running',
+        },
+      });
+    }
+  }
+
+  const runId = generateCronRunId();
+  const appBaseUrl = req.body?.appBaseUrl || process.env.APP_BASE_URL || DEFAULT_APP_BASE_URL;
+  const run = {
+    id: runId,
+    status: 'queued',
+    message: 'Queued',
+    appBaseUrl,
+    processedCount: 0,
+    queuedCount: 0,
+    startedCount: 0,
+    failedCount: 0,
+    totalProducts: 0,
+    totalBatches: 0,
+    currentBatch: 0,
+    progress: 0,
+    errors: [],
+    createdAt: new Date().toISOString(),
+    startedAt: null,
+    completedAt: null,
+  };
+  cronRuns.set(runId, run);
+  activeCronRunId = runId;
+
+  runCronOrchestration({
+    runId,
+    appBaseUrl,
+    cronSecret: process.env.CRON_SECRET,
+  });
+
+  return res.json({
+    success: true,
+    data: {
+      runId,
+      status: run.status,
+      appBaseUrl,
+      message: 'Cron orchestration started on Render',
+    },
+  });
+});
+
+app.get('/cron/orchestrate/:runId', (req, res) => {
+  const run = cronRuns.get(req.params.runId);
+  if (!run) {
+    return res.status(404).json({ success: false, error: 'Run not found' });
+  }
+  return res.json({ success: true, data: run });
+});
+
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', service: 'bestprice-playwright-scraper', jobs: jobs.size });
+  res.json({
+    status: 'ok',
+    service: 'bestprice-playwright-scraper',
+    jobs: jobs.size,
+    cronRuns: cronRuns.size,
+    activeCronRunId,
+  });
 });
 
 // Root endpoint
@@ -717,6 +966,8 @@ app.get('/', (req, res) => {
       'GET /health': 'Health check',
       'POST /scrape': 'Start async scrape job (returns jobId)',
       'GET /status/:jobId': 'Get job status and results',
+      'POST /cron/orchestrate': 'Start background daily orchestration run',
+      'GET /cron/orchestrate/:runId': 'Get orchestration run status',
     },
   });
 });
@@ -727,6 +978,13 @@ setInterval(() => {
   for (const [jobId, job] of jobs.entries()) {
     if (new Date(job.createdAt).getTime() < tenMinutesAgo) {
       jobs.delete(jobId);
+    }
+  }
+
+  const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+  for (const [runId, run] of cronRuns.entries()) {
+    if (new Date(run.createdAt).getTime() < oneDayAgo && !['queued', 'running'].includes(run.status)) {
+      cronRuns.delete(runId);
     }
   }
 }, 60 * 1000);

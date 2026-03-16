@@ -69,24 +69,6 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const { data: products, error: productsError } = await supabase
-      .from('products')
-      .select('id, name, barcode, recommended_price')
-      .order('name');
-
-    if (productsError) throw productsError;
-
-    if (!products || products.length === 0) {
-      return NextResponse.json({
-        success: true,
-        message: 'No products to scan',
-      });
-    }
-
-    // Always call the same deployment origin that received this cron request.
-    // This avoids failures when NEXT_PUBLIC_VERCEL_URL is missing or misconfigured.
-    const baseUrl = request.nextUrl.origin;
-
     const now = new Date().toISOString();
     const updatedSchedule = { ...FIXED_SCHEDULE, lastRunAt: now };
     const updatedPolicy = { ...scanPolicy, schedule: updatedSchedule };
@@ -100,54 +82,39 @@ export async function GET(request: NextRequest) {
       })
       .eq('id', settingsRow?.id || 1);
 
-    let queuedCount = 0;
-    let startedCount = 0;
-    const scanMode = (scanPolicy.scanMode as string) || 'zap_then_remaining';
-    const sitePreset = (scanPolicy.sitePreset as string) || 'enabled';
+    const workerBaseUrl = process.env.PLAYWRIGHT_SCRAPER_URL || 'https://bestprice-scraper.onrender.com';
+    const orchestratorRes = await fetch(`${workerBaseUrl}/cron/orchestrate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(cronSecret ? { Authorization: `Bearer ${cronSecret}`, 'x-cron-secret': cronSecret } : {}),
+      },
+      body: JSON.stringify({
+        appBaseUrl: request.nextUrl.origin,
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
 
-    for (const product of products) {
+    const orchestratorText = await orchestratorRes.text();
+    if (!orchestratorRes.ok) {
+      throw new Error(`Failed to trigger Render orchestrator: ${orchestratorRes.status} ${orchestratorText}`);
+    }
+    let orchestratorResult: Record<string, unknown> = {};
+    if (orchestratorText) {
       try {
-        const createRes = await fetch(`${baseUrl}/api/scraping/create-job`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            productId: product.id,
-            productName: product.name,
-            barcode: product.barcode,
-            recommendedPrice: Number(product.recommended_price),
-            scanMode,
-            sitePreset,
-          }),
-        });
-
-        const createResult = await createRes.json();
-        if (!createResult.success || !createResult.data?.id) {
-          continue;
-        }
-        queuedCount++;
-
-        // Kick each job once; do not long-poll inside cron to stay within maxDuration.
-        const tickRes = await fetch(`${baseUrl}/api/scraping/process-batch`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ jobId: createResult.data.id }),
-        });
-        if (tickRes.ok) {
-          startedCount++;
-        }
-      } catch (err) {
-        console.error(`Cron: failed to scan product ${product.name}:`, err);
+        orchestratorResult = JSON.parse(orchestratorText);
+      } catch {
+        orchestratorResult = { raw: orchestratorText };
       }
     }
 
     return NextResponse.json({
       success: true,
-      message: `Scheduled scan queued ${queuedCount}/${products.length} products, started ${startedCount}`,
+      message: 'Daily scan orchestration triggered on Render',
       schedule: updatedSchedule,
-      stats: {
-        totalProducts: products.length,
-        queuedCount,
-        startedCount,
+      orchestrator: {
+        workerBaseUrl,
+        ...(orchestratorResult?.data || {}),
       },
     });
   } catch (error) {
