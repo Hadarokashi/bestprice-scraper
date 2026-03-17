@@ -718,7 +718,11 @@ async function runCronOrchestration({
           }
 
           run.queuedCount += 1;
-          jobIds.push({ jobId: createJson.data.id, productName: product.name });
+          jobIds.push({
+            jobId: createJson.data.id,
+            productName: product.name,
+            recommendedPrice: Number(product.recommended_price ?? product.recommendedPrice ?? 0),
+          });
         } catch (error) {
           run.failedCount += 1;
           run.processedCount += 1;
@@ -759,8 +763,16 @@ async function runCronOrchestration({
                 run.startedCount += 1;
                 run.processedCount += 1;
                 run.progress = Math.round((run.processedCount / run.totalProducts) * 100);
-                const providerCount = tickJson?.data?.providers?.length || 0;
-                console.log(`[Cron] ✅ ${meta.productName}: ${status} (${providerCount} providers)`);
+                const providers = tickJson?.data?.providers || [];
+                console.log(`[Cron] ✅ ${meta.productName}: ${status} (${providers.length} providers)`);
+
+                run.productResults.push({
+                  productName: meta.productName,
+                  recommendedPrice: meta.recommendedPrice || 0,
+                  providers,
+                  status,
+                });
+
                 if (status === 'failed') {
                   run.failedCount += 1;
                   run.errors.push({
@@ -804,6 +816,10 @@ async function runCronOrchestration({
     run.status = 'completed';
     run.message = `Queued ${run.queuedCount}/${run.totalProducts}, started ${run.startedCount}, failed ${run.failedCount}`;
     run.completedAt = new Date().toISOString();
+
+    generateAndSendReport(run).catch((err) =>
+      console.error('[Report] Failed to send email report:', err.message || err)
+    );
   } catch (error) {
     run.status = 'failed';
     run.message = error instanceof Error ? error.message : 'Unknown cron orchestration error';
@@ -817,6 +833,308 @@ async function runCronOrchestration({
       activeCronRunId = null;
     }
   }
+}
+
+// ── Daily Report: PDF generation + email ──
+
+async function generateAndSendReport(run) {
+  const RESEND_API_KEY = process.env.RESEND_API_KEY;
+  const REPORT_EMAIL = (process.env.REPORT_EMAIL || '').split(',').map((e) => e.trim()).filter(Boolean);
+
+  if (!RESEND_API_KEY || REPORT_EMAIL.length === 0) {
+    console.log('[Report] Skipping — RESEND_API_KEY or REPORT_EMAIL not configured');
+    return;
+  }
+
+  console.log(`[Report] Generating PDF for ${run.productResults.length} products…`);
+
+  const html = buildReportHtml(run);
+
+  let browser = null;
+  try {
+    browser = await chromium.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+    });
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle', timeout: 30000 });
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: { top: '24px', bottom: '24px', left: '24px', right: '24px' },
+    });
+    await browser.close();
+    browser = null;
+
+    const pdfBase64 = pdfBuffer.toString('base64');
+    const today = new Date().toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem' });
+
+    const flagged = run.productResults.filter((p) => {
+      if (!p.providers.length || !p.recommendedPrice) return false;
+      const lowest = Math.min(...p.providers.map((pr) => pr.price));
+      return lowest < p.recommendedPrice * 0.99;
+    });
+
+    const emailHtml = buildEmailHtml(run, flagged.length, today);
+
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'BestPrice <onboarding@resend.dev>',
+        to: REPORT_EMAIL,
+        subject: `דוח מחירים יומי — ${today} ${flagged.length > 0 ? `⚠️ ${flagged.length} חריגים` : '✅ תקין'}`,
+        html: emailHtml,
+        attachments: [
+          {
+            filename: `bestprice-report-${today.replace(/\./g, '-')}.pdf`,
+            content: pdfBase64,
+          },
+        ],
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Resend API ${res.status}: ${errText}`);
+    }
+
+    console.log(`[Report] Email sent to ${REPORT_EMAIL.join(', ')}`);
+  } finally {
+    if (browser) await browser.close();
+  }
+}
+
+function buildEmailHtml(run, flaggedCount, today) {
+  const scanned = run.productResults.length;
+  const good = run.productResults.filter((p) => {
+    if (!p.providers.length || !p.recommendedPrice) return false;
+    const lowest = Math.min(...p.providers.map((pr) => pr.price));
+    return lowest >= p.recommendedPrice * 0.99;
+  }).length;
+  const noResults = run.productResults.filter((p) => !p.providers.length).length;
+
+  return `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;direction:rtl;max-width:520px;margin:0 auto;padding:24px;color:#1a1a2e">
+    <div style="text-align:center;margin-bottom:24px">
+      <h1 style="font-size:22px;margin:0 0 4px;color:#6c63ff">BestPrice</h1>
+      <p style="margin:0;color:#888;font-size:13px">דוח סריקה יומי — ${today}</p>
+    </div>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px">
+      <tr>
+        <td style="background:#6c63ff;color:#fff;border-radius:10px;padding:16px;text-align:center;width:25%">
+          <div style="font-size:24px;font-weight:700">${scanned}</div>
+          <div style="font-size:11px;opacity:.85">נסרקו</div>
+        </td>
+        <td width="8"></td>
+        <td style="background:${flaggedCount ? '#ff6b6b' : '#2ecc71'};color:#fff;border-radius:10px;padding:16px;text-align:center;width:25%">
+          <div style="font-size:24px;font-weight:700">${flaggedCount}</div>
+          <div style="font-size:11px;opacity:.85">חריגים</div>
+        </td>
+        <td width="8"></td>
+        <td style="background:#2ecc71;color:#fff;border-radius:10px;padding:16px;text-align:center;width:25%">
+          <div style="font-size:24px;font-weight:700">${good}</div>
+          <div style="font-size:11px;opacity:.85">תקינים</div>
+        </td>
+        <td width="8"></td>
+        <td style="background:#95a5a6;color:#fff;border-radius:10px;padding:16px;text-align:center;width:25%">
+          <div style="font-size:24px;font-weight:700">${noResults}</div>
+          <div style="font-size:11px;opacity:.85">ללא תוצאות</div>
+        </td>
+      </tr>
+    </table>
+    <p style="color:#555;font-size:13px;text-align:center">הדוח המפורט מצורף כ-PDF.</p>
+  </div>`;
+}
+
+function buildReportHtml(run) {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const timeStr = now.toLocaleTimeString('he-IL', { timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit' });
+
+  const products = run.productResults
+    .map((p) => {
+      const lowest = p.providers.length ? Math.min(...p.providers.map((pr) => pr.price)) : null;
+      const lowestProvider = p.providers.length
+        ? p.providers.reduce((a, b) => (a.price <= b.price ? a : b))
+        : null;
+      const diff = lowest && p.recommendedPrice ? ((lowest - p.recommendedPrice) / p.recommendedPrice) * 100 : null;
+      const isFlagged = diff !== null && diff < -1;
+      return { ...p, lowest, lowestProvider, diff, isFlagged };
+    })
+    .sort((a, b) => {
+      if (a.isFlagged && !b.isFlagged) return -1;
+      if (!a.isFlagged && b.isFlagged) return 1;
+      if (a.diff === null && b.diff === null) return 0;
+      if (a.diff === null) return 1;
+      if (b.diff === null) return -1;
+      return a.diff - b.diff;
+    });
+
+  const flagged = products.filter((p) => p.isFlagged);
+  const good = products.filter((p) => p.diff !== null && !p.isFlagged);
+  const noResults = products.filter((p) => p.diff === null);
+  const fmtPrice = (n) => n != null ? `₪${Math.round(n).toLocaleString('he-IL')}` : '—';
+  const fmtPct = (n) => n != null ? `${n > 0 ? '+' : ''}${n.toFixed(1)}%` : '';
+
+  const productRows = products
+    .map((p) => {
+      const bgColor = p.isFlagged ? '#fff5f5' : p.diff !== null ? '#f0fff4' : '#fafafa';
+      const diffColor = p.isFlagged ? '#e53e3e' : '#38a169';
+      const statusDot = p.isFlagged ? '🔴' : p.diff !== null ? '🟢' : '⚪';
+      return `
+      <tr style="background:${bgColor}">
+        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-size:12px">${statusDot}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-weight:500;font-size:13px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.productName}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-size:13px;text-align:center">${fmtPrice(p.recommendedPrice)}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-size:13px;text-align:center;font-weight:600;color:${p.isFlagged ? '#e53e3e' : '#2d3748'}">${fmtPrice(p.lowest)}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-size:12px;text-align:center;color:${diffColor};font-weight:600">${fmtPct(p.diff)}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-size:11px;color:#718096;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.lowestProvider?.providerName || '—'}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-size:12px;text-align:center;color:#a0aec0">${p.providers.length}</td>
+      </tr>`;
+    })
+    .join('');
+
+  return `<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Heebo', -apple-system, sans-serif; background: #f7f8fc; color: #1a1a2e; }
+  .page { max-width: 800px; margin: 0 auto; padding: 32px 24px; }
+
+  .header {
+    background: linear-gradient(135deg, #6c63ff 0%, #3b82f6 50%, #06b6d4 100%);
+    border-radius: 16px;
+    padding: 32px;
+    color: #fff;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -30%;
+    width: 300px; height: 300px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+  .header h1 { font-size: 28px; font-weight: 800; margin-bottom: 4px; position: relative; }
+  .header .sub { font-size: 14px; opacity: 0.85; position: relative; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 16px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .stat-card .num { font-size: 32px; font-weight: 800; line-height: 1; }
+  .stat-card .label { font-size: 12px; color: #718096; margin-top: 6px; font-weight: 500; }
+  .stat-card.flagged .num { color: #e53e3e; }
+  .stat-card.good .num { color: #38a169; }
+  .stat-card.total .num { color: #6c63ff; }
+  .stat-card.empty .num { color: #a0aec0; }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #edf2f7;
+    color: #2d3748;
+  }
+
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 24px; }
+  thead th {
+    background: #f7f8fc;
+    padding: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #718096;
+    text-align: right;
+    border-bottom: 2px solid #edf2f7;
+    white-space: nowrap;
+  }
+  thead th:nth-child(3), thead th:nth-child(4), thead th:nth-child(5), thead th:nth-child(7) { text-align: center; }
+
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: #a0aec0;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #edf2f7;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <h1>🏷️ BestPrice — דוח מחירים יומי</h1>
+    <div class="sub">${dateStr} | ${timeStr}</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card total">
+      <div class="num">${products.length}</div>
+      <div class="label">מוצרים נסרקו</div>
+    </div>
+    <div class="stat-card flagged">
+      <div class="num">${flagged.length}</div>
+      <div class="label">חריגי מחיר</div>
+    </div>
+    <div class="stat-card good">
+      <div class="num">${good.length}</div>
+      <div class="label">תקינים</div>
+    </div>
+    <div class="stat-card empty">
+      <div class="num">${noResults.length}</div>
+      <div class="label">ללא תוצאות</div>
+    </div>
+  </div>
+
+  <div class="section-title">📋 כל המוצרים</div>
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th>מוצר</th>
+        <th>מחיר מומלץ</th>
+        <th>מחיר נמוך</th>
+        <th>הפרש</th>
+        <th>ספק זול</th>
+        <th>ספקים</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${productRows}
+    </tbody>
+  </table>
+
+  <div class="footer">
+    נוצר אוטומטית ע״י BestPrice | סריקה: ${run.scanMode || 'zap_then_remaining'} | משך: ${
+    run.startedAt && run.completedAt
+      ? Math.round((new Date(run.completedAt) - new Date(run.startedAt)) / 60000) + ' דקות'
+      : '—'
+  }
+  </div>
+</div>
+</body>
+</html>`;
 }
 
 // Generate simple job ID
@@ -1001,6 +1319,7 @@ app.post('/cron/orchestrate', requireApiSecret, async (req, res) => {
     currentBatch: 0,
     progress: 0,
     errors: [],
+    productResults: [],
     createdAt: new Date().toISOString(),
     startedAt: null,
     completedAt: null,
