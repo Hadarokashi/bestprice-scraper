@@ -37,8 +37,10 @@ const cronRuns = new Map();
 let activeCronRunId = null;
 
 const DEFAULT_APP_BASE_URL = 'https://price-tracker-five-beryl.vercel.app';
-const DEFAULT_CRON_BATCH_SIZE = Number(process.env.CRON_BATCH_SIZE || 12);
-const DEFAULT_CRON_BATCH_DELAY_MS = Number(process.env.CRON_BATCH_DELAY_MS || 1500);
+const DEFAULT_CRON_BATCH_SIZE = Number(process.env.CRON_BATCH_SIZE || 3);
+const DEFAULT_CRON_BATCH_DELAY_MS = Number(process.env.CRON_BATCH_DELAY_MS || 2000);
+const POLL_INTERVAL_MS = Number(process.env.POLL_INTERVAL_MS || 8000);
+const POLL_TIMEOUT_MS = Number(process.env.POLL_TIMEOUT_MS || 300000);
 
 function generateCronRunId() {
   return `cron_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -686,66 +688,113 @@ async function runCronOrchestration({
       run.currentBatch = batchIndex + 1;
       run.message = `Batch ${batchIndex + 1}/${chunks.length}`;
 
-      await Promise.all(
-        batch.map(async (product) => {
-          try {
-            const createRes = await fetch(`${safeBaseUrl}/api/scraping/create-job`, {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({
-                productId: product.id,
-                productName: product.name,
-                barcode: product.barcode,
-                recommendedPrice: Number(product.recommended_price ?? product.recommendedPrice ?? 0),
-                scanMode,
-                sitePreset,
-              }),
-            });
+      const jobIds = [];
 
-            const createJson = await createRes.json().catch(() => ({}));
-            if (!createRes.ok || !createJson?.success || !createJson?.data?.id) {
-              run.failedCount += 1;
-              run.errors.push({
-                productName: product.name,
-                step: 'create-job',
-                error: createJson?.error || `HTTP ${createRes.status}`,
-              });
-              return;
-            }
+      for (const product of batch) {
+        try {
+          const createRes = await fetch(`${safeBaseUrl}/api/scraping/create-job`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              productId: product.id,
+              productName: product.name,
+              barcode: product.barcode,
+              recommendedPrice: Number(product.recommended_price ?? product.recommendedPrice ?? 0),
+              scanMode,
+              sitePreset,
+            }),
+          });
 
-            run.queuedCount += 1;
-            const jobId = createJson.data.id;
-
-            const tickRes = await fetch(`${safeBaseUrl}/api/scraping/process-batch`, {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({ jobId }),
-            });
-
-            if (tickRes.ok) {
-              run.startedCount += 1;
-            } else {
-              const tickText = await tickRes.text();
-              run.failedCount += 1;
-              run.errors.push({
-                productName: product.name,
-                step: 'process-batch',
-                error: `HTTP ${tickRes.status}: ${tickText}`,
-              });
-            }
-          } catch (error) {
+          const createJson = await createRes.json().catch(() => ({}));
+          if (!createRes.ok || !createJson?.success || !createJson?.data?.id) {
             run.failedCount += 1;
+            run.processedCount += 1;
             run.errors.push({
               productName: product.name,
-              step: 'unknown',
-              error: error instanceof Error ? error.message : 'Unknown error',
+              step: 'create-job',
+              error: createJson?.error || `HTTP ${createRes.status}`,
             });
-          } finally {
-            run.processedCount += 1;
-            run.progress = Math.round((run.processedCount / run.totalProducts) * 100);
+            continue;
           }
-        })
-      );
+
+          run.queuedCount += 1;
+          jobIds.push({ jobId: createJson.data.id, productName: product.name });
+        } catch (error) {
+          run.failedCount += 1;
+          run.processedCount += 1;
+          run.errors.push({
+            productName: product.name,
+            step: 'create-job',
+            error: error instanceof Error ? error.message : 'Unknown error',
+          });
+        }
+      }
+
+      const pendingJobs = new Map(jobIds.map((j) => [j.jobId, j]));
+
+      const startTime = Date.now();
+      while (pendingJobs.size > 0 && Date.now() - startTime < POLL_TIMEOUT_MS) {
+        const pollBatch = [...pendingJobs.entries()];
+
+        await Promise.all(
+          pollBatch.map(async ([jobId, meta]) => {
+            try {
+              const tickRes = await fetch(`${safeBaseUrl}/api/scraping/process-batch`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ jobId }),
+              });
+
+              if (!tickRes.ok) {
+                const tickText = await tickRes.text();
+                console.error(`[Cron] process-batch failed for ${meta.productName}: ${tickRes.status} ${tickText}`);
+                return;
+              }
+
+              const tickJson = await tickRes.json().catch(() => ({}));
+              const status = tickJson?.data?.status;
+
+              if (['completed', 'partial', 'failed'].includes(status)) {
+                pendingJobs.delete(jobId);
+                run.startedCount += 1;
+                run.processedCount += 1;
+                run.progress = Math.round((run.processedCount / run.totalProducts) * 100);
+                const providerCount = tickJson?.data?.providers?.length || 0;
+                console.log(`[Cron] ✅ ${meta.productName}: ${status} (${providerCount} providers)`);
+                if (status === 'failed') {
+                  run.failedCount += 1;
+                  run.errors.push({
+                    productName: meta.productName,
+                    step: 'scan',
+                    error: tickJson?.data?.error || 'Scan failed',
+                  });
+                }
+              }
+            } catch (error) {
+              console.error(`[Cron] poll error for ${meta.productName}:`, error.message);
+            }
+          })
+        );
+
+        if (pendingJobs.size > 0) {
+          run.message = `Batch ${batchIndex + 1}/${chunks.length} — ${pendingJobs.size} scanning`;
+          await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+        }
+      }
+
+      if (pendingJobs.size > 0) {
+        console.warn(`[Cron] Batch ${batchIndex + 1} timed out with ${pendingJobs.size} pending jobs`);
+        for (const [, meta] of pendingJobs) {
+          run.processedCount += 1;
+          run.failedCount += 1;
+          run.errors.push({
+            productName: meta.productName,
+            step: 'timeout',
+            error: `Timed out after ${POLL_TIMEOUT_MS / 1000}s`,
+          });
+        }
+        run.progress = Math.round((run.processedCount / run.totalProducts) * 100);
+      }
 
       if (batchIndex < chunks.length - 1 && batchDelayMs > 0) {
         await new Promise((resolve) => setTimeout(resolve, batchDelayMs));
@@ -1002,11 +1051,11 @@ app.get('/', (req, res) => {
   });
 });
 
-// Cleanup old jobs every 10 minutes
+// Cleanup old jobs every minute (keep jobs for 30 minutes to allow full scan cycles)
 setInterval(() => {
-  const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
+  const thirtyMinutesAgo = Date.now() - 30 * 60 * 1000;
   for (const [jobId, job] of jobs.entries()) {
-    if (new Date(job.createdAt).getTime() < tenMinutesAgo) {
+    if (new Date(job.createdAt).getTime() < thirtyMinutesAgo) {
       jobs.delete(jobId);
     }
   }
