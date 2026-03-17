@@ -639,6 +639,7 @@ async function runCronOrchestration({
   cronSecret,
   batchSize = DEFAULT_CRON_BATCH_SIZE,
   batchDelayMs = DEFAULT_CRON_BATCH_DELAY_MS,
+  limit = 0,
 }) {
   const run = cronRuns.get(runId);
   if (!run) return;
@@ -664,9 +665,13 @@ async function runCronOrchestration({
     const productsJson = await productsRes.json();
     const settingsJson = settingsRes.ok ? await settingsRes.json() : {};
 
-    const products = productsJson?.data?.products || [];
+    let products = productsJson?.data?.products || [];
     const scanMode = settingsJson?.data?.scanMode || 'zap_then_remaining';
     const sitePreset = settingsJson?.data?.sitePreset || 'enabled';
+
+    if (limit > 0 && products.length > limit) {
+      products = products.slice(0, limit);
+    }
 
     run.totalProducts = products.length;
     run.scanMode = scanMode;
@@ -1331,6 +1336,7 @@ app.post('/cron/orchestrate', requireApiSecret, async (req, res) => {
     runId,
     appBaseUrl,
     cronSecret: process.env.CRON_SECRET,
+    limit: Number(req.body?.limit) || 0,
   });
 
   return res.json({
