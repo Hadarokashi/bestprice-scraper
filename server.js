@@ -842,9 +842,11 @@ async function runCronOrchestration({
 
 // ── Daily Report: PDF generation + email ──
 
-async function generateAndSendReport(run) {
+async function generateAndSendReport(run, { toOverride } = {}) {
   const RESEND_API_KEY = process.env.RESEND_API_KEY;
-  const REPORT_EMAIL = (process.env.REPORT_EMAIL || '').split(',').map((e) => e.trim()).filter(Boolean);
+  const REPORT_EMAIL = toOverride
+    ? [toOverride]
+    : (process.env.REPORT_EMAIL || '').split(',').map((e) => e.trim()).filter(Boolean);
 
   if (!RESEND_API_KEY || REPORT_EMAIL.length === 0) {
     console.log('[Report] Skipping — RESEND_API_KEY or REPORT_EMAIL not configured');
@@ -1395,7 +1397,7 @@ app.post('/test-report', requireApiSecret, async (req, res) => {
       completedAt: new Date().toISOString(),
     };
 
-    await generateAndSendReport(fakeRun);
+    await generateAndSendReport(fakeRun, { toOverride: req.body?.to });
     res.json({ success: true, message: `Report sent with ${productResults.length} products` });
   } catch (error) {
     console.error('[test-report]', error);
