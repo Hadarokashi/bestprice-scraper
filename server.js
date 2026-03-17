@@ -891,7 +891,7 @@ async function generateAndSendReport(run, { toOverride } = {}) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'BestPrice <onboarding@resend.dev>',
+        from: 'BestPrice <reports@sofie-and-eyal.com>',
         to: REPORT_EMAIL,
         subject: `דוח מחירים יומי — ${today} ${flagged.length > 0 ? `⚠️ ${flagged.length} חריגים` : '✅ תקין'}`,
         html: emailHtml,
