@@ -1358,6 +1358,51 @@ app.get('/cron/orchestrate/:runId', requireApiSecret, (req, res) => {
   return res.json({ success: true, data: run });
 });
 
+// Test report endpoint — generates PDF + sends email from existing cached price data
+app.post('/test-report', requireApiSecret, async (req, res) => {
+  try {
+    const appBaseUrl = req.body?.appBaseUrl || DEFAULT_APP_BASE_URL;
+    const headers = buildAppHeaders(process.env.CRON_SECRET);
+
+    const [productsRes, pricesRes] = await Promise.all([
+      fetch(`${appBaseUrl}/api/products`, { headers }),
+      fetch(`${appBaseUrl}/api/prices`, { headers }),
+    ]);
+
+    if (!productsRes.ok) throw new Error(`Products API: ${productsRes.status}`);
+    const productsJson = await productsRes.json();
+    const allProducts = productsJson?.data?.products || [];
+
+    const priceCache = pricesRes.ok ? (await pricesRes.json())?.data || {} : {};
+
+    const productResults = allProducts.map((p) => {
+      const barcode = p.barcode;
+      const rec = Number(p.recommended_price ?? p.recommendedPrice ?? 0);
+      const cached = priceCache[barcode];
+      const providers = cached?.providers || [];
+      return {
+        productName: p.name,
+        recommendedPrice: rec,
+        providers,
+        status: 'completed',
+      };
+    });
+
+    const fakeRun = {
+      productResults,
+      scanMode: 'cached_data',
+      startedAt: new Date().toISOString(),
+      completedAt: new Date().toISOString(),
+    };
+
+    await generateAndSendReport(fakeRun);
+    res.json({ success: true, message: `Report sent with ${productResults.length} products` });
+  } catch (error) {
+    console.error('[test-report]', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({
