@@ -588,7 +588,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="flex flex-col min-h-screen lg:h-screen lg:overflow-hidden">
       {/* Header - Fixed */}
       <header className="flex-shrink-0 p-4 md:p-6 pb-0">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 md:mb-6">
@@ -672,11 +672,11 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content Area - Scrollable */}
-      <div className="flex-1 min-h-0 overflow-hidden p-4 md:p-6 pt-4 md:pt-6">
+      <div className="flex-1 lg:min-h-0 lg:overflow-hidden p-4 md:p-6 pt-4 md:pt-6">
         {activeTab === 'products' ? (
-          <div className="h-full min-h-0 flex flex-col lg:flex-row gap-4 lg:gap-6">
+          <div className="lg:h-full lg:min-h-0 flex flex-col lg:flex-row gap-4 lg:gap-6">
             {/* Product table - Scrollable */}
-            <div className="flex-1 flex min-h-0 flex-col min-w-0 space-y-4 overflow-hidden">
+            <div className="flex-1 flex lg:min-h-0 flex-col min-w-0 space-y-4 lg:overflow-hidden">
               {/* Actions bar */}
               <div className="flex-shrink-0 rounded-2xl p-4 bg-[var(--card)] border border-[var(--border)] shadow-lg">
                 <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3">
@@ -760,7 +760,7 @@ export default function Dashboard() {
               </div>
 
               {/* Products table - Scrollable */}
-              <div className="flex-1 min-h-0 rounded-2xl overflow-hidden border border-[var(--border)] shadow-lg bg-[var(--card)]">
+              <div className="min-h-[60vh] lg:min-h-0 lg:flex-1 rounded-2xl overflow-hidden border border-[var(--border)] shadow-lg bg-[var(--card)]">
                 <ProductTable
                   products={filteredProducts}
                   priceData={priceData}

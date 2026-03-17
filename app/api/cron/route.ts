@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
       body: JSON.stringify({
         appBaseUrl: request.nextUrl.origin,
       }),
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(90000),
     });
 
     const orchestratorText = await orchestratorRes.text();

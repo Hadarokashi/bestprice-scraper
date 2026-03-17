@@ -272,7 +272,7 @@ export default function ProductTable({
       )}
 
       {/* Table */}
-      <div className="flex-1 min-h-0 overflow-auto touch-pan-x">
+      <div className="flex-1 min-h-0 overflow-auto">
         <table className="min-w-full">
           <thead className="sticky top-0 z-10 bg-[var(--card)] shadow-sm">
             <tr>
