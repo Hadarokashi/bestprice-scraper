@@ -65,6 +65,60 @@ function buildAppHeaders(cronSecret) {
   return headers;
 }
 
+function normalizeProviderUrl(url) {
+  return (url || '').trim();
+}
+
+function providerMatchKey(barcode, providerName, providerUrl) {
+  return `${barcode}::${providerName}::${normalizeProviderUrl(providerUrl)}`;
+}
+
+async function fetchIgnoredMatches(appBaseUrl) {
+  try {
+    const headers = buildAppHeaders(process.env.CRON_SECRET);
+    const res = await fetch(`${appBaseUrl}/api/feedback`, { headers });
+    if (!res.ok) {
+      console.warn(`[Report] Ignored matches API returned ${res.status}`);
+      return [];
+    }
+    const json = await res.json();
+    return json?.data || [];
+  } catch (error) {
+    console.warn('[Report] Failed to fetch ignored matches:', error.message || error);
+    return [];
+  }
+}
+
+function filterIgnoredProviders(providers, barcode, ignoredMatches) {
+  if (!ignoredMatches.length || !barcode) return providers;
+  const ignoredKeys = new Set(
+    ignoredMatches.map((match) =>
+      providerMatchKey(match.barcode, match.providerName, match.providerUrl)
+    )
+  );
+
+  return providers.filter(
+    (provider) =>
+      !ignoredKeys.has(providerMatchKey(barcode, provider.providerName, provider.providerUrl))
+  );
+}
+
+function applyIgnoredFiltersToRun(run, ignoredMatches) {
+  if (!ignoredMatches.length) return run;
+
+  return {
+    ...run,
+    productResults: (run.productResults || []).map((product) => ({
+      ...product,
+      providers: filterIgnoredProviders(
+        product.providers || [],
+        product.barcode,
+        ignoredMatches
+      ),
+    })),
+  };
+}
+
 function isAuthorizedRequest(req) {
   if (!SCRAPER_API_SECRET) return true;
 
@@ -737,6 +791,7 @@ async function runCronOrchestration({
           jobIds.push({
             jobId: createJson.data.id,
             productName: product.name,
+            barcode: product.barcode,
             recommendedPrice: Number(product.recommended_price ?? product.recommendedPrice ?? 0),
           });
         } catch (error) {
@@ -784,6 +839,7 @@ async function runCronOrchestration({
 
                 run.productResults.push({
                   productName: meta.productName,
+                  barcode: meta.barcode,
                   recommendedPrice: meta.recommendedPrice || 0,
                   providers,
                   status,
@@ -833,7 +889,7 @@ async function runCronOrchestration({
     run.message = `Queued ${run.queuedCount}/${run.totalProducts}, started ${run.startedCount}, failed ${run.failedCount}`;
     run.completedAt = new Date().toISOString();
 
-    generateAndSendReport(run).catch((err) =>
+    generateAndSendReport(run, { appBaseUrl: safeBaseUrl }).catch((err) =>
       console.error('[Report] Failed to send email report:', err.message || err)
     );
   } catch (error) {
@@ -853,7 +909,7 @@ async function runCronOrchestration({
 
 // ── Daily Report: PDF generation + email ──
 
-async function generateAndSendReport(run, { toOverride } = {}) {
+async function generateAndSendReport(run, { toOverride, appBaseUrl } = {}) {
   const RESEND_API_KEY = process.env.RESEND_API_KEY;
   const REPORT_EMAIL = toOverride
     ? [toOverride]
@@ -864,9 +920,13 @@ async function generateAndSendReport(run, { toOverride } = {}) {
     return;
   }
 
-  console.log(`[Report] Generating PDF for ${run.productResults.length} products…`);
+  const safeAppBaseUrl = appBaseUrl || DEFAULT_APP_BASE_URL;
+  const ignoredMatches = await fetchIgnoredMatches(safeAppBaseUrl);
+  const filteredRun = applyIgnoredFiltersToRun(run, ignoredMatches);
 
-  const html = buildReportHtml(run);
+  console.log(`[Report] Generating PDF for ${filteredRun.productResults.length} products…`);
+
+  const html = buildReportHtml(filteredRun);
 
   let browser = null;
   try {
@@ -887,13 +947,13 @@ async function generateAndSendReport(run, { toOverride } = {}) {
     const pdfBase64 = pdfBuffer.toString('base64');
     const today = new Date().toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem' });
 
-    const flagged = run.productResults.filter((p) => {
+    const flagged = filteredRun.productResults.filter((p) => {
       if (!p.providers.length || !p.recommendedPrice) return false;
       const lowest = Math.min(...p.providers.map((pr) => pr.price));
       return lowest < p.recommendedPrice * 0.99;
     });
 
-    const emailHtml = buildEmailHtml(run, flagged.length, today);
+    const emailHtml = buildEmailHtml(filteredRun, flagged.length, today);
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -1403,9 +1463,10 @@ app.post('/test-report', requireApiSecret, async (req, res) => {
     const appBaseUrl = req.body?.appBaseUrl || DEFAULT_APP_BASE_URL;
     const headers = buildAppHeaders(process.env.CRON_SECRET);
 
-    const [productsRes, pricesRes] = await Promise.all([
+    const [productsRes, pricesRes, feedbackRes] = await Promise.all([
       fetch(`${appBaseUrl}/api/products`, { headers }),
       fetch(`${appBaseUrl}/api/prices`, { headers }),
+      fetch(`${appBaseUrl}/api/feedback`, { headers }),
     ]);
 
     if (!productsRes.ok) throw new Error(`Products API: ${productsRes.status}`);
@@ -1413,14 +1474,16 @@ app.post('/test-report', requireApiSecret, async (req, res) => {
     const allProducts = productsJson?.data?.products || [];
 
     const priceCache = pricesRes.ok ? (await pricesRes.json())?.data || {} : {};
+    const ignoredMatches = feedbackRes.ok ? (await feedbackRes.json())?.data || [] : [];
 
     const productResults = allProducts.map((p) => {
       const barcode = p.barcode;
       const rec = Number(p.recommended_price ?? p.recommendedPrice ?? 0);
       const cached = priceCache[barcode];
-      const providers = cached?.providers || [];
+      const providers = filterIgnoredProviders(cached?.providers || [], barcode, ignoredMatches);
       return {
         productName: p.name,
+        barcode,
         recommendedPrice: rec,
         providers,
         status: 'completed',
@@ -1434,7 +1497,7 @@ app.post('/test-report', requireApiSecret, async (req, res) => {
       completedAt: new Date().toISOString(),
     };
 
-    await generateAndSendReport(fakeRun, { toOverride: req.body?.to });
+    await generateAndSendReport(fakeRun, { toOverride: req.body?.to, appBaseUrl });
     res.json({ success: true, message: `Report sent with ${productResults.length} products` });
   } catch (error) {
     console.error('[test-report]', error);

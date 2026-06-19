@@ -55,7 +55,8 @@ export default function ProvidersView() {
       });
       
       if (!response.ok) {
-        throw new Error('Export failed');
+        const errorResult = await response.json().catch(() => null);
+        throw new Error(errorResult?.error || `Export failed (${response.status})`);
       }
       
       const blob = await response.blob();
@@ -67,7 +68,7 @@ export default function ProvidersView() {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error exporting provider:', error);
-      alert('שגיאה בייצוא הדוח');
+      alert(error instanceof Error ? error.message : 'שגיאה בייצוא הדוח');
     } finally {
       setExporting(null);
     }

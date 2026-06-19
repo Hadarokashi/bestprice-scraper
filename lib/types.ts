@@ -206,3 +206,13 @@ export interface ProductScanState {
   lastRunAt?: string;
   cached?: boolean;
 }
+
+export interface IgnoredMatch {
+  id: number;
+  barcode: string;
+  providerName: string;
+  providerUrl: string | null;
+  reason: string | null;
+  createdAt: string;
+  productName?: string;
+}

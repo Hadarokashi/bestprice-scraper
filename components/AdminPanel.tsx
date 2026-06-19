@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import type { AppSettings, ScraperConfig, ScheduleConfig, ScheduleFrequency } from '@/lib/types';
+import type { AppSettings, IgnoredMatch, ScraperConfig, ScheduleConfig, ScheduleFrequency } from '@/lib/types';
 
 interface AdminPanelProps {
   settings: AppSettings;
+  ignoredMatches: IgnoredMatch[];
+  onRestoreIgnoredMatch: (id: number) => Promise<void>;
   onRefresh: () => Promise<void>;
   onOpenSettings: () => void;
   onSaveSettings: (patch: Partial<AppSettings>) => Promise<void>;
@@ -38,6 +40,8 @@ function toUiErrorMessage(error: unknown): string {
 
 export default function AdminPanel({
   settings,
+  ignoredMatches,
+  onRestoreIgnoredMatch,
   onRefresh,
   onOpenSettings,
   onSaveSettings,
@@ -45,6 +49,7 @@ export default function AdminPanel({
   const [scrapers, setScrapers] = useState<ScraperConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [restoringId, setRestoringId] = useState<number | null>(null);
   const [filter, setFilter] = useState<'all' | 'enabled' | 'music' | 'electronics'>('all');
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -198,6 +203,17 @@ export default function AdminPanel({
     }
   };
 
+  const handleRestoreIgnored = async (id: number) => {
+    setRestoringId(id);
+    try {
+      await onRestoreIgnoredMatch(id);
+    } catch (error) {
+      alert(toUiErrorMessage(error));
+    } finally {
+      setRestoringId(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header card */}
@@ -309,6 +325,75 @@ export default function AdminPanel({
               </span>
             )}
           </p>
+        )}
+      </div>
+
+      {/* Ignored matches */}
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-lg overflow-hidden">
+        <div className="p-4 border-b border-[var(--border)] flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-bold">🚫 תוצאות שהוסתרו</h3>
+            <p className="text-sm text-[var(--muted)] mt-1">
+              התאמות שסומנו כשגויות ולא יוצגו בדשבורד או בדוח.
+            </p>
+          </div>
+          <span className="bg-[var(--background)] px-3 py-1 rounded-full text-sm font-medium">
+            {ignoredMatches.length}
+          </span>
+        </div>
+
+        {ignoredMatches.length === 0 ? (
+          <div className="p-8 text-center text-[var(--muted)] text-sm">
+            אין תוצאות מוסתרות כרגע.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>מוצר</th>
+                  <th>ספק</th>
+                  <th>קישור</th>
+                  <th>הוסתר בתאריך</th>
+                  <th className="w-24"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {ignoredMatches.map((match) => (
+                  <tr key={match.id}>
+                    <td className="font-medium">{match.productName || match.barcode}</td>
+                    <td>{match.providerName}</td>
+                    <td>
+                      {match.providerUrl ? (
+                        <a
+                          href={match.providerUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[var(--primary)] hover:underline text-sm"
+                        >
+                          קישור
+                        </a>
+                      ) : (
+                        <span className="text-[var(--muted)] text-sm">—</span>
+                      )}
+                    </td>
+                    <td className="text-sm text-[var(--muted)]">
+                      {new Date(match.createdAt).toLocaleString('he-IL')}
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => void handleRestoreIgnored(match.id)}
+                        disabled={restoringId === match.id}
+                        className="btn-secondary text-xs py-1.5 px-2"
+                      >
+                        {restoringId === match.id ? 'משחזר...' : 'שחזר'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 

@@ -7,9 +7,10 @@ interface PriceResultsProps {
   product: Product | null;
   comparison: PriceComparison | null;
   threshold: number;
+  onDismissMatch?: (barcode: string, provider: ProviderPrice) => Promise<void>;
 }
 
-export default function PriceResults({ product, comparison, threshold }: PriceResultsProps) {
+export default function PriceResults({ product, comparison, threshold, onDismissMatch }: PriceResultsProps) {
   if (!product) {
     return (
       <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-lg p-8 text-center">
@@ -137,6 +138,11 @@ export default function PriceResults({ product, comparison, threshold }: PriceRe
                 provider={provider}
                 thresholdPrice={thresholdPrice}
                 recommendedPrice={product.recommendedPrice}
+                onDismiss={
+                  onDismissMatch
+                    ? () => onDismissMatch(product.barcode, provider)
+                    : undefined
+                }
               />
             ))}
           </div>
@@ -222,14 +228,18 @@ function ProviderCard({
   provider,
   thresholdPrice,
   recommendedPrice,
+  onDismiss,
 }: {
   provider: ProviderPrice;
   thresholdPrice: number;
   recommendedPrice: number;
+  onDismiss?: () => Promise<void>;
 }) {
   const isBelowThreshold = provider.price < thresholdPrice;
   const priceDiff = recommendedPrice - provider.price;
   const percentDiff = ((priceDiff / recommendedPrice) * 100).toFixed(1);
+  const [dismissing, setDismissing] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('he-IL', {
@@ -238,6 +248,27 @@ function ProviderCard({
       minimumFractionDigits: 0,
     }).format(price);
   };
+
+  const handleDismiss = async () => {
+    if (!onDismiss || dismissing) return;
+
+    const confirmed = window.confirm('להסתיר את התוצאה הזו? היא לא תוצג יותר עבור מוצר זה.');
+    if (!confirmed) return;
+
+    setDismissing(true);
+    try {
+      await onDismiss();
+      setDismissed(true);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'שגיאה בהסתרת התוצאה');
+    } finally {
+      setDismissing(false);
+    }
+  };
+
+  if (dismissed) {
+    return null;
+  }
 
   return (
     <div className={`p-3 rounded-lg border ${isBelowThreshold ? 'border-[var(--danger)] bg-[var(--danger)]/5' : 'border-[var(--border)] bg-[var(--background)]'}`}>
@@ -259,14 +290,29 @@ function ProviderCard({
             </a>
           )}
         </div>
-        
-        <div className="text-left">
-          <p className={`font-bold ${isBelowThreshold ? 'text-[var(--danger)]' : ''}`}>
-            {formatPrice(provider.price)}
-          </p>
-          {priceDiff > 0 && (
-            <p className="text-xs text-[var(--success)]">-{percentDiff}%</p>
+
+        <div className="flex items-center gap-2">
+          {onDismiss && (
+            <button
+              type="button"
+              onClick={handleDismiss}
+              disabled={dismissing}
+              className="text-[var(--muted)] hover:text-[var(--danger)] hover:bg-[var(--danger)]/10 rounded p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center transition-colors"
+              title="הסתר תוצאה שגויה"
+              aria-label="הסתר תוצאה שגויה"
+            >
+              {dismissing ? '…' : '✕'}
+            </button>
           )}
+        
+          <div className="text-left">
+            <p className={`font-bold ${isBelowThreshold ? 'text-[var(--danger)]' : ''}`}>
+              {formatPrice(provider.price)}
+            </p>
+            {priceDiff > 0 && (
+              <p className="text-xs text-[var(--success)]">-{percentDiff}%</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import ProductTable, { FilterType } from '@/components/ProductTable';
 import PriceResults from '@/components/PriceResults';
 import ThresholdSlider from '@/components/ThresholdSlider';
@@ -13,14 +13,17 @@ import ProvidersView from '@/components/ProvidersView';
 import AdminPanel from '@/components/AdminPanel';
 import {
   AppSettings,
+  IgnoredMatch,
   PriceComparison,
   PriceSource,
   Product,
   ProductScanState,
+  ProviderPrice,
   ScanMode,
   ScanSitePreset,
   ScheduleConfig,
 } from '@/lib/types';
+import { applyIgnoredFiltersToPriceCache } from '@/lib/ignored-matches';
 import {
   buildScanStateFromComparison,
   DEFAULT_SCAN_SETTINGS,
@@ -39,6 +42,7 @@ export default function Dashboard() {
   // State
   const [products, setProducts] = useState<Product[]>([]);
   const [priceData, setPriceData] = useState<{ [barcode: string]: PriceComparison }>({});
+  const [ignoredMatches, setIgnoredMatches] = useState<IgnoredMatch[]>([]);
   const [scanStates, setScanStates] = useState<{ [barcode: string]: ProductScanState }>({});
   const [settings, setSettings] = useState<AppSettings>(mapSettingsWithDefaults({
     threshold: 10,
@@ -66,10 +70,11 @@ export default function Dashboard() {
   const [productFilter, setProductFilter] = useState<FilterType>('all');
 
   const loadDashboardData = useCallback(async () => {
-    const [productsRes, pricesRes, settingsRes] = await Promise.all([
+    const [productsRes, pricesRes, settingsRes, feedbackRes] = await Promise.all([
       fetch('/api/products').then((r) => r.json()),
       fetch('/api/prices').then((r) => r.json()),
       fetch('/api/settings').then((r) => r.json()),
+      fetch('/api/feedback').then((r) => r.json()),
     ]);
 
     if (productsRes.success && productsRes.data) {
@@ -92,6 +97,47 @@ export default function Dashboard() {
     if (settingsRes.success && settingsRes.data) {
       setSettings(mapSettingsWithDefaults(settingsRes.data));
     }
+
+    if (feedbackRes.success && feedbackRes.data) {
+      setIgnoredMatches(feedbackRes.data);
+    }
+  }, []);
+
+  const displayPriceData = useMemo(
+    () => applyIgnoredFiltersToPriceCache(priceData, ignoredMatches, settings.threshold),
+    [priceData, ignoredMatches, settings.threshold]
+  );
+
+  const handleDismissMatch = useCallback(async (barcode: string, provider: ProviderPrice) => {
+    const response = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        barcode,
+        providerName: provider.providerName,
+        providerUrl: provider.providerUrl || '',
+      }),
+    });
+
+    const result = await response.json();
+    if (!response.ok || !result.success || !result.data) {
+      throw new Error(result.error || 'Failed to dismiss match');
+    }
+
+    setIgnoredMatches((prev) => {
+      const exists = prev.some((match) => match.id === result.data.id);
+      return exists ? prev : [result.data, ...prev];
+    });
+  }, []);
+
+  const handleRestoreIgnoredMatch = useCallback(async (id: number) => {
+    const response = await fetch(`/api/feedback?id=${id}`, { method: 'DELETE' });
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Failed to restore match');
+    }
+
+    setIgnoredMatches((prev) => prev.filter((match) => match.id !== id));
   }, []);
 
   // Load initial data
@@ -102,7 +148,7 @@ export default function Dashboard() {
   }, [loadDashboardData]);
 
   // Count flagged products
-  const flaggedCount = Object.values(priceData).reduce(
+  const flaggedCount = Object.values(displayPriceData).reduce(
     (count, comparison) => count + (comparison.flaggedProviders?.length > 0 ? 1 : 0),
     0
   );
@@ -439,7 +485,7 @@ export default function Dashboard() {
 
   // Get product status helper
   const getProductStatus = (barcode: string): 'not-searched' | 'unmatched' | 'flagged' | 'good' => {
-    const comparison = priceData[barcode];
+    const comparison = displayPriceData[barcode];
     if (!comparison) return 'not-searched';
     if (comparison.providers.length === 0) return 'unmatched';
     if (comparison.flaggedProviders && comparison.flaggedProviders.length > 0) return 'flagged';
@@ -465,7 +511,7 @@ export default function Dashboard() {
     const exportData: Array<Record<string, string | number>> = [];
 
     for (const product of productsToExport) {
-      const comparison = priceData[product.barcode];
+      const comparison = displayPriceData[product.barcode];
       const status = getProductStatus(product.barcode);
       
       if (status === 'flagged' && comparison?.flaggedProviders) {
@@ -662,7 +708,7 @@ export default function Dashboard() {
         {activeTab === 'products' && (
           <StatsPanel
             products={products}
-            priceData={priceData}
+            priceData={displayPriceData}
             threshold={settings.threshold}
             isSearching={isSearching}
             searchProgress={searchProgress}
@@ -763,7 +809,7 @@ export default function Dashboard() {
               <div className="min-h-[60vh] lg:min-h-0 lg:flex-1 rounded-2xl overflow-hidden border border-[var(--border)] shadow-lg bg-[var(--card)]">
                 <ProductTable
                   products={filteredProducts}
-                  priceData={priceData}
+                  priceData={displayPriceData}
                   scanStates={scanStates}
                   threshold={settings.threshold}
                   onCheckPrice={handleCheckPrice}
@@ -786,8 +832,9 @@ export default function Dashboard() {
               />
               <PriceResults
                 product={selectedProduct}
-                comparison={selectedProduct ? priceData[selectedProduct.barcode] : null}
+                comparison={selectedProduct ? displayPriceData[selectedProduct.barcode] : null}
                 threshold={settings.threshold}
+                onDismissMatch={handleDismissMatch}
               />
             </div>
 
@@ -817,8 +864,9 @@ export default function Dashboard() {
                   />
                   <PriceResults
                     product={selectedProduct}
-                    comparison={priceData[selectedProduct.barcode] ?? null}
+                    comparison={displayPriceData[selectedProduct.barcode] ?? null}
                     threshold={settings.threshold}
+                    onDismissMatch={handleDismissMatch}
                   />
                 </div>
               </div>
@@ -833,6 +881,8 @@ export default function Dashboard() {
           <div className="h-full overflow-y-auto">
             <AdminPanel
               settings={settings}
+              ignoredMatches={ignoredMatches}
+              onRestoreIgnoredMatch={handleRestoreIgnoredMatch}
               onRefresh={loadDashboardData}
               onOpenSettings={() => setShowSettingsModal(true)}
               onSaveSettings={async (patch) => {

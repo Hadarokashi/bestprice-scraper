@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { filterIgnoredProviders, loadIgnoredMatches } from '@/lib/ignored-matches';
 import type { ProviderPrice } from '@/lib/types';
 
 interface ProviderExportRow {
@@ -15,6 +16,15 @@ interface ProviderExportRow {
   'תאריך בדיקה': string;
 }
 
+function toNumber(value: unknown): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function escapeCsvValue(value: string): string {
+  return `"${String(value).replace(/"/g, '""')}"`;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { providerName } = await request.json();
@@ -26,42 +36,50 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Fetch all price cache entries and products
-    const { data: priceCache, error: cacheError } = await supabase
-      .from('price_cache')
-      .select('*');
+    const [cacheResult, productsResult, ignoredMatches] = await Promise.all([
+      supabase.from('price_cache').select('*'),
+      supabase.from('products').select('id, name, sku, barcode'),
+      loadIgnoredMatches().catch(() => []),
+    ]);
+
+    if (cacheResult.error) throw cacheResult.error;
+    if (productsResult.error) throw productsResult.error;
+
+    const priceCache = cacheResult.data;
+    const products = productsResult.data;
     
-    if (cacheError) throw cacheError;
-    
-    const { data: products, error: productsError } = await supabase
-      .from('products')
-      .select('id, name, sku, barcode');
-    
-    if (productsError) throw productsError;
-    
-    // Create product lookup map
-    const productMap = new Map(products?.map(p => [p.id, p]) || []);
+    const productMap = new Map(products?.map((p) => [p.id, p]) || []);
     
     const providerProducts: ProviderExportRow[] = [];
     
     for (const cache of priceCache || []) {
-      const providers = (cache.providers || []) as ProviderPrice[];
+      const providers = filterIgnoredProviders(
+        (cache.providers || []) as ProviderPrice[],
+        cache.barcode,
+        ignoredMatches
+      );
       const provider = providers.find((p) => p.providerName === providerName);
       
       if (provider) {
         const product = productMap.get(cache.product_id);
-        const threshold = cache.threshold || 10;
-        const thresholdPrice = cache.recommended_price * (1 - threshold / 100);
-        const isFlagged = provider.price < thresholdPrice;
+        const recommendedPrice = toNumber(cache.recommended_price);
+        const providerPrice = toNumber(provider.price);
+        const threshold = toNumber(cache.threshold) || 10;
+        const thresholdPrice = recommendedPrice * (1 - threshold / 100);
+        const isFlagged = providerPrice < thresholdPrice;
+        const priceDifference = recommendedPrice - providerPrice;
+        const percentDiscount = recommendedPrice > 0
+          ? ((priceDifference / recommendedPrice) * 100).toFixed(1)
+          : '0.0';
         
         providerProducts.push({
           'שם מוצר': product?.name || 'Unknown',
           'ברקוד': cache.barcode,
           'מק"ט': product?.sku || '',
-          'מחיר מומלץ': cache.recommended_price.toFixed(2),
-          'מחיר ספק': provider.price.toFixed(2),
-          'הפרש מחיר': (cache.recommended_price - provider.price).toFixed(2),
-          'אחוז הנחה': (((cache.recommended_price - provider.price) / cache.recommended_price) * 100).toFixed(1) + '%',
+          'מחיר מומלץ': recommendedPrice.toFixed(2),
+          'מחיר ספק': providerPrice.toFixed(2),
+          'הפרש מחיר': priceDifference.toFixed(2),
+          'אחוז הנחה': `${percentDiscount}%`,
           'סטטוס': isFlagged ? 'חריג' : 'תקין',
           'קישור': provider.providerUrl || '',
           'תאריך בדיקה': new Date(provider.lastUpdated || cache.last_searched).toLocaleDateString('he-IL'),
@@ -76,23 +94,27 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Generate CSV
     const headers = Object.keys(providerProducts[0]).join(',');
-    const rows = providerProducts.map(item =>
-      Object.values(item).map(v => `"${v}"`).join(',')
+    const rows = providerProducts.map((item) =>
+      Object.values(item).map((value) => escapeCsvValue(String(value))).join(',')
     );
     const csv = [headers, ...rows].join('\n');
+    const date = new Date().toISOString().split('T')[0];
+    const safeFilename = `${providerName}-report-${date}.csv`;
     
     return new NextResponse('\ufeff' + csv, {
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': `attachment; filename="${providerName}-report-${new Date().toISOString().split('T')[0]}.csv"`,
+        'Content-Disposition': `attachment; filename="${safeFilename}"; filename*=UTF-8''${encodeURIComponent(safeFilename)}`,
       },
     });
   } catch (error) {
     console.error('Error generating provider report:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to generate report' },
+      {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to generate report',
+      },
       { status: 500 }
     );
   }
