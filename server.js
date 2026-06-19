@@ -1440,6 +1440,67 @@ setInterval(() => {
   }
 }, 60 * 1000);
 
+// ── Built-in daily scheduler (Israel 5:00 AM) ──
+// More reliable than Vercel Hobby cron which goes dormant.
+function scheduleNextRun() {
+  const now = new Date();
+  const israelNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
+
+  const target = new Date(israelNow);
+  target.setHours(5, 0, 0, 0);
+
+  if (israelNow >= target) {
+    target.setDate(target.getDate() + 1);
+  }
+
+  const israelOffset = israelNow.getTime() - now.getTime();
+  const msUntilTarget = target.getTime() - israelNow.getTime();
+
+  const hours = Math.round(msUntilTarget / 3600000 * 10) / 10;
+  console.log(`[Scheduler] Next daily scan in ${hours}h (5:00 AM Israel)`);
+
+  setTimeout(async () => {
+    console.log('[Scheduler] 5:00 AM Israel — triggering daily scan');
+    try {
+      const appBaseUrl = process.env.APP_BASE_URL || DEFAULT_APP_BASE_URL;
+      const runId = generateCronRunId();
+      const run = {
+        id: runId,
+        status: 'queued',
+        message: 'Queued (self-scheduled)',
+        appBaseUrl,
+        processedCount: 0,
+        queuedCount: 0,
+        startedCount: 0,
+        failedCount: 0,
+        totalProducts: 0,
+        totalBatches: 0,
+        currentBatch: 0,
+        progress: 0,
+        errors: [],
+        productResults: [],
+        createdAt: new Date().toISOString(),
+        startedAt: null,
+        completedAt: null,
+      };
+      cronRuns.set(runId, run);
+      activeCronRunId = runId;
+
+      await runCronOrchestration({
+        runId,
+        appBaseUrl,
+        cronSecret: process.env.CRON_SECRET,
+      });
+    } catch (err) {
+      console.error('[Scheduler] Error:', err.message || err);
+    }
+
+    scheduleNextRun();
+  }, msUntilTarget);
+}
+
+scheduleNextRun();
+
 app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════════════════════════════╗
