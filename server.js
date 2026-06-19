@@ -40,7 +40,7 @@ const DEFAULT_APP_BASE_URL = 'https://price-tracker-five-beryl.vercel.app';
 const DEFAULT_CRON_BATCH_SIZE = Number(process.env.CRON_BATCH_SIZE || 2);
 const DEFAULT_CRON_BATCH_DELAY_MS = Number(process.env.CRON_BATCH_DELAY_MS || 2000);
 const POLL_INTERVAL_MS = Number(process.env.POLL_INTERVAL_MS || 10000);
-const POLL_TIMEOUT_MS = Number(process.env.POLL_TIMEOUT_MS || 900000);
+const POLL_TIMEOUT_MS = Number(process.env.POLL_TIMEOUT_MS || 1200000);
 
 function generateCronRunId() {
   return `cron_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
