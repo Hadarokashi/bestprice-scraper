@@ -88,14 +88,31 @@ export function applyIgnoredFiltersToPriceCache(
 }
 
 export async function loadIgnoredMatches(): Promise<IgnoredMatch[]> {
-  const { data, error } = await supabase
+  const withJoin = await supabase
     .from('ignored_matches')
     .select('id, barcode, provider_name, provider_url, reason, created_at, products(name)')
     .order('created_at', { ascending: false });
 
-  if (error) {
-    throw error;
+  if (!withJoin.error) {
+    return (withJoin.data || []).map((row) => rowToIgnoredMatch(row as IgnoredMatchRow));
   }
 
-  return (data || []).map((row) => rowToIgnoredMatch(row as IgnoredMatchRow));
+  const message = String(withJoin.error.message || '');
+  if (!message.includes('ignored_matches') && !message.includes('relationship')) {
+    throw withJoin.error;
+  }
+
+  const fallback = await supabase
+    .from('ignored_matches')
+    .select('id, barcode, provider_name, provider_url, reason, created_at')
+    .order('created_at', { ascending: false });
+
+  if (fallback.error) {
+    if (String(fallback.error.message || '').includes('ignored_matches')) {
+      return [];
+    }
+    throw fallback.error;
+  }
+
+  return (fallback.data || []).map((row) => rowToIgnoredMatch(row as IgnoredMatchRow));
 }
