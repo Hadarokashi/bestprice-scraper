@@ -63,7 +63,11 @@ export default function ProvidersView() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${providerName}-report-${new Date().toISOString().split('T')[0]}.csv`;
+      const disposition = response.headers.get('Content-Disposition') || '';
+      const utf8Match = disposition.match(/filename\*=UTF-8''([^;]+)/i);
+      a.download = utf8Match
+        ? decodeURIComponent(utf8Match[1])
+        : `${providerName}-report-${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
