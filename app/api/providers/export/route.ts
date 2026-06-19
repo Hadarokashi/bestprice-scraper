@@ -25,6 +25,17 @@ function escapeCsvValue(value: string): string {
   return `"${String(value).replace(/"/g, '""')}"`;
 }
 
+function toAsciiFilename(providerName: string, date: string): string {
+  const slug = providerName
+    .normalize('NFKD')
+    .replace(/[^\x00-\x7F]/g, '')
+    .replace(/[^a-zA-Z0-9._-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+
+  return `${slug || 'provider'}-report-${date}.csv`;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { providerName } = await request.json();
@@ -100,12 +111,13 @@ export async function POST(request: NextRequest) {
     );
     const csv = [headers, ...rows].join('\n');
     const date = new Date().toISOString().split('T')[0];
-    const safeFilename = `${providerName}-report-${date}.csv`;
+    const utf8Filename = `${providerName}-report-${date}.csv`;
+    const asciiFilename = toAsciiFilename(providerName, date);
     
     return new NextResponse('\ufeff' + csv, {
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': `attachment; filename="${safeFilename}"; filename*=UTF-8''${encodeURIComponent(safeFilename)}`,
+        'Content-Disposition': `attachment; filename="${asciiFilename}"; filename*=UTF-8''${encodeURIComponent(utf8Filename)}`,
       },
     });
   } catch (error) {
