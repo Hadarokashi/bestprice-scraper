@@ -291,10 +291,21 @@ async function extractPrices(page, config) {
         try {
           console.log(`[Zap] Checking model: ${modelUrl}`);
           await page.goto(modelUrl, { timeout: 15000 });
-          await page.waitForTimeout(3000); // Wait for stores list to load
+          await page.waitForTimeout(3000);
+
+          // Validate model page actually matches our product
+          const pageModelName = await page.evaluate(() => {
+            const titleEl = document.querySelector('h1, .ProductTitle, [class*="product-title"], [class*="ProductName"]');
+            return titleEl?.textContent?.trim() || document.title?.replace(/ - זאפ.*$/, '').trim() || '';
+          });
+
+          if (pageModelName && !isProductMatch(pageModelName, productName)) {
+            console.log(`[Zap] Skipping model page — "${pageModelName}" doesn't match "${productName}"`);
+            continue;
+          }
           
           // Extract all store prices from the model page
-          const storeProducts = await page.evaluate((productName) => {
+          const storeProducts = await page.evaluate((modelName) => {
             const stores = [];
             
             // Zap stores list - each store row has price and store name
@@ -326,7 +337,7 @@ async function extractPrices(page, config) {
                 
                 if (storeName && price > 50 && price < 100000) {
                   stores.push({
-                    name: productName || 'Unknown',
+                    name: modelName || 'Unknown',
                     price,
                     url,
                     seller: storeName,
@@ -344,7 +355,7 @@ async function extractPrices(page, config) {
                 
                 if (price > 50 && price < 100000) {
                   stores.push({
-                    name: productName || 'Unknown',
+                    name: modelName || 'Unknown',
                     price,
                     url: window.location.href,
                     seller: 'Zap Store',
@@ -358,7 +369,7 @@ async function extractPrices(page, config) {
               const metaDesc = document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
               const priceMatch = metaDesc.match(/מ\s*[-–]\s*(\d{2,6})/);
               if (priceMatch) {
-                const title = document.title?.replace(/ - זאפ.*$/, '').trim() || productName;
+                const title = document.title?.replace(/ - זאפ.*$/, '').trim() || modelName;
                 stores.push({
                   name: title,
                   price: parseFloat(priceMatch[1]),
@@ -369,7 +380,7 @@ async function extractPrices(page, config) {
             }
             
             return stores;
-          }, productName);
+          }, pageModelName || productName);
           
           console.log(`[Zap] Found ${storeProducts.length} stores on model page`);
           
@@ -987,22 +998,57 @@ function buildReportHtml(run) {
   const fmtPrice = (n) => n != null ? `₪${Math.round(n).toLocaleString('he-IL')}` : '—';
   const fmtPct = (n) => n != null ? `${n > 0 ? '+' : ''}${n.toFixed(1)}%` : '';
 
-  const productRows = products
+  const productCards = products
+    .filter((p) => p.providers.length > 0)
     .map((p) => {
-      const bgColor = p.isFlagged ? '#fff5f5' : p.diff !== null ? '#f0fff4' : '#fafafa';
-      const diffColor = p.isFlagged ? '#e53e3e' : '#38a169';
-      const statusDot = p.isFlagged ? '🔴' : p.diff !== null ? '🟢' : '⚪';
+      const flaggedProviders = p.providers.filter((pr) => pr.price < p.recommendedPrice * 0.99);
+      const goodProviders = p.providers.filter((pr) => pr.price >= p.recommendedPrice * 0.99);
+      const borderColor = p.isFlagged ? '#e53e3e' : '#38a169';
+      const statusIcon = p.isFlagged ? '🔴' : '🟢';
+
+      const providerRow = (pr, isFlagged) => {
+        const diff = p.recommendedPrice ? ((pr.price - p.recommendedPrice) / p.recommendedPrice * 100) : 0;
+        const color = isFlagged ? '#e53e3e' : '#38a169';
+        return `<tr>
+          <td style="padding:6px 10px;border-bottom:1px solid #f0f0f0;font-size:12px;color:#4a5568">${pr.providerName || '—'}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #f0f0f0;font-size:12px;font-weight:600;color:${color}">${fmtPrice(pr.price)}</td>
+          <td style="padding:6px 10px;border-bottom:1px solid #f0f0f0;font-size:11px;color:${color}">${fmtPct(diff)}</td>
+        </tr>`;
+      };
+
+      const providerRows = [
+        ...flaggedProviders.sort((a, b) => a.price - b.price).map((pr) => providerRow(pr, true)),
+        ...goodProviders.sort((a, b) => a.price - b.price).map((pr) => providerRow(pr, false)),
+      ].join('');
+
       return `
-      <tr style="background:${bgColor}">
-        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-size:12px">${statusDot}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-weight:500;font-size:13px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.productName}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-size:13px;text-align:center">${fmtPrice(p.recommendedPrice)}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-size:13px;text-align:center;font-weight:600;color:${p.isFlagged ? '#e53e3e' : '#2d3748'}">${fmtPrice(p.lowest)}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-size:12px;text-align:center;color:${diffColor};font-weight:600">${fmtPct(p.diff)}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-size:11px;color:#718096;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.lowestProvider?.providerName || '—'}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid #edf2f7;font-size:12px;text-align:center;color:#a0aec0">${p.providers.length}</td>
-      </tr>`;
+      <div style="background:#fff;border-radius:12px;border-right:4px solid ${borderColor};box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:14px;overflow:hidden">
+        <div style="padding:14px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #edf2f7">
+          <div>
+            <span style="font-size:13px;margin-left:6px">${statusIcon}</span>
+            <strong style="font-size:14px">${p.productName}</strong>
+          </div>
+          <div style="font-size:12px;color:#718096">
+            מומלץ: <strong>${fmtPrice(p.recommendedPrice)}</strong> | נמוך: <strong style="color:${borderColor}">${fmtPrice(p.lowest)}</strong> (${fmtPct(p.diff)})
+          </div>
+        </div>
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:#f7f8fc">
+              <th style="padding:8px 10px;font-size:10px;font-weight:600;color:#718096;text-align:right">ספק</th>
+              <th style="padding:8px 10px;font-size:10px;font-weight:600;color:#718096;text-align:right">מחיר</th>
+              <th style="padding:8px 10px;font-size:10px;font-weight:600;color:#718096;text-align:right">הפרש</th>
+            </tr>
+          </thead>
+          <tbody>${providerRows}</tbody>
+        </table>
+      </div>`;
     })
+    .join('');
+
+  const noResultsList = products
+    .filter((p) => p.providers.length === 0)
+    .map((p) => `<span style="display:inline-block;padding:4px 10px;margin:3px;background:#f7f8fc;border-radius:6px;font-size:11px;color:#a0aec0">${p.productName}</span>`)
     .join('');
 
   return `<!DOCTYPE html>
@@ -1114,23 +1160,14 @@ function buildReportHtml(run) {
     </div>
   </div>
 
-  <div class="section-title">📋 כל המוצרים</div>
-  <table>
-    <thead>
-      <tr>
-        <th></th>
-        <th>מוצר</th>
-        <th>מחיר מומלץ</th>
-        <th>מחיר נמוך</th>
-        <th>הפרש</th>
-        <th>ספק זול</th>
-        <th>ספקים</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${productRows}
-    </tbody>
-  </table>
+  <div class="section-title">📋 מוצרים — ${products.filter((p) => p.providers.length > 0).length} עם תוצאות</div>
+  ${productCards}
+
+  ${noResults.length > 0 ? `
+  <div class="section-title" style="margin-top:20px">⚪ ללא תוצאות (${noResults.length})</div>
+  <div style="background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">
+    ${noResultsList}
+  </div>` : ''}
 
   <div class="footer">
     נוצר אוטומטית ע״י BestPrice | סריקה: ${run.scanMode || 'zap_then_remaining'} | משך: ${
